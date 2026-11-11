@@ -28,3 +28,7 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## BuildSource LT
+- Account type (buyer/supplier) lives in `user_roles`, set once via the `choose_account_type` RPC or signup metadata trigger — never on profiles, to prevent role escalation.
+- Signed-in pages live under `src/routes/_authenticated/`; `/dashboard` redirects to `/onboarding` until role + company details exist.
