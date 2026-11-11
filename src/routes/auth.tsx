@@ -12,12 +12,12 @@ import { lovable } from "@/integrations/lovable/index";
 import { cn } from "@/lib/utils";
 import type { AccountType } from "@/hooks/use-account";
 
-type Search = { mode?: "signin" | "signup"; type?: AccountType };
+type Search = { mode?: "signin" | "signup" | undefined; type?: AccountType | undefined };
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): Search => ({
-    mode: s.mode === "signup" ? "signup" : s.mode === "signin" ? "signin" : undefined,
-    type: s.type === "supplier" ? "supplier" : s.type === "buyer" ? "buyer" : undefined,
+    mode: s["mode"] === "signup" ? "signup" : s["mode"] === "signin" ? "signin" : undefined,
+    type: s["type"] === "supplier" ? "supplier" : s["type"] === "buyer" ? "buyer" : undefined,
   }),
   head: () => ({
     meta: [
@@ -74,7 +74,10 @@ function AuthPage() {
   }
 
   async function forgot() {
-    if (!form.email) return toast.error("Enter your email first");
+    if (!form.email) {
+      toast.error("Enter your email first");
+      return;
+    }
     const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
@@ -84,7 +87,10 @@ function AuthPage() {
 
   async function social(provider: "google" | "lovable") {
     const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
-    if (result.error) return toast.error(result.error.message ?? "Sign-in failed");
+    if (result.error) {
+      toast.error(result.error.message ?? "Sign-in failed");
+      return;
+    }
     if (result.redirected) return;
     navigate({ to: "/dashboard" });
   }

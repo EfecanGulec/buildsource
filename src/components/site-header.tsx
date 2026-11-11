@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useHydrated } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,7 @@ export function SiteHeader() {
   const { data: account } = useAccount();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const hydrated = useHydrated();
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -34,7 +35,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <Logo />
         <nav className="flex items-center gap-2">
-          {account ? (
+          {!hydrated ? null : account ? (
             <>
               <Button asChild variant="ghost" size="sm">
                 <Link to="/dashboard">Dashboard</Link>
