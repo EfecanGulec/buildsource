@@ -29,6 +29,8 @@ import { Route as AuthenticatedAppCreateRfqRouteImport } from './routes/_authent
 import { Route as AuthenticatedSupplierIndexRouteImport } from './routes/_authenticated/supplier.index'
 import { Route as AuthenticatedSupplierSectionRouteImport } from './routes/_authenticated/supplier.$section'
 import { Route as AuthenticatedSupplierProfileRouteImport } from './routes/_authenticated/supplier.profile'
+import { Route as AuthenticatedAppRfqsIndexRouteImport } from './routes/_authenticated/app.rfqs.index'
+import { Route as AuthenticatedAppRfqsRfqIdRouteImport } from './routes/_authenticated/app.rfqs.$rfqId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -136,6 +138,18 @@ const AuthenticatedSupplierProfileRoute =
     path: '/profile',
     getParentRoute: () => AuthenticatedSupplierRoute,
   } as any)
+const AuthenticatedAppRfqsIndexRoute =
+  AuthenticatedAppRfqsIndexRouteImport.update({
+    id: '/rfqs/',
+    path: '/rfqs/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppRfqsRfqIdRoute =
+  AuthenticatedAppRfqsRfqIdRouteImport.update({
+    id: '/rfqs/$rfqId',
+    path: '/rfqs/$rfqId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -157,6 +171,8 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/supplier/': typeof AuthenticatedSupplierIndexRoute
+  '/app/rfqs/$rfqId': typeof AuthenticatedAppRfqsRfqIdRoute
+  '/app/rfqs/': typeof AuthenticatedAppRfqsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -175,6 +191,8 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/supplier': typeof AuthenticatedSupplierIndexRoute
+  '/app/rfqs/$rfqId': typeof AuthenticatedAppRfqsRfqIdRoute
+  '/app/rfqs': typeof AuthenticatedAppRfqsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -198,6 +216,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/supplier/': typeof AuthenticatedSupplierIndexRoute
+  '/_authenticated/app/rfqs/$rfqId': typeof AuthenticatedAppRfqsRfqIdRoute
+  '/_authenticated/app/rfqs/': typeof AuthenticatedAppRfqsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -221,6 +241,8 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/app/'
     | '/supplier/'
+    | '/app/rfqs/$rfqId'
+    | '/app/rfqs/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -239,6 +261,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/supplier'
+    | '/app/rfqs/$rfqId'
+    | '/app/rfqs'
   id:
     | '__root__'
     | '/'
@@ -261,6 +285,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/supplier/'
+    | '/_authenticated/app/rfqs/$rfqId'
+    | '/_authenticated/app/rfqs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -412,6 +438,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupplierProfileRouteImport
       parentRoute: typeof AuthenticatedSupplierRoute
     }
+    '/_authenticated/app/rfqs/': {
+      id: '/_authenticated/app/rfqs/'
+      path: '/rfqs'
+      fullPath: '/app/rfqs/'
+      preLoaderRoute: typeof AuthenticatedAppRfqsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/rfqs/$rfqId': {
+      id: '/_authenticated/app/rfqs/$rfqId'
+      path: '/rfqs/$rfqId'
+      fullPath: '/app/rfqs/$rfqId'
+      preLoaderRoute: typeof AuthenticatedAppRfqsRfqIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
   }
 }
 
@@ -436,12 +476,16 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSectionRoute: typeof AuthenticatedAppSectionRoute
   AuthenticatedAppCreateRfqRoute: typeof AuthenticatedAppCreateRfqRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+  AuthenticatedAppRfqsRfqIdRoute: typeof AuthenticatedAppRfqsRfqIdRoute
+  AuthenticatedAppRfqsIndexRoute: typeof AuthenticatedAppRfqsIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppSectionRoute: AuthenticatedAppSectionRoute,
   AuthenticatedAppCreateRfqRoute: AuthenticatedAppCreateRfqRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+  AuthenticatedAppRfqsRfqIdRoute: AuthenticatedAppRfqsRfqIdRoute,
+  AuthenticatedAppRfqsIndexRoute: AuthenticatedAppRfqsIndexRoute,
 }
 
 const AuthenticatedAppRouteWithChildren =
