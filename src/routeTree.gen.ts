@@ -25,6 +25,7 @@ import { Route as AuthenticatedAdminDemoDataRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminTrustScoresRouteImport } from './routes/_authenticated/admin.trust-scores'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppSectionRouteImport } from './routes/_authenticated/app.$section'
+import { Route as AuthenticatedAppCreateRfqRouteImport } from './routes/_authenticated/app.create-rfq'
 import { Route as AuthenticatedSupplierIndexRouteImport } from './routes/_authenticated/supplier.index'
 import { Route as AuthenticatedSupplierSectionRouteImport } from './routes/_authenticated/supplier.$section'
 import { Route as AuthenticatedSupplierProfileRouteImport } from './routes/_authenticated/supplier.profile'
@@ -111,6 +112,12 @@ const AuthenticatedAppSectionRoute = AuthenticatedAppSectionRouteImport.update({
   path: '/$section',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppCreateRfqRoute =
+  AuthenticatedAppCreateRfqRouteImport.update({
+    id: '/create-rfq',
+    path: '/create-rfq',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedSupplierIndexRoute =
   AuthenticatedSupplierIndexRouteImport.update({
     id: '/',
@@ -144,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
+  '/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -161,6 +169,7 @@ export interface FileRoutesByTo {
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
+  '/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -183,6 +192,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/_authenticated/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/_authenticated/app/$section': typeof AuthenticatedAppSectionRoute
+  '/_authenticated/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
   '/_authenticated/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/_authenticated/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/admin/demo-data'
     | '/admin/trust-scores'
     | '/app/$section'
+    | '/app/create-rfq'
     | '/supplier/$section'
     | '/supplier/profile'
     | '/admin/'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/admin/demo-data'
     | '/admin/trust-scores'
     | '/app/$section'
+    | '/app/create-rfq'
     | '/supplier/$section'
     | '/supplier/profile'
     | '/admin'
@@ -243,6 +255,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/demo-data'
     | '/_authenticated/admin/trust-scores'
     | '/_authenticated/app/$section'
+    | '/_authenticated/app/create-rfq'
     | '/_authenticated/supplier/$section'
     | '/_authenticated/supplier/profile'
     | '/_authenticated/admin/'
@@ -371,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSectionRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/create-rfq': {
+      id: '/_authenticated/app/create-rfq'
+      path: '/create-rfq'
+      fullPath: '/app/create-rfq'
+      preLoaderRoute: typeof AuthenticatedAppCreateRfqRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/supplier/': {
       id: '/_authenticated/supplier/'
       path: '/'
@@ -414,11 +434,13 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSectionRoute: typeof AuthenticatedAppSectionRoute
+  AuthenticatedAppCreateRfqRoute: typeof AuthenticatedAppCreateRfqRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppSectionRoute: AuthenticatedAppSectionRoute,
+  AuthenticatedAppCreateRfqRoute: AuthenticatedAppCreateRfqRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
 }
 
