@@ -10,6 +10,8 @@ import { Logo } from "@/components/site-header";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { AccountType } from "@/hooks/use-account";
 
 type Search = { mode?: "signin" | "signup" | undefined; type?: AccountType | undefined };
@@ -37,9 +39,11 @@ const GoogleG = () => (
 function AuthPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
   const [type, setType] = useState<AccountType>(search.type ?? "buyer");
-  const [form, setForm] = useState({ fullName: "", company: "", email: "", password: "" });
+  const [form, setForm] = useState({ fullName: "", company: "", companyCode: "", email: "", password: "" });
+  const [segment, setSegment] = useState<"contractor" | "designer" | "business">("contractor");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -56,7 +60,10 @@ function AuthPage() {
           password: form.password,
           options: {
             emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: { full_name: form.fullName, company_name: form.company, account_type: type },
+            data: {
+              full_name: form.fullName, company_name: form.company, company_code: form.companyCode, account_type: type,
+              ...(type === "buyer" ? { buyer_segment: segment } : {}),
+            },
           },
         });
         if (error) throw error;
@@ -163,7 +170,22 @@ function AuthPage() {
                       ))}
                     </div>
                     <Field label="Full name"><Input required value={form.fullName} onChange={set("fullName")} /></Field>
-                    <Field label="Company name"><Input required value={form.company} onChange={set("company")} /></Field>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="Company name"><Input required value={form.company} onChange={set("company")} /></Field>
+                      <Field label="Company code"><Input required inputMode="numeric" pattern="[0-9]{7,9}" title="7–9 digit įmonės kodas" placeholder="e.g. 304123456" value={form.companyCode} onChange={set("companyCode")} /></Field>
+                    </div>
+                    {type === "buyer" && (
+                      <Field label={t("segment.label")}>
+                        <Select value={segment} onValueChange={(v) => setSegment(v as typeof segment)}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {(["contractor", "designer", "business"] as const).map((s) => (
+                              <SelectItem key={s} value={s}>{t(`segment.${s}`)}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                    )}
                   </>
                 )}
                 <Field label="Work email"><Input type="email" required value={form.email} onChange={set("email")} /></Field>

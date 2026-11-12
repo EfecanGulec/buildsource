@@ -23,14 +23,16 @@ function Onboarding() {
   const navigate = useNavigate();
   const p = account?.profile;
   const [type, setType] = useState<AccountType>(account?.role ?? "buyer");
+  const c = account?.company;
   const [form, setForm] = useState({
     full_name: p?.full_name ?? "",
-    company_name: p?.company_name ?? "",
-    company_code: p?.company_code ?? "",
-    country: p?.country ?? "Lithuania",
-    city: p?.city ?? "",
+    company_name: c?.name ?? p?.company_name ?? "",
+    company_code: c?.company_code ?? p?.company_code ?? "",
+    country: c?.country ?? "LT",
+    city: c?.city ?? p?.city ?? "",
     phone: p?.phone ?? "",
   });
+  const [segment, setSegment] = useState<"contractor" | "designer" | "business">(c?.buyer_segment ?? "contractor");
   const [busy, setBusy] = useState(false);
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [k]: e.target.value });
@@ -44,7 +46,14 @@ function Onboarding() {
         const { error } = await supabase.rpc("choose_account_type", { _role: type });
         if (error) throw error;
       }
-      const { error } = await supabase.from("profiles").upsert({ id: account.user.id, ...form });
+      const { error: pErr } = await supabase
+        .from("profiles").update({ full_name: form.full_name, phone: form.phone }).eq("id", account.user.id);
+      if (pErr) throw pErr;
+      const role = account.role ?? type;
+      const { error } = await supabase.rpc("save_my_company", {
+        _name: form.company_name, _company_code: form.company_code, _city: form.city, _country: form.country,
+        ...(role === "buyer" ? { _buyer_segment: segment } : {}),
+      });
       if (error) throw error;
       await qc.invalidateQueries({ queryKey: ["account"] });
       toast.success("Company profile saved");
@@ -60,7 +69,7 @@ function Onboarding() {
     <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-2xl px-6 py-16">
-        <p className="eyebrow">Step 1 of 1</p>
+        <p className="eyebrow">Step 1 of 2</p>
         <h1 className="mt-3 text-4xl">Tell us about your company</h1>
         <p className="mt-2 text-muted-foreground">This is shared with the other party when you exchange RFQs and quotes.</p>
 
@@ -83,10 +92,22 @@ function Onboarding() {
             <F label="Your full name"><Input required value={form.full_name} onChange={set("full_name")} /></F>
             <F label="Phone"><Input value={form.phone} onChange={set("phone")} placeholder="+370…" /></F>
             <F label="Company name"><Input required value={form.company_name} onChange={set("company_name")} /></F>
-            <F label="Company code"><Input value={form.company_code} onChange={set("company_code")} /></F>
+            <F label="Company code"><Input required inputMode="numeric" pattern="[0-9]{7,9}" title="7–9 digit įmonės kodas" value={form.company_code} onChange={set("company_code")} /></F>
             <F label="Country"><Input required value={form.country} onChange={set("country")} /></F>
             <F label="City"><Input required value={form.city} onChange={set("city")} /></F>
           </div>
+          {(account?.role ?? type) === "buyer" && (
+            <F label="Buyer segment">
+              <div className="grid gap-2 sm:grid-cols-3">
+                {([["contractor", "Contractor"], ["designer", "Interior designer"], ["business", "Business"]] as const).map(([v, l]) => (
+                  <button type="button" key={v} onClick={() => setSegment(v)}
+                    className={cn("rounded-md border p-3 text-left text-sm font-semibold", segment === v ? "border-primary bg-primary/5" : "border-border")}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </F>
+          )}
           <Button type="submit" size="lg" disabled={busy} className="justify-self-start">
             {busy ? "Saving…" : "Save and continue"}
           </Button>
