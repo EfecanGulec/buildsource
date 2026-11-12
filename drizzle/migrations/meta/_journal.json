@@ -50,6 +50,13 @@
       "when": 1794526271739,
       "tag": "0006_fix_trust_score_rating",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794526609530,
+      "tag": "0007_rfq_number",
+      "breakpoints": true
     }
   ]
 }

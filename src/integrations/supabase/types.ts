@@ -1418,7 +1418,7 @@ export type Database = {
           negotiation_round_limit?: number
           project_id?: string | null
           project_type: Database["public"]["Enums"]["project_type"]
-          rfq_number: string
+          rfq_number?: string
           source?: string
           status?: Database["public"]["Enums"]["rfq_status"]
           submitted_at?: string | null
