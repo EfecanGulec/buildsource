@@ -1679,6 +1679,7 @@ export type Database = {
       quote_rfq: { Args: { _quote: string }; Returns: string }
       quote_supplier: { Args: { _quote: string }; Returns: string }
       recipient_supplier: { Args: { _rec: string }; Returns: string }
+      reset_demo_data: { Args: never; Returns: Json }
       save_my_company: {
         Args: {
           _buyer_segment?: Database["public"]["Enums"]["buyer_segment"]
