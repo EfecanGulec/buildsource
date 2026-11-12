@@ -21,6 +21,7 @@ import { Route as AuthenticatedSupplierRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedVerifyRouteImport } from './routes/_authenticated/verify'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminSectionRouteImport } from './routes/_authenticated/admin.$section'
+import { Route as AuthenticatedAdminDemoDataRouteImport } from './routes/_authenticated/admin.demo-data'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppSectionRouteImport } from './routes/_authenticated/app.$section'
 import { Route as AuthenticatedSupplierIndexRouteImport } from './routes/_authenticated/supplier.index'
@@ -86,6 +87,12 @@ const AuthenticatedAdminSectionRoute =
     path: '/$section',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminDemoDataRoute =
+  AuthenticatedAdminDemoDataRouteImport.update({
+    id: '/demo-data',
+    path: '/demo-data',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -120,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/supplier': typeof AuthenticatedSupplierRouteWithChildren
   '/verify': typeof AuthenticatedVerifyRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
+  '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -134,6 +142,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/verify': typeof AuthenticatedVerifyRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
+  '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -153,6 +162,7 @@ export interface FileRoutesById {
   '/_authenticated/supplier': typeof AuthenticatedSupplierRouteWithChildren
   '/_authenticated/verify': typeof AuthenticatedVerifyRoute
   '/_authenticated/admin/$section': typeof AuthenticatedAdminSectionRoute
+  '/_authenticated/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/_authenticated/app/$section': typeof AuthenticatedAppSectionRoute
   '/_authenticated/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/supplier'
     | '/verify'
     | '/admin/$section'
+    | '/admin/demo-data'
     | '/app/$section'
     | '/supplier/$section'
     | '/admin/'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/verify'
     | '/admin/$section'
+    | '/admin/demo-data'
     | '/app/$section'
     | '/supplier/$section'
     | '/admin'
@@ -204,6 +216,7 @@ export interface FileRouteTypes {
     | '/_authenticated/supplier'
     | '/_authenticated/verify'
     | '/_authenticated/admin/$section'
+    | '/_authenticated/admin/demo-data'
     | '/_authenticated/app/$section'
     | '/_authenticated/supplier/$section'
     | '/_authenticated/admin/'
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSectionRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/demo-data': {
+      id: '/_authenticated/admin/demo-data'
+      path: '/demo-data'
+      fullPath: '/admin/demo-data'
+      preLoaderRoute: typeof AuthenticatedAdminDemoDataRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/app/': {
       id: '/_authenticated/app/'
       path: '/'
@@ -337,11 +357,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSectionRoute: typeof AuthenticatedAdminSectionRoute
+  AuthenticatedAdminDemoDataRoute: typeof AuthenticatedAdminDemoDataRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminSectionRoute: AuthenticatedAdminSectionRoute,
+  AuthenticatedAdminDemoDataRoute: AuthenticatedAdminDemoDataRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
