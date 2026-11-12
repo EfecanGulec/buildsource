@@ -31,7 +31,8 @@ use the editor.
 
 ## BuildSource LT
 - Account type (buyer/supplier) lives in `user_roles`, set once via the `choose_account_type` RPC or signup metadata trigger — never on profiles, to prevent role escalation.
-- Signed-in pages live under `src/routes/_authenticated/`; `/dashboard` only redirects (onboarding until role + company exist, then `/app`, `/supplier` or `/admin`).
+- Signed-in pages live under `src/routes/_authenticated/`; `homeFor` in `src/lib/access.ts` decides each user's single allowed place (onboarding → verify → own area) and `requireHome` enforces it in each area's `beforeLoad`.
+- Company data lives in `companies` (linked via `profiles.company_id`); clients write it only through the `save_my_company` RPC, and `smart_id_verified` only through `mark_smart_id_verified`, because profile column grants block direct edits.
 - Area menus come from `src/lib/nav.ts`; each area has `<area>.$section.tsx` placeholders until a section gets its own route file.
 - All UI text goes through `useI18n().t` with keys in `src/lib/translations.ts` (Lithuanian falls back to English).
 - Full product spec is `docs/build-spec.md`; follow its section numbers.
