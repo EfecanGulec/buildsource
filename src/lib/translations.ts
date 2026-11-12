@@ -58,6 +58,20 @@ export const en = {
   "landing.suppliers.l1": "Qualified RFQs matched to your categories and regions",
   "landing.suppliers.l2": "Commission only on won orders",
   "landing.suppliers.l3": "Run Group Buy pools to move volume",
+  "smartid.title": "Sign with Smart-ID",
+  "smartid.cta": "Verify with Smart-ID (demo)",
+  "smartid.instructions": "Check that the code matches the one in your Smart-ID app, then enter your PIN1.",
+  "smartid.code": "Verification code",
+  "smartid.waiting": "Waiting for confirmation…",
+  "smartid.confirmed": "Confirmed",
+  "verify.step": "Last step",
+  "verify.title": "Verify your identity",
+  "verify.sub": "Buyers and suppliers on BuildSource LT confirm who they are with Smart-ID. In demo mode this takes two seconds.",
+  "verify.done": "Identity verified",
+  "segment.label": "Buyer segment",
+  "segment.contractor": "Contractor",
+  "segment.designer": "Interior designer",
+  "segment.business": "Business (restaurant, office, shop)",
 } as const;
 
 export type TKey = keyof typeof en;
