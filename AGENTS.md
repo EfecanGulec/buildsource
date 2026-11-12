@@ -36,3 +36,5 @@ use the editor.
 - Area menus come from `src/lib/nav.ts`; each area has `<area>.$section.tsx` placeholders until a section gets its own route file.
 - All UI text goes through `useI18n().t` with keys in `src/lib/translations.ts` (Lithuanian falls back to English).
 - Full product spec is `docs/build-spec.md`; follow its section numbers.
+- Demo data lives in demo companies (`companies.is_demo`); `reset_demo_data()` (service-role only) wipes and reseeds them, called by the admin-only `resetDemoData` server fn, which first creates any missing demo logins from `src/lib/demo-accounts.ts` — so reset is the single source of demo state.
+- RLS helpers (`my_company_id`, `is_rfq_buyer`, `is_rfq_supplier`, `quote_supplier`, …) are security-definer functions so cross-table policies never recurse; reuse them in new policies.
