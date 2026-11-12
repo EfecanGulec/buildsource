@@ -22,6 +22,7 @@ import { Route as AuthenticatedVerifyRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminSectionRouteImport } from './routes/_authenticated/admin.$section'
 import { Route as AuthenticatedAdminDemoDataRouteImport } from './routes/_authenticated/admin.demo-data'
+import { Route as AuthenticatedAdminTrustScoresRouteImport } from './routes/_authenticated/admin.trust-scores'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppSectionRouteImport } from './routes/_authenticated/app.$section'
 import { Route as AuthenticatedSupplierIndexRouteImport } from './routes/_authenticated/supplier.index'
@@ -93,6 +94,12 @@ const AuthenticatedAdminDemoDataRoute =
     path: '/demo-data',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminTrustScoresRoute =
+  AuthenticatedAdminTrustScoresRouteImport.update({
+    id: '/trust-scores',
+    path: '/trust-scores',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/verify': typeof AuthenticatedVerifyRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
+  '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -143,6 +151,7 @@ export interface FileRoutesByTo {
   '/verify': typeof AuthenticatedVerifyRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
+  '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -163,6 +172,7 @@ export interface FileRoutesById {
   '/_authenticated/verify': typeof AuthenticatedVerifyRoute
   '/_authenticated/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/_authenticated/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
+  '/_authenticated/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/_authenticated/app/$section': typeof AuthenticatedAppSectionRoute
   '/_authenticated/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/admin/$section'
     | '/admin/demo-data'
+    | '/admin/trust-scores'
     | '/app/$section'
     | '/supplier/$section'
     | '/admin/'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/admin/$section'
     | '/admin/demo-data'
+    | '/admin/trust-scores'
     | '/app/$section'
     | '/supplier/$section'
     | '/admin'
@@ -217,6 +229,7 @@ export interface FileRouteTypes {
     | '/_authenticated/verify'
     | '/_authenticated/admin/$section'
     | '/_authenticated/admin/demo-data'
+    | '/_authenticated/admin/trust-scores'
     | '/_authenticated/app/$section'
     | '/_authenticated/supplier/$section'
     | '/_authenticated/admin/'
@@ -324,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDemoDataRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/trust-scores': {
+      id: '/_authenticated/admin/trust-scores'
+      path: '/trust-scores'
+      fullPath: '/admin/trust-scores'
+      preLoaderRoute: typeof AuthenticatedAdminTrustScoresRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/app/': {
       id: '/_authenticated/app/'
       path: '/'
@@ -358,12 +378,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSectionRoute: typeof AuthenticatedAdminSectionRoute
   AuthenticatedAdminDemoDataRoute: typeof AuthenticatedAdminDemoDataRoute
+  AuthenticatedAdminTrustScoresRoute: typeof AuthenticatedAdminTrustScoresRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminSectionRoute: AuthenticatedAdminSectionRoute,
   AuthenticatedAdminDemoDataRoute: AuthenticatedAdminDemoDataRoute,
+  AuthenticatedAdminTrustScoresRoute: AuthenticatedAdminTrustScoresRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
