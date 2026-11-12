@@ -38,3 +38,4 @@ use the editor.
 - Full product spec is `docs/build-spec.md`; follow its section numbers.
 - Demo data lives in demo companies (`companies.is_demo`); `reset_demo_data()` (service-role only) wipes and reseeds them, called by the admin-only `resetDemoData` server fn, which first creates any missing demo logins from `src/lib/demo-accounts.ts` — so reset is the single source of demo state.
 - RLS helpers (`my_company_id`, `is_rfq_buyer`, `is_rfq_supplier`, `quote_supplier`, …) are security-definer functions so cross-table policies never recurse; reuse them in new policies.
+- Trust Score / buyer reliability are computed only in SQL (`compute_trust_score`, `compute_buyer_reliability`, `recompute_all_scores`) from orders, reviews, invitations and disputes, and triggers recompute on order completion, review insert and dispute resolution — the UI only reads `trust_scores.breakdown`, so there is one formula.
