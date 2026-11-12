@@ -46,7 +46,7 @@ export const DEMO_CAFE_ITEMS: SnapItem[] = [
   ["commercial-equipment", "Commercial dishwasher", { item: "Glass/dish washer", power: "230V", installation: true, warranty_months_min: 12 }, 1, "pcs", 0, 0.79, "Kitchen wash zone"],
   ["commercial-equipment", "Display cooler for pastries", { item: "Display cooler", dimensions: "120x70x130", installation: false }, 1, "pcs", 0, 0.72, "Front counter display — type not labelled"],
   ["commercial-equipment", "Extraction hood", { item: "Hood", dimensions: "180x90", installation: true }, 1, "pcs", 0, 0.6, "Kitchen hood size guessed from cooking line"],
-  ["roofing", "Ceramic floor tiles, kitchen", { material: "Ceramic tile", colour: "Grey anti-slip" }, 28, "m2", 10, 0.77, "Kitchen area 25.5 m² + 10% waste"],
+  ["insulation", "Acoustic wall insulation, kitchen partition", { material: "Stone wool", thickness_mm: 100 }, 28, "m2", 10, 0.77, "Partition 25.5 m² + 10% waste"],
   ["facade-systems", "Shopfront cladding panels", { system: "Cladding", finish: "Dark oak" }, 14, "m2", 5, 0.55, "Shopfront width from plan only; height assumed 3 m"],
 ].map(([category_slug, description, specs, quantity, unit, waste_pct, confidence, reasoning]) => ({
   category_slug, description, specs, quantity, unit, waste_pct, confidence, reasoning, standard: null,
