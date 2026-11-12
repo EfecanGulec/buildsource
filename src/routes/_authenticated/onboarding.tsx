@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/integrations/supabase/client";
-import { accountQuery, type AccountType } from "@/hooks/use-account";
+import { accountQuery, requireHome, type AccountType } from "@/hooks/use-account";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
+  beforeLoad: ({ context }) => requireHome(context.queryClient, "/onboarding"),
   loader: ({ context }) => context.queryClient.ensureQueryData(accountQuery),
   head: () => ({ meta: [{ title: "Set up your company — BuildSource LT" }] }),
   component: Onboarding,
