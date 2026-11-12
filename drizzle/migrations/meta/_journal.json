@@ -57,6 +57,13 @@
       "when": 1794526609530,
       "tag": "0007_rfq_number",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794527193006,
+      "tag": "0008_rfq_uploads_storage",
+      "breakpoints": true
     }
   ]
 }
