@@ -71,6 +71,13 @@
       "when": 1794527630712,
       "tag": "0009_matching_and_inbox",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794527645154,
+      "tag": "0010_fix_invite_token",
+      "breakpoints": true
     }
   ]
 }
