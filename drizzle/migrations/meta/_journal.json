@@ -8,6 +8,13 @@
       "when": 1794409987609,
       "tag": "0000_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794524763174,
+      "tag": "0001_companies_and_smart_id",
+      "breakpoints": true
     }
   ]
 }

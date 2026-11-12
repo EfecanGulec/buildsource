@@ -93,12 +93,7 @@ export function AppShell({ area, children }: { area: Area; children: ReactNode }
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="truncate">{name}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="text-xs text-muted-foreground">{t("top.switchArea")}</DropdownMenuLabel>
-                <DropdownMenuItem asChild><Link to="/app">{t("area.app")}</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/supplier">{t("area.supplier")}</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/admin">{t("area.admin")}</Link></DropdownMenuItem>
+                <DropdownMenuLabel className="truncate">{name}<span className="block text-xs font-normal text-muted-foreground">{account?.company?.name}</span></DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut}>{t("top.signOut")}</DropdownMenuItem>
               </DropdownMenuContent>

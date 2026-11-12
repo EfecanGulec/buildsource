@@ -14,41 +14,130 @@ export type Database = {
   }
   public: {
     Tables: {
+      companies: {
+        Row: {
+          address: string | null
+          bank_account_iban: string | null
+          bank_account_verified: boolean
+          buyer_segment: Database["public"]["Enums"]["buyer_segment"] | null
+          city: string | null
+          claimed_at: string | null
+          company_code: string
+          country: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_claimed: boolean
+          logo_url: string | null
+          name: string
+          type: Database["public"]["Enums"]["company_type"]
+          updated_at: string
+          vat_code: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          bank_account_iban?: string | null
+          bank_account_verified?: boolean
+          buyer_segment?: Database["public"]["Enums"]["buyer_segment"] | null
+          city?: string | null
+          claimed_at?: string | null
+          company_code: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_claimed?: boolean
+          logo_url?: string | null
+          name: string
+          type: Database["public"]["Enums"]["company_type"]
+          updated_at?: string
+          vat_code?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          bank_account_iban?: string | null
+          bank_account_verified?: boolean
+          buyer_segment?: Database["public"]["Enums"]["buyer_segment"] | null
+          city?: string | null
+          claimed_at?: string | null
+          company_code?: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_claimed?: boolean
+          logo_url?: string | null
+          name?: string
+          type?: Database["public"]["Enums"]["company_type"]
+          updated_at?: string
+          vat_code?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           city: string | null
           company_code: string | null
+          company_id: string | null
           company_name: string | null
           country: string | null
           created_at: string
+          email: string | null
           full_name: string | null
           id: string
+          language: string
           phone: string | null
+          smart_id_verified: boolean
+          smart_id_verified_at: string | null
           updated_at: string
         }
         Insert: {
           city?: string | null
           company_code?: string | null
+          company_id?: string | null
           company_name?: string | null
           country?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id: string
+          language?: string
           phone?: string | null
+          smart_id_verified?: boolean
+          smart_id_verified_at?: string | null
           updated_at?: string
         }
         Update: {
           city?: string | null
           company_code?: string | null
+          company_id?: string | null
           company_name?: string | null
           country?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id?: string
+          language?: string
           phone?: string | null
+          smart_id_verified?: boolean
+          smart_id_verified_at?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -87,9 +176,22 @@ export type Database = {
         }
         Returns: boolean
       }
+      mark_smart_id_verified: { Args: never; Returns: undefined }
+      save_my_company: {
+        Args: {
+          _buyer_segment?: Database["public"]["Enums"]["buyer_segment"]
+          _city: string
+          _company_code: string
+          _country?: string
+          _name: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "buyer" | "supplier" | "admin"
+      buyer_segment: "contractor" | "designer" | "business"
+      company_type: "buyer" | "supplier"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -218,6 +320,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["buyer", "supplier", "admin"],
+      buyer_segment: ["contractor", "designer", "business"],
+      company_type: ["buyer", "supplier"],
     },
   },
 } as const
