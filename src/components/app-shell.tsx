@@ -56,7 +56,7 @@ export function AppShell({ area, children }: { area: Area; children: ReactNode }
                   return (
                     <SidebarMenuItem key={item.slug || "home"}>
                       <SidebarMenuButton asChild isActive={active} tooltip={t(item.key)}>
-                        <Link to={href}>
+                        <Link to={href as "/app"}>
                           <item.icon />
                           <span>{t(item.key)}</span>
                         </Link>

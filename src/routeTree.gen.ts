@@ -13,8 +13,17 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedSupplierRouteImport } from './routes/_authenticated/supplier'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminSectionRouteImport } from './routes/_authenticated/admin.$section'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as AuthenticatedAppSectionRouteImport } from './routes/_authenticated/app.$section'
+import { Route as AuthenticatedSupplierIndexRouteImport } from './routes/_authenticated/supplier.index'
+import { Route as AuthenticatedSupplierSectionRouteImport } from './routes/_authenticated/supplier.$section'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -35,6 +44,16 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -45,13 +64,60 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSupplierRoute = AuthenticatedSupplierRouteImport.update({
+  id: '/supplier',
+  path: '/supplier',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminSectionRoute =
+  AuthenticatedAdminSectionRouteImport.update({
+    id: '/$section',
+    path: '/$section',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppSectionRoute = AuthenticatedAppSectionRouteImport.update({
+  id: '/$section',
+  path: '/$section',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedSupplierIndexRoute =
+  AuthenticatedSupplierIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSupplierRoute,
+  } as any)
+const AuthenticatedSupplierSectionRoute =
+  AuthenticatedSupplierSectionRouteImport.update({
+    id: '/$section',
+    path: '/$section',
+    getParentRoute: () => AuthenticatedSupplierRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/app': typeof AuthenticatedAppRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/supplier': typeof AuthenticatedSupplierRouteWithChildren
+  '/admin/$section': typeof AuthenticatedAdminSectionRoute
+  '/app/$section': typeof AuthenticatedAppSectionRoute
+  '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/app/': typeof AuthenticatedAppIndexRoute
+  '/supplier/': typeof AuthenticatedSupplierIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -59,6 +125,12 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/$section': typeof AuthenticatedAdminSectionRoute
+  '/app/$section': typeof AuthenticatedAppSectionRoute
+  '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/app': typeof AuthenticatedAppIndexRoute
+  '/supplier': typeof AuthenticatedSupplierIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -66,22 +138,65 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/supplier': typeof AuthenticatedSupplierRouteWithChildren
+  '/_authenticated/admin/$section': typeof AuthenticatedAdminSectionRoute
+  '/_authenticated/app/$section': typeof AuthenticatedAppSectionRoute
+  '/_authenticated/supplier/$section': typeof AuthenticatedSupplierSectionRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/supplier/': typeof AuthenticatedSupplierIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/reset-password' | '/dashboard' | '/onboarding'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/admin'
+    | '/app'
+    | '/dashboard'
+    | '/onboarding'
+    | '/supplier'
+    | '/admin/$section'
+    | '/app/$section'
+    | '/supplier/$section'
+    | '/admin/'
+    | '/app/'
+    | '/supplier/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/reset-password' | '/dashboard' | '/onboarding'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/onboarding'
+    | '/admin/$section'
+    | '/app/$section'
+    | '/supplier/$section'
+    | '/admin'
+    | '/app'
+    | '/supplier'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/admin'
+    | '/_authenticated/app'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
+    | '/_authenticated/supplier'
+    | '/_authenticated/admin/$section'
+    | '/_authenticated/app/$section'
+    | '/_authenticated/supplier/$section'
+    | '/_authenticated/admin/'
+    | '/_authenticated/app/'
+    | '/_authenticated/supplier/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -121,6 +236,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app': {
+      id: '/_authenticated/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthenticatedAppRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -135,17 +264,113 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/supplier': {
+      id: '/_authenticated/supplier'
+      path: '/supplier'
+      fullPath: '/supplier'
+      preLoaderRoute: typeof AuthenticatedSupplierRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/$section': {
+      id: '/_authenticated/admin/$section'
+      path: '/$section'
+      fullPath: '/admin/$section'
+      preLoaderRoute: typeof AuthenticatedAdminSectionRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/$section': {
+      id: '/_authenticated/app/$section'
+      path: '/$section'
+      fullPath: '/app/$section'
+      preLoaderRoute: typeof AuthenticatedAppSectionRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/supplier/': {
+      id: '/_authenticated/supplier/'
+      path: '/'
+      fullPath: '/supplier/'
+      preLoaderRoute: typeof AuthenticatedSupplierIndexRouteImport
+      parentRoute: typeof AuthenticatedSupplierRoute
+    }
+    '/_authenticated/supplier/$section': {
+      id: '/_authenticated/supplier/$section'
+      path: '/$section'
+      fullPath: '/supplier/$section'
+      preLoaderRoute: typeof AuthenticatedSupplierSectionRouteImport
+      parentRoute: typeof AuthenticatedSupplierRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminSectionRoute: typeof AuthenticatedAdminSectionRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminSectionRoute: AuthenticatedAdminSectionRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppSectionRoute: typeof AuthenticatedAppSectionRoute
+  AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+}
+
+const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppSectionRoute: AuthenticatedAppSectionRoute,
+  AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+}
+
+const AuthenticatedAppRouteWithChildren =
+  AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
+
+interface AuthenticatedSupplierRouteChildren {
+  AuthenticatedSupplierSectionRoute: typeof AuthenticatedSupplierSectionRoute
+  AuthenticatedSupplierIndexRoute: typeof AuthenticatedSupplierIndexRoute
+}
+
+const AuthenticatedSupplierRouteChildren: AuthenticatedSupplierRouteChildren = {
+  AuthenticatedSupplierSectionRoute: AuthenticatedSupplierSectionRoute,
+  AuthenticatedSupplierIndexRoute: AuthenticatedSupplierIndexRoute,
+}
+
+const AuthenticatedSupplierRouteWithChildren =
+  AuthenticatedSupplierRoute._addFileChildren(
+    AuthenticatedSupplierRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedSupplierRoute: typeof AuthenticatedSupplierRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedSupplierRoute: AuthenticatedSupplierRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
