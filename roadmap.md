@@ -3,5 +3,6 @@
 - [x] Step 2 – Sign-up with company code + segment, own-area restriction, demo Smart-ID
 - [x] Step 3 – full database, demo seed, admin reset
 - [x] Step 5 – Create RFQ (manual), My RFQs, RFQ detail
-- [ ] Steps 6–23 – see prompts PDF
+- [x] Step 6 – Snap & Source (AI reads plans/photos into RFQ items)
+- [ ] Steps 7–23 – see prompts PDF
 - [x] Step 4 – Trust Score from real platform data
