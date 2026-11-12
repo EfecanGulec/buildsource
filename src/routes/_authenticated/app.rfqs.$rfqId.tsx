@@ -52,7 +52,7 @@ function RfqDetail() {
 
   async function submit() {
     const { error } = await supabase.from("rfqs").update({ status: "submitted", submitted_at: new Date().toISOString() }).eq("id", rfqId);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(t("rfq.submitted").replace("{n}", rfq.rfq_number));
     qc.invalidateQueries({ queryKey: ["rfqs"] });
   }

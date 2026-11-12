@@ -3,7 +3,7 @@ export type FieldDef = { key: string; label: string; type: "select" | "text" | "
 
 /** ISO week like "2026-W48" for a yyyy-mm-dd date. */
 export function isoWeek(dateStr: string): string {
-  const [y, m, d] = dateStr.split("-").map(Number);
+  const [y = 1970, m = 1, d = 1] = dateStr.split("-").map(Number);
   const date = new Date(Date.UTC(y, m - 1, d));
   const day = date.getUTCDay() || 7;
   date.setUTCDate(date.getUTCDate() + 4 - day);
