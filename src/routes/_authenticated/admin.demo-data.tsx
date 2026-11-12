@@ -26,7 +26,7 @@ function DemoData() {
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center gap-3">
         <Database className="h-6 w-6 text-primary" />
-        <h1 className="font-heading text-2xl font-semibold">{t("nav.demoData")}</h1>
+        <h1 className="font-display text-2xl font-semibold">{t("nav.demoData")}</h1>
       </div>
       <div className="rounded-lg border bg-card p-6 space-y-4">
         <p className="text-muted-foreground">{t("demo.intro")}</p>
@@ -35,7 +35,7 @@ function DemoData() {
         </Button>
       </div>
       <div className="rounded-lg border bg-card p-6">
-        <h2 className="font-heading text-lg font-semibold mb-3">{t("demo.logins")}</h2>
+        <h2 className="font-display text-lg font-semibold mb-3">{t("demo.logins")}</h2>
         <table className="w-full text-sm">
           <tbody>
             {DEMO_ACCOUNTS.map((a) => (
