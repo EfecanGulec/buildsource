@@ -53,8 +53,11 @@ confidence is 0-1; use below 0.75 when quantities or types are guesses.`;
           }],
           text: { format: { type: "json_object" } },
         });
-        const text = (res.output ?? []).flatMap((o) => ("content" in o && Array.isArray(o.content) ? o.content : []))
-          .map((c) => (c && typeof c === "object" && "text" in c ? String(c.text) : "")).join("");
+        let text = "";
+        for (const o of (res.output ?? []) as unknown as { type?: string; content?: { type?: string; text?: string }[] }[]) {
+          if (o.type !== "message") continue;
+          for (const c of o.content ?? []) if (c.type === "output_text" && c.text) text += c.text;
+        }
         const items = parseSnapResult(text, leaf.map((c) => c.slug));
         if (items) return { items, source: "ai" };
       } catch (e) {

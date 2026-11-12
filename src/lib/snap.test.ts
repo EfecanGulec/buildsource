@@ -13,7 +13,7 @@ describe("snap & source", () => {
     expect(canConfirmAll([{ confidence: 0.6, reviewed: true }, { confidence: 0.9, reviewed: false }])).toBe(true);
   });
   it("accepts valid JSON with allowed categories", () => {
-    expect(parseSnapResult(ok, ["insulation"])?.[0].quantity).toBe(520);
+    expect(parseSnapResult(ok, ["insulation"])?.[0]?.quantity).toBe(520);
   });
   it("rejects invalid JSON and unknown categories", () => {
     expect(parseSnapResult("not json", ["insulation"])).toBeNull();
