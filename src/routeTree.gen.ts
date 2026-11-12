@@ -27,6 +27,7 @@ import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppSectionRouteImport } from './routes/_authenticated/app.$section'
 import { Route as AuthenticatedSupplierIndexRouteImport } from './routes/_authenticated/supplier.index'
 import { Route as AuthenticatedSupplierSectionRouteImport } from './routes/_authenticated/supplier.$section'
+import { Route as AuthenticatedSupplierProfileRouteImport } from './routes/_authenticated/supplier.profile'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -122,6 +123,12 @@ const AuthenticatedSupplierSectionRoute =
     path: '/$section',
     getParentRoute: () => AuthenticatedSupplierRoute,
   } as any)
+const AuthenticatedSupplierProfileRoute =
+  AuthenticatedSupplierProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedSupplierRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
+  '/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/supplier/': typeof AuthenticatedSupplierIndexRoute
@@ -154,6 +162,7 @@ export interface FileRoutesByTo {
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
+  '/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/supplier': typeof AuthenticatedSupplierIndexRoute
@@ -175,6 +184,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/_authenticated/app/$section': typeof AuthenticatedAppSectionRoute
   '/_authenticated/supplier/$section': typeof AuthenticatedSupplierSectionRoute
+  '/_authenticated/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/supplier/': typeof AuthenticatedSupplierIndexRoute
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/admin/trust-scores'
     | '/app/$section'
     | '/supplier/$section'
+    | '/supplier/profile'
     | '/admin/'
     | '/app/'
     | '/supplier/'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/admin/trust-scores'
     | '/app/$section'
     | '/supplier/$section'
+    | '/supplier/profile'
     | '/admin'
     | '/app'
     | '/supplier'
@@ -232,6 +244,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/trust-scores'
     | '/_authenticated/app/$section'
     | '/_authenticated/supplier/$section'
+    | '/_authenticated/supplier/profile'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/supplier/'
@@ -372,6 +385,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupplierSectionRouteImport
       parentRoute: typeof AuthenticatedSupplierRoute
     }
+    '/_authenticated/supplier/profile': {
+      id: '/_authenticated/supplier/profile'
+      path: '/profile'
+      fullPath: '/supplier/profile'
+      preLoaderRoute: typeof AuthenticatedSupplierProfileRouteImport
+      parentRoute: typeof AuthenticatedSupplierRoute
+    }
   }
 }
 
@@ -407,11 +427,13 @@ const AuthenticatedAppRouteWithChildren =
 
 interface AuthenticatedSupplierRouteChildren {
   AuthenticatedSupplierSectionRoute: typeof AuthenticatedSupplierSectionRoute
+  AuthenticatedSupplierProfileRoute: typeof AuthenticatedSupplierProfileRoute
   AuthenticatedSupplierIndexRoute: typeof AuthenticatedSupplierIndexRoute
 }
 
 const AuthenticatedSupplierRouteChildren: AuthenticatedSupplierRouteChildren = {
   AuthenticatedSupplierSectionRoute: AuthenticatedSupplierSectionRoute,
+  AuthenticatedSupplierProfileRoute: AuthenticatedSupplierProfileRoute,
   AuthenticatedSupplierIndexRoute: AuthenticatedSupplierIndexRoute,
 }
 
