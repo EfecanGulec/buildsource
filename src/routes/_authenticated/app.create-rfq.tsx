@@ -122,15 +122,20 @@ function CreateRfq() {
       buyer_company_id: account.company.id, project_type: projectType, title: title.trim(), description: description.trim() || null,
       delivery_city: delivery.city.trim(), delivery_address: delivery.address.trim() || null,
       delivery_date_requested: delivery.date || null, delivery_week: delivery.date ? isoWeek(delivery.date) : null,
-      status: submit ? "submitted" : "draft", submitted_at: submit ? new Date().toISOString() : null, source: fromAi ? "snap_source" : kit ? "kit" : "manual", ai_upload_urls: fromAi ? uploadPaths : [],
+      status: "draft", source: fromAi ? "snap_source" : kit ? "kit" : "manual", ai_upload_urls: fromAi ? uploadPaths : [],
     }).select("id,rfq_number").single();
     if (error || !rfq) { setSaving(false); toast.error(error?.message ?? "Error"); return; }
     const { error: e2 } = await supabase.from("rfq_items").insert(items.map((i, n) => ({
       rfq_id: rfq.id, category_id: i.category_id, description: i.description.trim(), specs: i.specs, quantity: i.quantity,
       unit: i.unit || catById.get(i.category_id)?.default_unit || null, standard: i.standard || null, waste_pct: i.waste_pct, sort_order: n + 1, buyer_confirmed: i.confirmed, ai_confidence: i.confidence,
     })));
+    if (e2) { setSaving(false); toast.error(e2.message); return; }
+    // Submitting after items exist lets the database match suppliers on the full item list.
+    if (submit) {
+      const { error: e3 } = await supabase.from("rfqs").update({ status: "submitted", submitted_at: new Date().toISOString() }).eq("id", rfq.id);
+      if (e3) { setSaving(false); toast.error(e3.message); return; }
+    }
     setSaving(false);
-    if (e2) { toast.error(e2.message); return; }
     toast.success(t(submit ? "rfq.submitted" : "rfq.saved").replace("{n}", rfq.rfq_number));
     qc.invalidateQueries({ queryKey: ["rfqs"] });
     nav({ to: "/app/rfqs/$rfqId", params: { rfqId: rfq.id } });

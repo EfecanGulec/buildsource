@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Database, RotateCcw } from "lucide-react";
+import { Clock, Database, RotateCcw } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { resetDemoData } from "@/lib/demo.functions";
@@ -22,6 +23,15 @@ function DemoData() {
     onSuccess: (r) => { toast.success(t("demo.done").replace("{n}", String(r.companies))); qc.invalidateQueries(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : String(e)),
   });
+  const sim = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc("admin_simulate_48h");
+      if (error) throw error;
+      return data as { reminders: number; rerouted: number };
+    },
+    onSuccess: (r) => { toast.success(t("demo.simulated").replace("{r}", String(r.reminders)).replace("{x}", String(r.rerouted))); qc.invalidateQueries(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : String(e)),
+  });
   return (
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center gap-3">
@@ -33,6 +43,10 @@ function DemoData() {
         <Button onClick={() => m.mutate()} disabled={m.isPending}>
           <RotateCcw className="mr-2 h-4 w-4" />{m.isPending ? t("demo.resetting") : t("demo.reset")}
         </Button>
+      </div>
+      <div className="rounded-lg border bg-card p-6 space-y-4">
+        <p className="text-muted-foreground">{t("demo.simulateHint")}</p>
+        <Button variant="outline" onClick={() => sim.mutate()} disabled={sim.isPending}><Clock className="mr-2 h-4 w-4" />{t("demo.simulate")}</Button>
       </div>
       <div className="rounded-lg border bg-card p-6">
         <h2 className="font-display text-lg font-semibold mb-3">{t("demo.logins")}</h2>
