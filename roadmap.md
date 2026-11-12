@@ -4,5 +4,6 @@
 - [x] Step 3 – full database, demo seed, admin reset
 - [x] Step 5 – Create RFQ (manual), My RFQs, RFQ detail
 - [x] Step 6 – Snap & Source (AI reads plans/photos into RFQ items)
-- [ ] Steps 7–23 – see prompts PDF
+- [x] Step 7 – Matching on submit, supplier inbox, decline + reroute, questions, admin "Simulate 48 h"
+- [ ] Steps 8–23 – see prompts PDF
 - [x] Step 4 – Trust Score from real platform data

@@ -58,7 +58,7 @@ function Inbox() {
             </tr></thead>
             <tbody>{shown.map((r) => { const f = r.rfqs!; const items = f.rfq_items; return (
               <tr key={r.id} className="border-t [&>td]:px-4 [&>td]:py-3 hover:bg-muted/50">
-                <td className="font-mono"><Link to="/supplier/inbox/$rfqId" params={{ rfqId: f.id }} className="text-primary hover:underline">{f.rfq_number}</Link></td>
+                <td className="whitespace-nowrap font-mono"><Link to="/supplier/inbox/$rfqId" params={{ rfqId: f.id }} className="text-primary hover:underline">{f.rfq_number}</Link></td>
                 <td>{f.title}</td>
                 <td>{f.companies?.name}</td>
                 <td>{f.delivery_city}</td>

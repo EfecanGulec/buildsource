@@ -78,6 +78,13 @@
       "when": 1794527645154,
       "tag": "0010_fix_invite_token",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794527823216,
+      "tag": "0011_timeouts_open_rfqs_only",
+      "breakpoints": true
     }
   ]
 }
