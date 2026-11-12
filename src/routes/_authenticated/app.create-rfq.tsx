@@ -1,7 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Building2, Check, Hammer, Package, Plus, Sofa, Store, Trash2 } from "lucide-react";
+import { Building2, Camera, Check, Hammer, Loader2, Package, Plus, Sofa, Store, Trash2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Checkbox } from "@/components/ui/checkbox";
+import { snapSource } from "@/lib/snap.functions";
+import { canConfirmAll, isLowConfidence } from "@/lib/snap";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +21,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
 
 type ProjectType = Database["public"]["Enums"]["project_type"];
-type Item = { category_id: string; description: string; specs: Record<string, string | number | boolean>; quantity: number; unit: string; standard: string; waste_pct: number };
+type Item = { category_id: string; description: string; specs: Record<string, string | number | boolean>; quantity: number; unit: string; standard: string; waste_pct: number; confidence: number | null; confirmed: boolean; reasoning?: string };
 
 export const Route = createFileRoute("/_authenticated/app/create-rfq")({
   head: () => ({ meta: [{ title: "Create RFQ — BuildSource LT" }] }),
@@ -29,7 +33,7 @@ const TYPES: { v: ProjectType; icon: typeof Hammer }[] = [
   { v: "interior_design", icon: Sofa }, { v: "business_fitout", icon: Store },
 ];
 const STEPS = ["rfq.step.project", "rfq.step.items", "rfq.step.delivery", "rfq.step.review"] as const;
-const blankItem = (): Item => ({ category_id: "", description: "", specs: {}, quantity: 1, unit: "", standard: "", waste_pct: 0 });
+const blankItem = (): Item => ({ category_id: "", description: "", specs: {}, quantity: 1, unit: "", standard: "", waste_pct: 0, confidence: null, confirmed: true });
 
 function CreateRfq() {
   const { t } = useI18n();
@@ -45,6 +49,11 @@ function CreateRfq() {
   const [kitSize, setKitSize] = useState(40);
   const [delivery, setDelivery] = useState({ city: account?.company?.city ?? "", address: "", date: "" });
   const [saving, setSaving] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
+  const [notes, setNotes] = useState("");
+  const [reading, setReading] = useState(false);
+  const [uploadPaths, setUploadPaths] = useState<string[]>([]);
+  const runSnap = useServerFn(snapSource);
 
   const refs = useQuery({
     queryKey: ["rfq-refs"],
@@ -72,7 +81,37 @@ function CreateRfq() {
     toast.success(t("rfq.kitApplied"));
   };
 
-  const itemsValid = items.length > 0 && items.every((i) => i.category_id && i.description.trim() && i.quantity > 0);
+  async function readFiles() {
+    if (!account?.company || !files.length) return;
+    setReading(true);
+    try {
+      const paths: string[] = [];
+      for (const f of files) {
+        const path = `${account.company.id}/${crypto.randomUUID()}-${f.name.replace(/[^\w.-]/g, "_")}`;
+        const { error } = await supabase.storage.from("rfq-uploads").upload(path, f, { contentType: f.type });
+        if (error) throw error;
+        paths.push(path);
+      }
+      setUploadPaths(paths);
+      const res = await runSnap({ data: { paths, projectType, notes } });
+      if (res.source === "failed" || !res.items.length) { toast.error(t("snap.failed")); return; }
+      const bySlug = new Map(cats.map((c) => [c.slug, c]));
+      setItems(res.items.map((i) => ({
+        category_id: bySlug.get(i.category_slug)?.id ?? "", description: i.description, specs: i.specs, quantity: i.quantity,
+        unit: i.unit || bySlug.get(i.category_slug)?.default_unit || "", standard: i.standard ?? "", waste_pct: i.waste_pct,
+        confidence: i.confidence, confirmed: false, reasoning: i.reasoning,
+      })));
+      if (res.source === "demo") toast.warning(t("snap.demo"));
+      else toast.success(t("snap.done").replace("{n}", String(res.items.length)));
+    } catch (e) {
+      toast.error(t("snap.failed"));
+      console.error(e);
+    } finally { setReading(false); }
+  }
+  const allReviewed = canConfirmAll(items.map((i) => ({ confidence: i.confidence, reviewed: i.confirmed })));
+  const fromAi = items.some((i) => i.confidence !== null);
+
+  const itemsValid = items.length > 0 && items.every((i) => i.category_id && i.description.trim() && i.quantity > 0 && i.confirmed);
   const canNext = [!!projectType && !!title.trim(), itemsValid, !!delivery.city.trim() && !!delivery.date, true][step];
 
   async function save(submit: boolean) {
@@ -83,12 +122,12 @@ function CreateRfq() {
       buyer_company_id: account.company.id, project_type: projectType, title: title.trim(), description: description.trim() || null,
       delivery_city: delivery.city.trim(), delivery_address: delivery.address.trim() || null,
       delivery_date_requested: delivery.date || null, delivery_week: delivery.date ? isoWeek(delivery.date) : null,
-      status: submit ? "submitted" : "draft", submitted_at: submit ? new Date().toISOString() : null, source: kit ? "kit" : "manual",
+      status: submit ? "submitted" : "draft", submitted_at: submit ? new Date().toISOString() : null, source: fromAi ? "snap_source" : kit ? "kit" : "manual", ai_upload_urls: fromAi ? uploadPaths : [],
     }).select("id,rfq_number").single();
     if (error || !rfq) { setSaving(false); toast.error(error?.message ?? "Error"); return; }
     const { error: e2 } = await supabase.from("rfq_items").insert(items.map((i, n) => ({
       rfq_id: rfq.id, category_id: i.category_id, description: i.description.trim(), specs: i.specs, quantity: i.quantity,
-      unit: i.unit || catById.get(i.category_id)?.default_unit || null, standard: i.standard || null, waste_pct: i.waste_pct, sort_order: n + 1, buyer_confirmed: true,
+      unit: i.unit || catById.get(i.category_id)?.default_unit || null, standard: i.standard || null, waste_pct: i.waste_pct, sort_order: n + 1, buyer_confirmed: i.confirmed, ai_confidence: i.confidence,
     })));
     setSaving(false);
     if (e2) { toast.error(e2.message); return; }
@@ -139,12 +178,34 @@ function CreateRfq() {
 
         {step === 1 && (<>
           <p className="text-sm text-muted-foreground">{t("rfq.itemsHint")}</p>
+          <div className="rounded-md border border-dashed border-primary/40 bg-primary/5 p-4 space-y-3">
+            <p className="flex items-center gap-2 text-sm font-medium"><Camera className="h-4 w-4 text-primary" />{t("snap.title")}</p>
+            <p className="text-xs text-muted-foreground">{t("snap.hint")}</p>
+            <Input type="file" multiple accept="image/*,application/pdf" aria-label={t("snap.title")}
+              onChange={(e) => setFiles(Array.from(e.target.files ?? []).filter((f) => f.size <= 20 * 1024 * 1024).slice(0, 5))} />
+            <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("snap.notes")} />
+            <Button onClick={readFiles} disabled={!files.length || reading}>
+              {reading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t("snap.reading")}</> : t("snap.analyse")}
+            </Button>
+          </div>
+          {fromAi && (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-muted p-3 text-sm">
+              <span>{allReviewed ? t("snap.mustConfirm") : t("snap.confirmAllHint")}</span>
+              <Button size="sm" variant="outline" disabled={!allReviewed}
+                onClick={() => setItems((xs) => xs.map((x) => ({ ...x, confirmed: true })))}><Check className="mr-1 h-4 w-4" />{t("snap.confirmAll")}</Button>
+            </div>
+          )}
           {items.map((it, i) => {
             const cat = catById.get(it.category_id);
+            const low = it.confidence !== null && isLowConfidence(it.confidence);
             return (
-              <div key={i} className="rounded-md border p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{t("rfq.item")} {i + 1}</span>
+              <div key={i} data-low={low || undefined} className={cn("rounded-md border p-4 space-y-3", low && !it.confirmed && "border-warning bg-warning/15", low && it.confirmed && "border-warning/50")}>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium">{t("rfq.item")} {i + 1}
+                    {it.confidence !== null && <span className={cn("ml-2 rounded px-1.5 py-0.5 text-xs tabular-nums", low ? "bg-warning/30" : "bg-primary/10 text-primary")}>
+                      {t("snap.confidence")} {Math.round(it.confidence * 100)}%</span>}</span>
+                  {it.confidence !== null && <label className="ml-auto flex items-center gap-2 text-sm">
+                    <Checkbox checked={it.confirmed} onCheckedChange={(v) => update(i, { confirmed: v === true })} aria-label={`${t("snap.confirm")} ${i + 1}`} />{t("snap.confirm")}</label>}
                   <Button variant="ghost" size="icon" aria-label={t("rfq.removeItem")} disabled={items.length === 1}
                     onClick={() => setItems((xs) => xs.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button>
                 </div>
@@ -161,6 +222,7 @@ function CreateRfq() {
                   <label className="space-y-1 text-sm"><span className="text-muted-foreground">{t("rfq.itemDescription")}</span>
                     <Input value={it.description} onChange={(e) => update(i, { description: e.target.value })} /></label>
                 </div>
+                {it.reasoning && <p className="text-xs text-muted-foreground">{t("snap.why")}: {it.reasoning}</p>}
                 {cat && <SpecFields template={(cat.field_template as FieldDef[]) ?? []} value={it.specs} onChange={(specs) => update(i, { specs })} />}
                 <div className="grid gap-3 sm:grid-cols-4">
                   <label className="space-y-1 text-sm"><span className="text-muted-foreground">{t("rfq.quantity")}</span>
