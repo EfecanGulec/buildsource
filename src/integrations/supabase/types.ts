@@ -1693,6 +1693,7 @@ export type Database = {
         }
         Returns: string
       }
+      seed_demo_base: { Args: never; Returns: Json }
     }
     Enums: {
       app_role: "buyer" | "supplier" | "admin"

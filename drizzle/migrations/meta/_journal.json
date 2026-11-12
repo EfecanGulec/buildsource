@@ -36,6 +36,13 @@
       "when": 1794526206944,
       "tag": "0004_trust_scores",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794526231527,
+      "tag": "0005_reset_demo_scores",
+      "breakpoints": true
     }
   ]
 }
