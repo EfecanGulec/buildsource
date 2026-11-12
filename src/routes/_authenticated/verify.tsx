@@ -24,7 +24,10 @@ function Verify() {
 
   async function confirmed() {
     const { error } = await supabase.rpc("mark_smart_id_verified");
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     await qc.invalidateQueries({ queryKey: ["account"] });
     toast.success(t("verify.done"));
     navigate({ to: "/dashboard" });
