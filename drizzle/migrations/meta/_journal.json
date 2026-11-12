@@ -29,6 +29,13 @@
       "when": 1794525600004,
       "tag": "0003_reset_demo_data",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794526206944,
+      "tag": "0004_trust_scores",
+      "breakpoints": true
     }
   ]
 }

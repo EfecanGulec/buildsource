@@ -1661,6 +1661,8 @@ export type Database = {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: undefined
       }
+      compute_buyer_reliability: { Args: { _company: string }; Returns: number }
+      compute_trust_score: { Args: { _company: string }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1679,6 +1681,7 @@ export type Database = {
       quote_rfq: { Args: { _quote: string }; Returns: string }
       quote_supplier: { Args: { _quote: string }; Returns: string }
       recipient_supplier: { Args: { _rec: string }; Returns: string }
+      recompute_all_scores: { Args: never; Returns: number }
       reset_demo_data: { Args: never; Returns: Json }
       save_my_company: {
         Args: {
