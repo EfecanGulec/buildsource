@@ -31,6 +31,8 @@ import { Route as AuthenticatedSupplierSectionRouteImport } from './routes/_auth
 import { Route as AuthenticatedSupplierProfileRouteImport } from './routes/_authenticated/supplier.profile'
 import { Route as AuthenticatedAppRfqsIndexRouteImport } from './routes/_authenticated/app.rfqs.index'
 import { Route as AuthenticatedAppRfqsRfqIdRouteImport } from './routes/_authenticated/app.rfqs.$rfqId'
+import { Route as AuthenticatedSupplierInboxIndexRouteImport } from './routes/_authenticated/supplier.inbox.index'
+import { Route as AuthenticatedSupplierInboxRfqIdRouteImport } from './routes/_authenticated/supplier.inbox.$rfqId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -150,6 +152,18 @@ const AuthenticatedAppRfqsRfqIdRoute =
     path: '/rfqs/$rfqId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedSupplierInboxIndexRoute =
+  AuthenticatedSupplierInboxIndexRouteImport.update({
+    id: '/inbox/',
+    path: '/inbox/',
+    getParentRoute: () => AuthenticatedSupplierRoute,
+  } as any)
+const AuthenticatedSupplierInboxRfqIdRoute =
+  AuthenticatedSupplierInboxRfqIdRouteImport.update({
+    id: '/inbox/$rfqId',
+    path: '/inbox/$rfqId',
+    getParentRoute: () => AuthenticatedSupplierRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -172,7 +186,9 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AuthenticatedAppIndexRoute
   '/supplier/': typeof AuthenticatedSupplierIndexRoute
   '/app/rfqs/$rfqId': typeof AuthenticatedAppRfqsRfqIdRoute
+  '/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/app/rfqs/': typeof AuthenticatedAppRfqsIndexRoute
+  '/supplier/inbox/': typeof AuthenticatedSupplierInboxIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -192,7 +208,9 @@ export interface FileRoutesByTo {
   '/app': typeof AuthenticatedAppIndexRoute
   '/supplier': typeof AuthenticatedSupplierIndexRoute
   '/app/rfqs/$rfqId': typeof AuthenticatedAppRfqsRfqIdRoute
+  '/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/app/rfqs': typeof AuthenticatedAppRfqsIndexRoute
+  '/supplier/inbox': typeof AuthenticatedSupplierInboxIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -217,7 +235,9 @@ export interface FileRoutesById {
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/supplier/': typeof AuthenticatedSupplierIndexRoute
   '/_authenticated/app/rfqs/$rfqId': typeof AuthenticatedAppRfqsRfqIdRoute
+  '/_authenticated/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/_authenticated/app/rfqs/': typeof AuthenticatedAppRfqsIndexRoute
+  '/_authenticated/supplier/inbox/': typeof AuthenticatedSupplierInboxIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -242,7 +262,9 @@ export interface FileRouteTypes {
     | '/app/'
     | '/supplier/'
     | '/app/rfqs/$rfqId'
+    | '/supplier/inbox/$rfqId'
     | '/app/rfqs/'
+    | '/supplier/inbox/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -262,7 +284,9 @@ export interface FileRouteTypes {
     | '/app'
     | '/supplier'
     | '/app/rfqs/$rfqId'
+    | '/supplier/inbox/$rfqId'
     | '/app/rfqs'
+    | '/supplier/inbox'
   id:
     | '__root__'
     | '/'
@@ -286,7 +310,9 @@ export interface FileRouteTypes {
     | '/_authenticated/app/'
     | '/_authenticated/supplier/'
     | '/_authenticated/app/rfqs/$rfqId'
+    | '/_authenticated/supplier/inbox/$rfqId'
     | '/_authenticated/app/rfqs/'
+    | '/_authenticated/supplier/inbox/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -452,6 +478,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRfqsRfqIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/supplier/inbox/': {
+      id: '/_authenticated/supplier/inbox/'
+      path: '/inbox'
+      fullPath: '/supplier/inbox/'
+      preLoaderRoute: typeof AuthenticatedSupplierInboxIndexRouteImport
+      parentRoute: typeof AuthenticatedSupplierRoute
+    }
+    '/_authenticated/supplier/inbox/$rfqId': {
+      id: '/_authenticated/supplier/inbox/$rfqId'
+      path: '/inbox/$rfqId'
+      fullPath: '/supplier/inbox/$rfqId'
+      preLoaderRoute: typeof AuthenticatedSupplierInboxRfqIdRouteImport
+      parentRoute: typeof AuthenticatedSupplierRoute
+    }
   }
 }
 
@@ -495,12 +535,16 @@ interface AuthenticatedSupplierRouteChildren {
   AuthenticatedSupplierSectionRoute: typeof AuthenticatedSupplierSectionRoute
   AuthenticatedSupplierProfileRoute: typeof AuthenticatedSupplierProfileRoute
   AuthenticatedSupplierIndexRoute: typeof AuthenticatedSupplierIndexRoute
+  AuthenticatedSupplierInboxRfqIdRoute: typeof AuthenticatedSupplierInboxRfqIdRoute
+  AuthenticatedSupplierInboxIndexRoute: typeof AuthenticatedSupplierInboxIndexRoute
 }
 
 const AuthenticatedSupplierRouteChildren: AuthenticatedSupplierRouteChildren = {
   AuthenticatedSupplierSectionRoute: AuthenticatedSupplierSectionRoute,
   AuthenticatedSupplierProfileRoute: AuthenticatedSupplierProfileRoute,
   AuthenticatedSupplierIndexRoute: AuthenticatedSupplierIndexRoute,
+  AuthenticatedSupplierInboxRfqIdRoute: AuthenticatedSupplierInboxRfqIdRoute,
+  AuthenticatedSupplierInboxIndexRoute: AuthenticatedSupplierInboxIndexRoute,
 }
 
 const AuthenticatedSupplierRouteWithChildren =

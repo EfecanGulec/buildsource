@@ -84,7 +84,8 @@ function RfqDetail() {
                   <td className="w-10 tabular-nums text-muted-foreground">#{r.rank}</td>
                   <td>{r.companies?.name}<div className="text-xs text-muted-foreground">{r.companies?.city}</div></td>
                   <td>{s && <TrustBadge score={s.score} breakdown={s.breakdown as Breakdown} dataDate={s.public_data_date} />}</td>
-                  <td><StatusBadge kind="recipient" status={r.status} /></td>
+                  <td><StatusBadge kind="recipient" status={r.status} />
+                    {r.decline_reason && <div className="mt-1 text-xs text-muted-foreground">{t(`reason.${r.decline_reason}` as TKey)}{r.decline_message && ` — ${r.decline_message}`}</div>}</td>
                 </tr>); })}
             </tbody></table>)}
         </TabsContent>

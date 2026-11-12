@@ -1657,6 +1657,17 @@ export type Database = {
       }
     }
     Functions: {
+      _invite_supplier: {
+        Args: {
+          _claimed: boolean
+          _rank: number
+          _rfq: string
+          _score: number
+          _supplier: string
+        }
+        Returns: undefined
+      }
+      admin_simulate_48h: { Args: never; Returns: Json }
       choose_account_type: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: undefined
@@ -1675,13 +1686,24 @@ export type Database = {
       is_rfq_buyer: { Args: { _rfq: string }; Returns: boolean }
       is_rfq_supplier: { Args: { _rfq: string }; Returns: boolean }
       mark_smart_id_verified: { Args: never; Returns: undefined }
+      match_rfq: { Args: { _rfq: string }; Returns: number }
       my_company_id: { Args: never; Returns: string }
       pool_joined_qty: { Args: { _pool: string }; Returns: number }
       pool_owner: { Args: { _pool: string }; Returns: string }
+      process_rfq_timeouts: { Args: { _offset?: string }; Returns: Json }
       quote_rfq: { Args: { _quote: string }; Returns: string }
       quote_supplier: { Args: { _quote: string }; Returns: string }
+      rank_rfq_candidates: {
+        Args: { _rfq: string }
+        Returns: {
+          is_claimed: boolean
+          match_score: number
+          supplier_company_id: string
+        }[]
+      }
       recipient_supplier: { Args: { _rec: string }; Returns: string }
       recompute_all_scores: { Args: never; Returns: number }
+      reroute_rfq: { Args: { _rfq: string }; Returns: string }
       reset_demo_data: { Args: never; Returns: Json }
       save_my_company: {
         Args: {
@@ -1694,6 +1716,15 @@ export type Database = {
         Returns: string
       }
       seed_demo_base: { Args: never; Returns: Json }
+      supplier_decline_rfq: {
+        Args: {
+          _message: string
+          _reason: Database["public"]["Enums"]["decline_reason"]
+          _rfq: string
+        }
+        Returns: undefined
+      }
+      supplier_view_rfq: { Args: { _rfq: string }; Returns: undefined }
     }
     Enums: {
       app_role: "buyer" | "supplier" | "admin"
