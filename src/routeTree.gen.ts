@@ -23,6 +23,7 @@ import { Route as QTokenRouteImport } from './routes/q.$token'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminSectionRouteImport } from './routes/_authenticated/admin.$section'
 import { Route as AuthenticatedAdminDemoDataRouteImport } from './routes/_authenticated/admin.demo-data'
+import { Route as AuthenticatedAdminDisputesRouteImport } from './routes/_authenticated/admin.disputes'
 import { Route as AuthenticatedAdminTrustScoresRouteImport } from './routes/_authenticated/admin.trust-scores'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppSectionRouteImport } from './routes/_authenticated/app.$section'
@@ -111,6 +112,12 @@ const AuthenticatedAdminDemoDataRoute =
   AuthenticatedAdminDemoDataRouteImport.update({
     id: '/demo-data',
     path: '/demo-data',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminDisputesRoute =
+  AuthenticatedAdminDisputesRouteImport.update({
+    id: '/disputes',
+    path: '/disputes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminTrustScoresRoute =
@@ -232,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/q/$token': typeof QTokenRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
+  '/admin/disputes': typeof AuthenticatedAdminDisputesRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
   '/app/compare': typeof AuthenticatedAppCompareRoute
@@ -262,6 +270,7 @@ export interface FileRoutesByTo {
   '/q/$token': typeof QTokenRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
+  '/admin/disputes': typeof AuthenticatedAdminDisputesRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
   '/app/compare': typeof AuthenticatedAppCompareRoute
@@ -297,6 +306,7 @@ export interface FileRoutesById {
   '/q/$token': typeof QTokenRoute
   '/_authenticated/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/_authenticated/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
+  '/_authenticated/admin/disputes': typeof AuthenticatedAdminDisputesRoute
   '/_authenticated/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/_authenticated/app/$section': typeof AuthenticatedAppSectionRoute
   '/_authenticated/app/compare': typeof AuthenticatedAppCompareRoute
@@ -332,6 +342,7 @@ export interface FileRouteTypes {
     | '/q/$token'
     | '/admin/$section'
     | '/admin/demo-data'
+    | '/admin/disputes'
     | '/admin/trust-scores'
     | '/app/$section'
     | '/app/compare'
@@ -362,6 +373,7 @@ export interface FileRouteTypes {
     | '/q/$token'
     | '/admin/$section'
     | '/admin/demo-data'
+    | '/admin/disputes'
     | '/admin/trust-scores'
     | '/app/$section'
     | '/app/compare'
@@ -396,6 +408,7 @@ export interface FileRouteTypes {
     | '/q/$token'
     | '/_authenticated/admin/$section'
     | '/_authenticated/admin/demo-data'
+    | '/_authenticated/admin/disputes'
     | '/_authenticated/admin/trust-scores'
     | '/_authenticated/app/$section'
     | '/_authenticated/app/compare'
@@ -523,6 +536,13 @@ declare module '@tanstack/react-router' {
       path: '/demo-data'
       fullPath: '/admin/demo-data'
       preLoaderRoute: typeof AuthenticatedAdminDemoDataRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/disputes': {
+      id: '/_authenticated/admin/disputes'
+      path: '/disputes'
+      fullPath: '/admin/disputes'
+      preLoaderRoute: typeof AuthenticatedAdminDisputesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/trust-scores': {
@@ -657,6 +677,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSectionRoute: typeof AuthenticatedAdminSectionRoute
   AuthenticatedAdminDemoDataRoute: typeof AuthenticatedAdminDemoDataRoute
+  AuthenticatedAdminDisputesRoute: typeof AuthenticatedAdminDisputesRoute
   AuthenticatedAdminTrustScoresRoute: typeof AuthenticatedAdminTrustScoresRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -664,6 +685,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminSectionRoute: AuthenticatedAdminSectionRoute,
   AuthenticatedAdminDemoDataRoute: AuthenticatedAdminDemoDataRoute,
+  AuthenticatedAdminDisputesRoute: AuthenticatedAdminDisputesRoute,
   AuthenticatedAdminTrustScoresRoute: AuthenticatedAdminTrustScoresRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
