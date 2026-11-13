@@ -162,6 +162,13 @@
       "when": 1794534285919,
       "tag": "0022_supplier_earnings",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1794534691383,
+      "tag": "0023_integration_framework",
+      "breakpoints": true
     }
   ]
 }
