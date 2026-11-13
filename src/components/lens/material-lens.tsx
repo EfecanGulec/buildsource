@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAccount } from "@/hooks/use-account";
 import { useI18n } from "@/lib/i18n";
 import { identifyMaterial, type LensResponse } from "@/lib/lens.functions";
-import { LENS_MAX_PHOTOS, LENS_MAX_PX } from "@/lib/lens";
+import { LENS_MAX_PHOTOS, LENS_MAX_PX, lensCanSubmit } from "@/lib/lens";
 import { prepPhoto } from "@/lib/image-prep";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +29,7 @@ export function LensButton({ variant = "ghost", label }: { variant?: "ghost" | "
   </>);
 }
 
-export function MaterialLensDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: boolean; onOpenChange: (o: boolean) => void; onAskInChat?: ((text: string) => void) | undefined }) {
   const { t, lang } = useI18n();
   const nav = useNavigate();
   const { data: account } = useAccount();
@@ -42,9 +42,15 @@ export function MaterialLensDialog({ open, onOpenChange }: { open: boolean; onOp
   const [slug, setSlug] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [chosen, setChosen] = useState<string[]>([]);
+  const [targetRfq, setTargetRfq] = useState("");
+  const [qty, setQty] = useState(0);
   const previews = files.map((f) => URL.createObjectURL(f));
   const isSupplier = account?.role === "supplier";
 
+  const drafts = useQuery({
+    queryKey: ["lens-drafts", account?.company?.id], enabled: !!res && !isSupplier && !onAskInChat,
+    queryFn: async () => (await supabase.from("rfqs").select("id,rfq_number,title").eq("buyer_company_id", account!.company!.id).eq("status", "draft").order("created_at", { ascending: false }).limit(10)).data ?? [],
+  });
   const suppliers = useQuery({
     queryKey: ["lens-suppliers", slug, account?.company?.city],
     enabled: !!slug,
@@ -93,6 +99,25 @@ export function MaterialLensDialog({ open, onOpenChange }: { open: boolean; onOp
   }
   async function save() {
     try { await persist({ saved: true }); toast.success(t("lens.saved")); } catch { toast.error(t("lens.failed")); }
+  }
+  async function addToRfq() {
+    const rfq = drafts.data?.find((d) => d.id === targetRfq);
+    if (!rfq || !lensCanSubmit(qty)) return;
+    const { data: cat } = await supabase.from("categories").select("id,default_unit").eq("slug", slug!).maybeSingle();
+    const { count } = await supabase.from("rfq_items").select("id", { count: "exact", head: true }).eq("rfq_id", rfq.id);
+    const { error } = await supabase.from("rfq_items").insert({ rfq_id: rfq.id, category_id: cat?.id ?? null, description: name, specs: specs as never,
+      quantity: qty, unit: res?.result.rfq_item_draft?.unit || cat?.default_unit || null, standard: res?.result.standards_to_ask_for[0] ?? null,
+      sort_order: (count ?? 0) + 1, buyer_confirmed: true, ai_confidence: res?.result.confidence ?? null });
+    if (error) { toast.error(error.message); return; }
+    try { await persist({ saved: true }); } catch { /* scan already stored */ }
+    toast.success(t("lens.added").replace("{n}", rfq.rfq_number));
+    onOpenChange(false); nav({ to: "/app/rfqs/$rfqId", params: { rfqId: rfq.id } });
+  }
+  function askChat() {
+    const sp = Object.entries(specs).map(([k, v]) => `${k}: ${v}`).join(", ");
+    onAskInChat?.(t("lens.chatSummary").replace("{name}", name).replace("{specs}", sp || "—"));
+    persist({ saved: true }).catch(() => undefined);
+    onOpenChange(false);
   }
   const pickAlt = (a: { item_name: string; category_slug: string | null }) => { setName(a.item_name); setSlug(a.category_slug); };
   const toggle = (id: string) => setChosen((c) => c.includes(id) ? c.filter((x) => x !== id) : [...c, id]);
@@ -181,11 +206,25 @@ export function MaterialLensDialog({ open, onOpenChange }: { open: boolean; onOp
           </div>)}
 
           <div className="flex flex-wrap gap-2">
-            {!isSupplier && slug && <Button onClick={requestOffers}><Send className="mr-2 h-4 w-4" />{t("lens.request")}</Button>}
+            {onAskInChat && r.status !== "not_a_material" && <Button onClick={askChat}><Send className="mr-2 h-4 w-4" />{t("lens.askChat")}</Button>}
+            {!isSupplier && !onAskInChat && slug && <Button onClick={requestOffers}><Send className="mr-2 h-4 w-4" />{t("lens.request")}</Button>}
             {isSupplier && <Button variant="outline" onClick={() => { onOpenChange(false); nav({ to: "/supplier/catalogue" }); }}><Package className="mr-2 h-4 w-4" />{t("lens.addCatalogue")}</Button>}
             <Button variant="outline" onClick={save}><Bookmark className="mr-2 h-4 w-4" />{t("lens.save")}</Button>
             <Button variant="ghost" onClick={() => { setRes(null); setFiles([]); setSlug(null); }}>{t("lens.again")}</Button>
           </div>
+          {!isSupplier && !onAskInChat && slug && (
+            <div className="space-y-2 rounded-md border p-3">
+              <p className="text-sm font-medium">{t("lens.addExisting")}</p>
+              {drafts.data?.length === 0 ? <p className="text-xs text-muted-foreground">{t("lens.noDrafts")}</p> : (
+                <div className="flex flex-wrap items-end gap-2">
+                  <select aria-label={t("lens.chooseRfq")} value={targetRfq} onChange={(e) => setTargetRfq(e.target.value)} className="h-9 flex-1 rounded-md border bg-background px-2 text-sm">
+                    <option value="">{t("lens.chooseRfq")}</option>
+                    {drafts.data?.map((d) => <option key={d.id} value={d.id}>{d.rfq_number} · {d.title}</option>)}
+                  </select>
+                  <Input type="number" min={0} aria-label={t("lens.qty")} placeholder={t("lens.qty")} className="h-9 w-28" value={qty || ""} onChange={(e) => setQty(Number(e.target.value))} />
+                  <Button size="sm" variant="outline" onClick={addToRfq} disabled={!targetRfq || !lensCanSubmit(qty)}>{t("lens.addExisting")}</Button>
+                </div>)}
+            </div>)}
           <p className="text-xs text-muted-foreground">{t("ai.label")}</p>
         </div>)}
       </DialogContent>
