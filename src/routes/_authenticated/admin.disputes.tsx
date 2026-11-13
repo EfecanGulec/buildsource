@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { StatusBadge } from "@/components/rfq/status-badge";
 import { eur } from "@/components/rfq/quote-thread";
 import { PhotoStrip } from "@/components/order/photos";
+import { QueryState } from "@/components/query-state";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import type { TKey } from "@/lib/translations";
@@ -37,6 +38,7 @@ function AdminDisputes() {
   return (
     <div className="max-w-4xl space-y-6">
       <h1 className="font-display text-2xl font-semibold">{t("nav.disputes")}</h1>
+      <QueryState isLoading={q.isLoading} error={q.error} onRetry={() => q.refetch()} />
       {q.data?.length === 0 && <p className="rounded-lg border bg-card p-8 text-center text-muted-foreground">{t("adm.disputes.empty")}</p>}
       {(q.data ?? []).map((d) => <DisputeCard key={d.id} d={d} />)}
     </div>

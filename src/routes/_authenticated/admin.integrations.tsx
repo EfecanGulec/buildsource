@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { QueryState } from "@/components/query-state";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { SERVICES, type Service } from "@/lib/connectors/services";
@@ -59,6 +60,7 @@ function Integrations() {
         <h1 className="font-display text-2xl font-semibold">{t("nav.integrations")}</h1>
         <p className="text-sm text-muted-foreground">{t("int.intro")}</p>
       </div>
+      <QueryState isLoading={rows.isLoading} error={rows.error} onRetry={() => rows.refetch()} />
       <div className="overflow-x-auto rounded-lg border bg-card">
         <table className="w-full text-sm">
           <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
