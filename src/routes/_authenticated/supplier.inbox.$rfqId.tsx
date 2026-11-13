@@ -15,6 +15,7 @@ import { QuoteThread, type ThreadVersion } from "@/components/rfq/quote-thread";
 import { nextActions } from "@/lib/quote";
 import { specsSummary } from "@/components/rfq/spec-fields";
 import { supabase } from "@/integrations/supabase/client";
+import { ScanPhotos } from "@/components/lens/scan-photos";
 import { useAccount } from "@/hooks/use-account";
 import { useI18n } from "@/lib/i18n";
 import type { TKey } from "@/lib/translations";
@@ -122,6 +123,7 @@ function SupplierRfq() {
   return (
     <div className="max-w-5xl space-y-6">
       <Link to="/supplier/inbox" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />{t("nav.inbox")}</Link>
+      <ScanPhotos rfqId={rfq.id} />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="font-mono text-sm text-muted-foreground">{rfq.rfq_number}</p>
