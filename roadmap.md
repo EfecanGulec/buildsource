@@ -24,3 +24,5 @@
 - [ ] Step 21 – Live Smart-ID — blocked: needs identity provider account + key
 - [ ] Step 22 – Live payments — blocked: user chose to wait
 - [x] Step 4 – Trust Score from real platform data
+- [x] AI chat assistant: private ✦ AI panel, @AI shared replies, drafts fill offer forms
+- [ ] AI: TC26–TC30 on Go-live page, Material Lens photo feature

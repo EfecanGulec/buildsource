@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { StatusBadge } from "@/components/rfq/status-badge";
 import { ChatPanel } from "@/components/rfq/chat-panel";
 import { OfferForm, type Offer } from "@/components/rfq/offer-form";
+import type { OfferDraft } from "@/lib/ai-agent";
 import { QuoteThread, type ThreadVersion } from "@/components/rfq/quote-thread";
 import { nextActions } from "@/lib/quote";
 import { specsSummary } from "@/components/rfq/spec-fields";
@@ -39,6 +40,9 @@ function SupplierRfq() {
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);
   const [quoting, setQuoting] = useState(false);
+  const [draft, setDraft] = useState<OfferDraft | null>(null);
+  const [draftKey, setDraftKey] = useState(0);
+  const useDraft = (d: OfferDraft) => { setDraft(d); setDraftKey((k) => k + 1); setQuoting(true); };
 
   const q = useQuery({
     queryKey: ["supplier-rfq", rfqId],
@@ -172,12 +176,12 @@ function SupplierRfq() {
       {quoting && (
         <div className="rounded-lg border bg-card p-6 space-y-4">
           <h2 className="font-display text-lg font-semibold">{quote ? t("quote.revise") : t("quote.yourQuote")}</h2>
-          <OfferForm items={items} hints={hints} initial={last} submitLabel={quote ? t("quote.revise") : t("quote.send")} onSubmit={sendOffer} onCancel={() => setQuoting(false)} />
+          <OfferForm key={draftKey} items={items} hints={hints} initial={draft ? fromDraft(last, draft) : last} draftMessage={draft?.message} submitLabel={quote ? t("quote.revise") : t("quote.send")} onSubmit={sendOffer} onCancel={() => setQuoting(false)} />
         </div>
       )}
 
       <div className="rounded-lg border bg-card p-6">
-        <ChatPanel rfqId={rfqId} recipientId={rec.id} viewer="supplier" canSend={rec.status !== "declined" && rec.status !== "rerouted"} />
+        <ChatPanel rfqId={rfqId} recipientId={rec.id} viewer="supplier" canSend={rec.status !== "declined" && rec.status !== "rerouted"} onOfferDraft={!quote || acts?.supplierRevise ? useDraft : undefined} />
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -193,4 +197,9 @@ function SupplierRfq() {
       </Dialog>
     </div>
   );
+}
+
+function fromDraft<T extends object>(last: T | null | undefined, d: OfferDraft) {
+  return { ...(last ?? {}), lines: d.lines, delivery_cost: d.delivery_cost ?? (last as { delivery_cost?: number } | null)?.delivery_cost ?? 0,
+    lead_time_days: d.lead_time_days ?? (last as { lead_time_days?: number | null } | null)?.lead_time_days ?? null } as T & { lines: unknown; delivery_cost: number; lead_time_days: number | null; delivery_date: string | null; valid_until: string | null; payment_terms: string | null };
 }

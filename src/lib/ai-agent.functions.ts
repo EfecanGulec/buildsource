@@ -26,7 +26,7 @@ export const askAgent = createServerFn({ method: "POST" })
 
     const { data: prof } = await supabase.from("profiles").select("company_id").eq("id", userId).maybeSingle();
     const { data: rec } = await supabase.from("rfq_recipients")
-      .select("id,rfq_id,supplier_company_id,companies(name,city,country),rfqs(rfq_number,title,buyer_company_id,delivery_city,delivery_date,notes,negotiation_round_limit,rfq_items(id,description,quantity,unit,specs,category_id,categories(name_en)))")
+      .select("id,rfq_id,supplier_company_id,companies(name,city,country),rfqs(rfq_number,title,buyer_company_id,delivery_city,delivery_date_requested,description,negotiation_round_limit,rfq_items(id,description,quantity,unit,specs,category_id,categories(name_en)))")
       .eq("id", data.recipientId).maybeSingle();
     if (!rec?.rfqs || !prof?.company_id) throw new Error("Thread not found");
     const role: "buyer" | "supplier" = rec.rfqs.buyer_company_id === prof.company_id ? "buyer"
@@ -44,7 +44,7 @@ export const askAgent = createServerFn({ method: "POST" })
 
     const ctx: Record<string, unknown> = {
       you_are_helping: role, supplier: rec.companies, trust_score: trust,
-      rfq: { number: rfq.rfq_number, title: rfq.title, delivery_city: rfq.delivery_city, delivery_date: rfq.delivery_date, notes: rfq.notes, round_limit: rfq.negotiation_round_limit,
+      rfq: { number: rfq.rfq_number, title: rfq.title, delivery_city: rfq.delivery_city, delivery_date: rfq.delivery_date_requested, notes: rfq.description, round_limit: rfq.negotiation_round_limit,
         items: items.map((i) => ({ rfq_item_id: i.id, description: i.description, quantity: i.quantity, unit: i.unit, specs: i.specs, category: i.categories?.name_en })) },
       quote: quote ? { status: quote.status, rounds_used: quote.round_count, versions: [...quote.quote_versions].sort((a, b) => a.version - b.version) } : null,
       price_index_market_average: prices,
@@ -52,17 +52,18 @@ export const askAgent = createServerFn({ method: "POST" })
     };
     if (data.scope === "private" && role === "buyer") {
       const { data: others } = await supabase.from("quotes").select("id,status,companies(name),quote_versions(version,party,total,delivery_cost,lead_time_days,valid_until)").eq("rfq_id", rec.rfq_id).neq("recipient_id", rec.id);
-      ctx.other_quotes_on_this_rfq = others;
+      ctx["other_quotes_on_this_rfq"] = others;
     }
     if (role === "supplier" && catIds.length) {
-      const { data: prods } = await supabase.from("products").select("name,category_id,list_price,unit,stock_qty").eq("company_id", prof.company_id).in("category_id", catIds).limit(40);
-      ctx.my_catalogue_products = prods;
+      const { data: prods } = await supabase.from("products").select("name,category_id,list_price,unit,stock_qty").eq("supplier_company_id", prof.company_id).in("category_id", catIds).limit(40);
+      ctx["my_catalogue_products"] = prods;
     }
 
     // Conversation log (private assistant keeps its own history).
-    const { data: conv } = await supabase.from("ai_conversations").upsert(
-      { profile_id: userId, rfq_id: rec.rfq_id, recipient_id: rec.id, scope: data.scope },
-      { onConflict: "profile_id,recipient_id,scope" }).select("id").single();
+    let { data: conv } = await supabase.from("ai_conversations").select("id")
+      .eq("profile_id", userId).eq("recipient_id", rec.id).eq("scope", data.scope).maybeSingle();
+    if (!conv) ({ data: conv } = await supabase.from("ai_conversations").insert(
+      { profile_id: userId, rfq_id: rec.rfq_id, recipient_id: rec.id, scope: data.scope }).select("id").single());
     const { data: hist } = conv ? await supabase.from("ai_messages").select("role,content").eq("conversation_id", conv.id).order("created_at").limit(20) : { data: [] };
 
     const lang = { en: "English", lt: "Lithuanian", pl: "Polish", de: "German" }[data.lang];
