@@ -22,12 +22,14 @@ export function DeliveryAcceptance({ rfqId, quoteId, agreementId, onSaved, varia
   const q = useQuery({
     queryKey: ["delivery-prefill", rfqId], enabled: open,
     queryFn: async () => {
-      const [{ data: r, error }, { data: c, error: ce }] = await Promise.all([
+      const [{ data: r, error }, { data: c, error: ce }, { data: me }] = await Promise.all([
         supabase.from("rfqs").select("delivery_city,delivery_address,unloading,delivery_window,site_access_notes").eq("id", rfqId).single(),
         supabase.from("rfq_site_contacts").select("name,phone").eq("rfq_id", rfqId).maybeSingle(),
+        supabase.rpc("my_profile"),
       ]);
       if (error || ce) throw error ?? ce;
-      return { ...emptyDeliveryDetails, city: r.delivery_city ?? "", address: r.delivery_address ?? "", contact: c?.name ?? "", phone: c?.phone ?? "", unloading: r.unloading ?? "manual", window: r.delivery_window ?? "any", access: r.site_access_notes ?? "" };
+      const d = ((me as { default_delivery?: Partial<DeliveryDetails> } | null)?.default_delivery ?? {}) as Partial<DeliveryDetails>;
+      return { ...emptyDeliveryDetails, city: r.delivery_city || d.city || "", address: r.delivery_address || d.address || "", contact: c?.name || d.contact || "", phone: c?.phone || d.phone || "", unloading: r.unloading || d.unloading || "manual", window: r.delivery_window || d.window || "any", access: r.site_access_notes || d.access || "" };
     },
   });
   return <>
@@ -58,6 +60,7 @@ function DeliveryForm({ initial, quoteId, agreementId, onCancel, onSaved }: {
     if (!parsed.success) { setError(t("delivery.required")); return; }
     setSaving(true); setError("");
     try {
+      void supabase.rpc("save_my_default_delivery", { _details: parsed.data });
       if (agreementId) {
         const { error } = await supabase.rpc("buyer_save_agreement_delivery", { _agreement: agreementId, _details: parsed.data });
         if (error) throw error;

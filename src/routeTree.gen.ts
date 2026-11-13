@@ -35,11 +35,14 @@ import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppSectionRouteImport } from './routes/_authenticated/app.$section'
 import { Route as AuthenticatedAppCompareRouteImport } from './routes/_authenticated/app.compare'
 import { Route as AuthenticatedAppCreateRfqRouteImport } from './routes/_authenticated/app.create-rfq'
+import { Route as AuthenticatedAppInvoicesRouteImport } from './routes/_authenticated/app.invoices'
 import { Route as AuthenticatedAppPriceIndexRouteImport } from './routes/_authenticated/app.price-index'
+import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated/app.settings'
 import { Route as AuthenticatedSupplierIndexRouteImport } from './routes/_authenticated/supplier.index'
 import { Route as AuthenticatedSupplierSectionRouteImport } from './routes/_authenticated/supplier.$section'
 import { Route as AuthenticatedSupplierCatalogueRouteImport } from './routes/_authenticated/supplier.catalogue'
 import { Route as AuthenticatedSupplierEarningsRouteImport } from './routes/_authenticated/supplier.earnings'
+import { Route as AuthenticatedSupplierInvoicesRouteImport } from './routes/_authenticated/supplier.invoices'
 import { Route as AuthenticatedSupplierPoolsRouteImport } from './routes/_authenticated/supplier.pools'
 import { Route as AuthenticatedSupplierProfileRouteImport } from './routes/_authenticated/supplier.profile'
 import { Route as AuthenticatedSupplierQuotesRouteImport } from './routes/_authenticated/supplier.quotes'
@@ -197,10 +200,22 @@ const AuthenticatedAppCreateRfqRoute =
     path: '/create-rfq',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppInvoicesRoute =
+  AuthenticatedAppInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppPriceIndexRoute =
   AuthenticatedAppPriceIndexRouteImport.update({
     id: '/price-index',
     path: '/price-index',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSettingsRoute =
+  AuthenticatedAppSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedSupplierIndexRoute =
@@ -225,6 +240,12 @@ const AuthenticatedSupplierEarningsRoute =
   AuthenticatedSupplierEarningsRouteImport.update({
     id: '/earnings',
     path: '/earnings',
+    getParentRoute: () => AuthenticatedSupplierRoute,
+  } as any)
+const AuthenticatedSupplierInvoicesRoute =
+  AuthenticatedSupplierInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
     getParentRoute: () => AuthenticatedSupplierRoute,
   } as any)
 const AuthenticatedSupplierPoolsRoute =
@@ -360,10 +381,13 @@ export interface FileRoutesByFullPath {
   '/app/$section': typeof AuthenticatedAppSectionRoute
   '/app/compare': typeof AuthenticatedAppCompareRoute
   '/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
+  '/app/invoices': typeof AuthenticatedAppInvoicesRoute
   '/app/price-index': typeof AuthenticatedAppPriceIndexRoute
+  '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/supplier/catalogue': typeof AuthenticatedSupplierCatalogueRoute
   '/supplier/earnings': typeof AuthenticatedSupplierEarningsRoute
+  '/supplier/invoices': typeof AuthenticatedSupplierInvoicesRoute
   '/supplier/pools': typeof AuthenticatedSupplierPoolsRoute
   '/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/supplier/quotes': typeof AuthenticatedSupplierQuotesRoute
@@ -407,10 +431,13 @@ export interface FileRoutesByTo {
   '/app/$section': typeof AuthenticatedAppSectionRoute
   '/app/compare': typeof AuthenticatedAppCompareRoute
   '/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
+  '/app/invoices': typeof AuthenticatedAppInvoicesRoute
   '/app/price-index': typeof AuthenticatedAppPriceIndexRoute
+  '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/supplier/catalogue': typeof AuthenticatedSupplierCatalogueRoute
   '/supplier/earnings': typeof AuthenticatedSupplierEarningsRoute
+  '/supplier/invoices': typeof AuthenticatedSupplierInvoicesRoute
   '/supplier/pools': typeof AuthenticatedSupplierPoolsRoute
   '/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/supplier/quotes': typeof AuthenticatedSupplierQuotesRoute
@@ -459,10 +486,13 @@ export interface FileRoutesById {
   '/_authenticated/app/$section': typeof AuthenticatedAppSectionRoute
   '/_authenticated/app/compare': typeof AuthenticatedAppCompareRoute
   '/_authenticated/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
+  '/_authenticated/app/invoices': typeof AuthenticatedAppInvoicesRoute
   '/_authenticated/app/price-index': typeof AuthenticatedAppPriceIndexRoute
+  '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRoute
   '/_authenticated/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/_authenticated/supplier/catalogue': typeof AuthenticatedSupplierCatalogueRoute
   '/_authenticated/supplier/earnings': typeof AuthenticatedSupplierEarningsRoute
+  '/_authenticated/supplier/invoices': typeof AuthenticatedSupplierInvoicesRoute
   '/_authenticated/supplier/pools': typeof AuthenticatedSupplierPoolsRoute
   '/_authenticated/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/_authenticated/supplier/quotes': typeof AuthenticatedSupplierQuotesRoute
@@ -511,10 +541,13 @@ export interface FileRouteTypes {
     | '/app/$section'
     | '/app/compare'
     | '/app/create-rfq'
+    | '/app/invoices'
     | '/app/price-index'
+    | '/app/settings'
     | '/supplier/$section'
     | '/supplier/catalogue'
     | '/supplier/earnings'
+    | '/supplier/invoices'
     | '/supplier/pools'
     | '/supplier/profile'
     | '/supplier/quotes'
@@ -558,10 +591,13 @@ export interface FileRouteTypes {
     | '/app/$section'
     | '/app/compare'
     | '/app/create-rfq'
+    | '/app/invoices'
     | '/app/price-index'
+    | '/app/settings'
     | '/supplier/$section'
     | '/supplier/catalogue'
     | '/supplier/earnings'
+    | '/supplier/invoices'
     | '/supplier/pools'
     | '/supplier/profile'
     | '/supplier/quotes'
@@ -609,10 +645,13 @@ export interface FileRouteTypes {
     | '/_authenticated/app/$section'
     | '/_authenticated/app/compare'
     | '/_authenticated/app/create-rfq'
+    | '/_authenticated/app/invoices'
     | '/_authenticated/app/price-index'
+    | '/_authenticated/app/settings'
     | '/_authenticated/supplier/$section'
     | '/_authenticated/supplier/catalogue'
     | '/_authenticated/supplier/earnings'
+    | '/_authenticated/supplier/invoices'
     | '/_authenticated/supplier/pools'
     | '/_authenticated/supplier/profile'
     | '/_authenticated/supplier/quotes'
@@ -831,11 +870,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppCreateRfqRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/invoices': {
+      id: '/_authenticated/app/invoices'
+      path: '/invoices'
+      fullPath: '/app/invoices'
+      preLoaderRoute: typeof AuthenticatedAppInvoicesRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/price-index': {
       id: '/_authenticated/app/price-index'
       path: '/price-index'
       fullPath: '/app/price-index'
       preLoaderRoute: typeof AuthenticatedAppPriceIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/settings': {
+      id: '/_authenticated/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AuthenticatedAppSettingsRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/supplier/': {
@@ -864,6 +917,13 @@ declare module '@tanstack/react-router' {
       path: '/earnings'
       fullPath: '/supplier/earnings'
       preLoaderRoute: typeof AuthenticatedSupplierEarningsRouteImport
+      parentRoute: typeof AuthenticatedSupplierRoute
+    }
+    '/_authenticated/supplier/invoices': {
+      id: '/_authenticated/supplier/invoices'
+      path: '/invoices'
+      fullPath: '/supplier/invoices'
+      preLoaderRoute: typeof AuthenticatedSupplierInvoicesRouteImport
       parentRoute: typeof AuthenticatedSupplierRoute
     }
     '/_authenticated/supplier/pools': {
@@ -1028,7 +1088,9 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSectionRoute: typeof AuthenticatedAppSectionRoute
   AuthenticatedAppCompareRoute: typeof AuthenticatedAppCompareRoute
   AuthenticatedAppCreateRfqRoute: typeof AuthenticatedAppCreateRfqRoute
+  AuthenticatedAppInvoicesRoute: typeof AuthenticatedAppInvoicesRoute
   AuthenticatedAppPriceIndexRoute: typeof AuthenticatedAppPriceIndexRoute
+  AuthenticatedAppSettingsRoute: typeof AuthenticatedAppSettingsRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAgreementsAgreementIdRoute: typeof AuthenticatedAppAgreementsAgreementIdRoute
   AuthenticatedAppGroupBuyPoolIdRoute: typeof AuthenticatedAppGroupBuyPoolIdRoute
@@ -1043,7 +1105,9 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppSectionRoute: AuthenticatedAppSectionRoute,
   AuthenticatedAppCompareRoute: AuthenticatedAppCompareRoute,
   AuthenticatedAppCreateRfqRoute: AuthenticatedAppCreateRfqRoute,
+  AuthenticatedAppInvoicesRoute: AuthenticatedAppInvoicesRoute,
   AuthenticatedAppPriceIndexRoute: AuthenticatedAppPriceIndexRoute,
+  AuthenticatedAppSettingsRoute: AuthenticatedAppSettingsRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAgreementsAgreementIdRoute:
     AuthenticatedAppAgreementsAgreementIdRoute,
@@ -1062,6 +1126,7 @@ interface AuthenticatedSupplierRouteChildren {
   AuthenticatedSupplierSectionRoute: typeof AuthenticatedSupplierSectionRoute
   AuthenticatedSupplierCatalogueRoute: typeof AuthenticatedSupplierCatalogueRoute
   AuthenticatedSupplierEarningsRoute: typeof AuthenticatedSupplierEarningsRoute
+  AuthenticatedSupplierInvoicesRoute: typeof AuthenticatedSupplierInvoicesRoute
   AuthenticatedSupplierPoolsRoute: typeof AuthenticatedSupplierPoolsRoute
   AuthenticatedSupplierProfileRoute: typeof AuthenticatedSupplierProfileRoute
   AuthenticatedSupplierQuotesRoute: typeof AuthenticatedSupplierQuotesRoute
@@ -1078,6 +1143,7 @@ const AuthenticatedSupplierRouteChildren: AuthenticatedSupplierRouteChildren = {
   AuthenticatedSupplierSectionRoute: AuthenticatedSupplierSectionRoute,
   AuthenticatedSupplierCatalogueRoute: AuthenticatedSupplierCatalogueRoute,
   AuthenticatedSupplierEarningsRoute: AuthenticatedSupplierEarningsRoute,
+  AuthenticatedSupplierInvoicesRoute: AuthenticatedSupplierInvoicesRoute,
   AuthenticatedSupplierPoolsRoute: AuthenticatedSupplierPoolsRoute,
   AuthenticatedSupplierProfileRoute: AuthenticatedSupplierProfileRoute,
   AuthenticatedSupplierQuotesRoute: AuthenticatedSupplierQuotesRoute,
