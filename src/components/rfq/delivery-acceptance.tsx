@@ -71,7 +71,10 @@ function DeliveryForm({ initial, quoteId, agreementId, onCancel, onSaved }: {
       qc.invalidateQueries({ queryKey: ["agreement"] });
       qc.invalidateQueries({ queryKey: ["compare"] });
       if (agreementId) { toast.success(t("delivery.saved")); onSaved(); }
-    } catch { setError(t("delivery.saveError")); }
+    } catch (err) {
+      const msg = (err as { message?: string })?.message ?? "";
+      setError(/already open/i.test(msg) ? t("compare.hasAgreement") : /expired|closed/i.test(msg) ? t("delivery.offerUnavailable") : t("delivery.saveError"));
+    }
     finally { setSaving(false); }
   }
   const fields: { key: string; label: TKey; type?: string }[] = [
