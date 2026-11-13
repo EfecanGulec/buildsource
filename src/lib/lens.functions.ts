@@ -52,6 +52,7 @@ Return JSON only with keys: status, item_name, category_slug, confidence, altern
           if (o.type === "message") for (const c of o.content ?? []) if (c.type === "output_text" && c.text) text += c.text;
         }
         result = parseLensResult(text, slugs);
+        if (!result) console.warn("identify-material unparseable", text.slice(0, 1500));
       }
     } catch (e) { console.error("identify-material AI error", e); }
     if (!result) { result = normaliseLens(pickDemoLens(`${data.hint} ${data.note}`), slugs); source = "demo"; }
