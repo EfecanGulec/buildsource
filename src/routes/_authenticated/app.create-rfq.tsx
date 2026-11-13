@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MatchingPools } from "@/components/pool/matching-pools";
 import { useEffect, useState } from "react";
 import { lensProducts, type LensResult, type LensProduct } from "@/lib/lens";
+import { lensItemPhotos } from "@/lib/lens-item-photos";
 import { LensButton } from "@/components/lens/material-lens";
 import { Building2, Camera, Check, Hammer, Loader2, Package, Plus, Sofa, Store, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
@@ -24,7 +25,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
 
 type ProjectType = Database["public"]["Enums"]["project_type"];
-type Item = { category_id: string; description: string; specs: Record<string, string | number | boolean>; quantity: number; unit: string; standard: string; waste_pct: number; confidence: number | null; confirmed: boolean; reasoning?: string };
+type Item = { category_id: string; description: string; specs: Record<string, string | number | boolean>; quantity: number; unit: string; standard: string; waste_pct: number; confidence: number | null; confirmed: boolean; reasoning?: string; itemTitle?: string; photoPaths?: string[] };
 
 export const Route = createFileRoute("/_authenticated/app/create-rfq")({
   head: () => ({ meta: [{ title: "Create RFQ — BuildSource LT" }, { name: "description", content: "Review materials, photos and potential suppliers before sending your BuildSource LT request." }, { property: "og:title", content: "Create RFQ — BuildSource LT" }, { property: "og:description", content: "Prepare a multi-product request and choose your suppliers." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -61,6 +62,30 @@ function CreateRfq() {
   const { scan } = Route.useSearch();
   const [preferred, setPreferred] = useState<string[]>([]);
   const [scanId, setScanId] = useState<string | null>(null);
+  const photoPaths = [...new Set(items.flatMap((item) => item.photoPaths ?? []))];
+  const photoUrls = useQuery({
+    queryKey: ["rfq-composer-photos", account?.user.id, photoPaths],
+    enabled: !!account?.user.id && photoPaths.length > 0,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase.storage.from("material-scans").createSignedUrls(photoPaths, 600);
+      if (error) throw error;
+      return Object.fromEntries((data ?? []).flatMap((photo) => photo.path && photo.signedUrl ? [[photo.path, photo.signedUrl]] : []));
+    },
+  });
+  const renderItemPhotos = (item: Item) => item.photoPaths?.length ? (
+    <div className="space-y-2">
+      <h3 className="break-words text-base font-semibold">{item.itemTitle || item.description}</h3>
+      <div className="flex flex-wrap gap-2">
+        {item.photoPaths.map((path, index) => {
+          const url = photoUrls.data?.[path];
+          return url ? <img key={path} src={url} alt={`${item.itemTitle || item.description} · ${t("lens.photo")} ${index + 1}`} className="h-24 w-24 rounded-md border bg-surface-2 object-contain sm:h-32 sm:w-32" />
+            : <div key={path} className="grid h-24 w-24 place-items-center rounded-md bg-surface-2 sm:h-32 sm:w-32">{photoUrls.isPending && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}</div>;
+        })}
+      </div>
+      {photoUrls.isError && <Button size="sm" variant="outline" onClick={() => photoUrls.refetch()}>{t("qs.retry")}</Button>}
+    </div>
+  ) : null;
 
   const refs = useQuery({
     queryKey: ["rfq-refs"],
@@ -80,7 +105,7 @@ function CreateRfq() {
   useEffect(() => {
     if (!scan || scan === scanId || !cats.length) return;
     setScanId(scan);
-    supabase.from("material_scans").select("id,result,note").eq("id", scan).maybeSingle().then(({ data }) => {
+    supabase.from("material_scans").select("id,result,note,photo_paths").eq("id", scan).maybeSingle().then(({ data }) => {
       const r = data?.result as (LensResult & { products?: LensProduct[]; chosen_suppliers?: string[] }) | undefined;
       if (!r) return;
       const products = lensProducts(r).filter((p) => p.rfq_item_draft);
@@ -88,7 +113,7 @@ function CreateRfq() {
       setItems(products.map((p) => {
         const d = p.rfq_item_draft;
         const cat = cats.find((c) => c.slug === d?.category_slug);
-        return { ...blankItem(), category_id: cat?.id ?? "", description: d?.description ?? p.item_name,
+        return { ...blankItem(), ...lensItemPhotos(p, data?.photo_paths ?? []), category_id: cat?.id ?? "", description: d?.description ?? p.item_name,
           specs: d?.specs ?? {}, unit: d?.unit || cat?.default_unit || "", standard: p.standards_to_ask_for[0] ?? "", quantity: 0, confidence: p.confidence, confirmed: false };
       }));
       setPreferred(r.chosen_suppliers ?? []);
@@ -272,6 +297,7 @@ function CreateRfq() {
                   <Button variant="ghost" size="icon" aria-label={t("rfq.removeItem")} disabled={items.length === 1}
                     onClick={() => setItems((xs) => xs.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button>
                 </div>
+                {renderItemPhotos(it)}
                 <div className="grid gap-3 sm:grid-cols-2">
                   <label className="space-y-1 text-sm"><span className="text-muted-foreground">{t("rfq.category")}</span>
                     <Select value={it.category_id} onValueChange={(v) => update(i, { category_id: v, specs: {}, unit: catById.get(v)?.default_unit ?? "" })}>
@@ -313,7 +339,7 @@ function CreateRfq() {
               <thead className="text-left text-muted-foreground"><tr><th className="py-1">{t("rfq.category")}</th><th>{t("rfq.itemDescription")}</th><th className="text-right">{t("rfq.quantity")}</th></tr></thead>
               <tbody>{items.map((it, i) => (
                 <tr key={i} className="border-t align-top"><td className="py-2">{catById.get(it.category_id)?.name_en}</td>
-                  <td>{it.description}<div className="text-xs text-muted-foreground">{specsSummary(it.specs)}</div></td>
+                  <td className="space-y-2 p-2">{renderItemPhotos(it)}<p>{it.description}</p><div className="text-xs text-muted-foreground">{specsSummary(it.specs)}</div></td>
                   <td className="text-right tabular-nums">{it.quantity} {it.unit}</td></tr>))}
               </tbody>
             </table></div>

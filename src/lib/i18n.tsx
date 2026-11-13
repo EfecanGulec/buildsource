@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { en, lt, type TKey } from "./translations";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
+import { en, type TKey } from "./translations";
 
-export type Lang = "en" | "lt";
+export type Lang = "en";
 const Ctx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: (k: TKey) => string }>({
   lang: "en",
   setLang: () => {},
@@ -9,18 +9,11 @@ const Ctx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: (k: TKey)
 });
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("en");
   useEffect(() => {
-    const saved = window.localStorage.getItem("lang");
-    if (saved === "lt" || saved === "en") setLangState(saved);
+    window.localStorage.setItem("lang", "en");
+    document.documentElement.lang = "en";
   }, []);
-  const setLang = (l: Lang) => {
-    setLangState(l);
-    window.localStorage.setItem("lang", l);
-    document.documentElement.lang = l;
-  };
-  const t = (k: TKey) => (lang === "lt" ? lt[k] || en[k] : en[k]);
-  return <Ctx.Provider value={{ lang, setLang, t }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ lang: "en", setLang: () => {}, t: (k) => en[k] }}>{children}</Ctx.Provider>;
 }
 
 export const useI18n = () => useContext(Ctx);

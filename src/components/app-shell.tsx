@@ -16,7 +16,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAccount } from "@/hooks/use-account";
 import { useI18n } from "@/lib/i18n";
 import { NAV, type Area } from "@/lib/nav";
-import { LangToggle } from "@/components/lang-toggle";
 import { LensButton } from "@/components/lens/material-lens";
 import { ThemeMenuItems } from "@/components/theme-toggle";
 
@@ -83,7 +82,6 @@ export function AppShell({ area, children }: { area: Area; children: ReactNode }
               {t("top.demo")}
             </span>
             {(area === "app" || area === "supplier") && <LensButton variant="outline" label />}
-            <LangToggle />
             <Button variant="ghost" size="icon" aria-label={t("top.notifications")}>
               <Bell />
             </Button>
