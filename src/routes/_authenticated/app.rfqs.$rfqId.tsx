@@ -15,6 +15,7 @@ import { nextActions } from "@/lib/quote";
 import { useState } from "react";
 import { TrustBadge, type Breakdown } from "@/components/trust-badge";
 import { supabase } from "@/integrations/supabase/client";
+import { ScanPhotos } from "@/components/lens/scan-photos";
 import { useI18n } from "@/lib/i18n";
 import type { TKey } from "@/lib/translations";
 
@@ -68,6 +69,7 @@ function RfqDetail() {
   return (
     <div className="max-w-5xl space-y-6">
       <Link to="/app/rfqs" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />{t("nav.rfqs")}</Link>
+      <ScanPhotos rfqId={rfq.id} />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="font-mono text-sm text-muted-foreground">{rfq.rfq_number}</p>

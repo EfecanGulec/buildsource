@@ -2531,6 +2531,7 @@ export type Database = {
           rate: number
         }[]
       }
+      can_read_scan_photo: { Args: { _path: string }; Returns: boolean }
       cancel_agreement: { Args: { _agreement: string }; Returns: undefined }
       choose_account_type: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
@@ -2653,6 +2654,7 @@ export type Database = {
       recompute_all_scores: { Args: never; Returns: number }
       reroute_rfq: { Args: { _rfq: string }; Returns: string }
       reset_demo_data: { Args: never; Returns: Json }
+      rfq_scan_photos: { Args: { _rfq: string }; Returns: string[] }
       run_sync_jobs: { Args: never; Returns: number }
       save_my_company: {
         Args: {
