@@ -17,6 +17,7 @@ import { useAccount } from "@/hooks/use-account";
 import { useI18n } from "@/lib/i18n";
 import { NAV, type Area } from "@/lib/nav";
 import { LangToggle } from "@/components/lang-toggle";
+import { LensButton } from "@/components/lens/material-lens";
 
 export function AppShell({ area, children }: { area: Area; children: ReactNode }) {
   const { t } = useI18n();
@@ -80,6 +81,7 @@ export function AppShell({ area, children }: { area: Area; children: ReactNode }
             <span className="rounded-full border border-warning/50 bg-warning/15 px-2.5 py-0.5 text-xs font-semibold text-foreground">
               {t("top.demo")}
             </span>
+            {(area === "app" || area === "supplier") && <LensButton variant="outline" label />}
             <LangToggle />
             <Button variant="ghost" size="icon" aria-label={t("top.notifications")}>
               <Bell />

@@ -54,3 +54,4 @@ use the editor.
 - Timed work runs through `sync_jobs` via `scheduler_tick` (one pg_cron job every 5 min + nightly trust recompute); `run_sync_jobs` retries with `job_backoff` (mirrored in `services.ts`), so there is a single scheduler and no extra sweeper.
 - Delivery tables change only via shipment RPCs funnelled through `_shipment_event`, which also moves the order status (so on-time rate keeps reading `order_events`); rules mirrored in `src/lib/shipment.ts`.
 - Public `/d/$token` uses only `driver_*` RPCs (token = credential); photos in private `delivery-photos/<driver_token>/`; site contact sits in `rfq_site_contacts`, hidden from suppliers until an order exists.
+- Material Lens: logic and flow notes in `src/lib/AGENTS.md`.

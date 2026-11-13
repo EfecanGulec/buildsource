@@ -777,6 +777,53 @@ export type Database = {
         }
         Relationships: []
       }
+      material_scans: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          note: string | null
+          photo_paths: string[]
+          profile_id: string
+          result: Json
+          saved: boolean
+          source: string
+          status: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          photo_paths?: string[]
+          profile_id?: string
+          result?: Json
+          saved?: boolean
+          source?: string
+          status: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          photo_paths?: string[]
+          profile_id?: string
+          result?: Json
+          saved?: boolean
+          source?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "material_scans_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           attachments: string[]
@@ -1891,9 +1938,11 @@ export type Database = {
           delivery_window: string | null
           description: string | null
           id: string
+          material_scan_id: string | null
           max_suppliers: number
           min_trust_score: number
           negotiation_round_limit: number
+          preferred_supplier_ids: string[]
           project_id: string | null
           project_type: Database["public"]["Enums"]["project_type"]
           rfq_number: string
@@ -1918,9 +1967,11 @@ export type Database = {
           delivery_window?: string | null
           description?: string | null
           id?: string
+          material_scan_id?: string | null
           max_suppliers?: number
           min_trust_score?: number
           negotiation_round_limit?: number
+          preferred_supplier_ids?: string[]
           project_id?: string | null
           project_type: Database["public"]["Enums"]["project_type"]
           rfq_number?: string
@@ -1945,9 +1996,11 @@ export type Database = {
           delivery_window?: string | null
           description?: string | null
           id?: string
+          material_scan_id?: string | null
           max_suppliers?: number
           min_trust_score?: number
           negotiation_round_limit?: number
+          preferred_supplier_ids?: string[]
           project_id?: string | null
           project_type?: Database["public"]["Enums"]["project_type"]
           rfq_number?: string
@@ -1972,6 +2025,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rfqs_material_scan_id_fkey"
+            columns: ["material_scan_id"]
+            isOneToOne: false
+            referencedRelation: "material_scans"
             referencedColumns: ["id"]
           },
           {
@@ -2512,6 +2572,24 @@ export type Database = {
       is_rfq_buyer: { Args: { _rfq: string }; Returns: boolean }
       is_rfq_supplier: { Args: { _rfq: string }; Returns: boolean }
       job_backoff: { Args: { _attempts: number }; Returns: string }
+      lens_suppliers: {
+        Args: { _category_slug: string; _city: string }
+        Returns: {
+          city: string
+          company_id: string
+          country: string
+          in_region: boolean
+          lead_time_days: number
+          match_score: number
+          name: string
+          price_updated_at: string
+          product_currency: string
+          product_name: string
+          product_price: number
+          product_stock: number
+          trust_score: number
+        }[]
+      }
       magic_ask: { Args: { _body: string; _token: string }; Returns: undefined }
       magic_decline: {
         Args: {
