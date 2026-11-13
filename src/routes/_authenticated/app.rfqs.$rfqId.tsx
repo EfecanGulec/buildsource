@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/rfq/status-badge";
 import { specsSummary } from "@/components/rfq/spec-fields";
+import { OfferForm, type Offer } from "@/components/rfq/offer-form";
+import { QuoteThread, type ThreadVersion } from "@/components/rfq/quote-thread";
+import { Textarea } from "@/components/ui/textarea";
+import { nextActions } from "@/lib/quote";
+import { useState } from "react";
 import { TrustBadge, type Breakdown } from "@/components/trust-badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
@@ -73,6 +78,7 @@ function RfqDetail() {
         <TabsList>
           <TabsTrigger value="suppliers">{t("rfq.tab.suppliers")} ({recipients.length})</TabsTrigger>
           <TabsTrigger value="quotes">{t("rfq.tab.quotes")} ({rfq.quotes.length})</TabsTrigger>
+          <TabsTrigger value="summary">{t("quote.overview")}</TabsTrigger>
           <TabsTrigger value="details">{t("rfq.tab.details")}</TabsTrigger>
           <TabsTrigger value="activity">{t("rfq.tab.activity")}</TabsTrigger>
         </TabsList>
@@ -89,7 +95,10 @@ function RfqDetail() {
                 </tr>); })}
             </tbody></table>)}
         </TabsContent>
-        <TabsContent value="quotes" className="rounded-lg border bg-card">
+        <TabsContent value="quotes" className="space-y-4">
+          {rfq.quotes.map((qu) => <BuyerQuote key={qu.id} quote={qu} items={items} roundLimit={rfq.negotiation_round_limit} onChange={() => qc.invalidateQueries({ queryKey: ["rfqs"] })} />)}
+        </TabsContent>
+        <TabsContent value="summary" className="rounded-lg border bg-card">
           {rfq.quotes.length === 0 ? <p className="p-8 text-center text-muted-foreground">{t("rfq.noQuotes")}</p> : (
             <table className="w-full text-sm">
               <thead className="text-left text-muted-foreground"><tr className="[&>th]:px-4 [&>th]:py-3"><th>{t("trust.company")}</th><th>{t("rfq.version")}</th><th className="text-right">{t("rfq.total")}</th><th>{t("rfq.leadTime")}</th><th>{t("rfq.status")}</th></tr></thead>
@@ -122,6 +131,58 @@ function RfqDetail() {
           </ol>
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+type BuyerQuoteProps = {
+  quote: { id: string; status: string; round_count: number; companies: { name: string } | null; quote_versions: ThreadVersion[] };
+  items: { id: string; description: string; quantity: number; unit: string | null }[];
+  roundLimit: number; onChange: () => void;
+};
+function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
+  const { t } = useI18n();
+  const [countering, setCountering] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
+  const [reason, setReason] = useState("");
+  const versions = [...quote.quote_versions].sort((a, b) => a.version - b.version);
+  const last = versions[versions.length - 1];
+  const acts = nextActions({ status: quote.status, lastParty: last?.party ?? null, roundCount: quote.round_count, roundLimit });
+
+  async function counter(o: Offer) {
+    const { error } = await supabase.rpc("buyer_counter_quote", { _quote: quote.id, _offer: o });
+    if (error) { toast.error(error.message); return false; }
+    toast.success(t("quote.counterSent")); setCountering(false); onChange(); return true;
+  }
+  async function reject() {
+    const { error } = await supabase.rpc("buyer_reject_quote", { _quote: quote.id, _reason: reason });
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("quote.rejected")); setRejecting(false); onChange();
+  }
+  return (
+    <div className="rounded-lg border bg-card p-6 space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="font-display text-lg font-semibold">{quote.companies?.name}</h3>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          {t("quote.rounds").replace("{n}", String(quote.round_count)).replace("{m}", String(roundLimit))}
+          <StatusBadge kind="quote" status={quote.status} /></div>
+      </div>
+      <QuoteThread versions={versions} viewer="buyer" items={items} />
+      {acts.roundLimitReached && <p className="rounded-md border border-warning bg-warning/15 p-3 text-sm">{t("quote.limit")}</p>}
+      {last?.party === "buyer" && acts.buyerReject && <p className="text-sm text-muted-foreground">{t("quote.waitSupplier")}</p>}
+      {!countering && !rejecting && acts.buyerReject && (
+        <div className="flex flex-wrap items-center gap-2">
+          {acts.buyerCounter && <Button onClick={() => setCountering(true)}>{t("quote.makeCounter")}</Button>}
+          <Button variant="outline" onClick={() => setRejecting(true)}>{t("quote.reject")}</Button>
+          <span className="text-xs text-muted-foreground">{t("quote.acceptSoon")}</span>
+        </div>)}
+      {countering && <OfferForm items={items} initial={last} submitLabel={t("quote.sendCounter")} onSubmit={counter} onCancel={() => setCountering(false)} />}
+      {rejecting && (
+        <div className="space-y-2">
+          <Textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("quote.rejectReason")} aria-label={t("quote.rejectReason")} />
+          <div className="flex gap-2"><Button variant="destructive" onClick={reject}>{t("quote.reject")}</Button>
+            <Button variant="ghost" onClick={() => setRejecting(false)}>{t("quote.cancel")}</Button></div>
+        </div>)}
     </div>
   );
 }
