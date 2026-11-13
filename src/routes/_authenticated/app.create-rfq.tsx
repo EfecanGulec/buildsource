@@ -341,7 +341,7 @@ function CreateRfq() {
         ) : (
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => save(false)} disabled={saving}>{t("rfq.saveDraft")}</Button>
-            <Button onClick={() => save(true)} disabled={saving}>{t("rfq.submit")}</Button>
+            <Button onClick={() => save(true)} disabled={saving || (list.length > 0 && chosen.length === 0)}>{t("rfq.submit")}</Button>
           </div>
         )}
       </div>
