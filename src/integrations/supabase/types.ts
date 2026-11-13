@@ -1728,6 +1728,7 @@ export type Database = {
         Args: { _offer: Json; _quote: string }
         Returns: number
       }
+      buyer_dashboard: { Args: never; Returns: Json }
       buyer_open_dispute: {
         Args: {
           _description: string
@@ -1861,6 +1862,7 @@ export type Database = {
         Args: { _name: string; _order: string; _photos?: string[] }
         Returns: undefined
       }
+      supplier_dashboard: { Args: never; Returns: Json }
       supplier_decline_rfq: {
         Args: {
           _message: string
