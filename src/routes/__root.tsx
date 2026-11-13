@@ -104,12 +104,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap",
-      },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
@@ -128,10 +122,14 @@ function r(){if(window.__bsR)return true;var n=Date.now(),st=null;try{st=JSON.pa
 addEventListener("error",function(e){var t=e.target;if(t&&t.tagName==="SCRIPT"&&t.type==="module"){r();return}if(P.test(String(e.message||"")))r()},true);
 addEventListener("unhandledrejection",function(e){var m=e.reason&&e.reason.message||String(e.reason||"");if(P.test(m))r()});})();`;
 
+// Applies the saved light/dark/system theme before first paint (no flash). Mirrors src/lib/theme.ts.
+const THEME_INIT = `(function(){try{var t=localStorage.getItem("bs-theme");var d=t==="dark"||((t!=="light")&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d)}catch(e){}})();`;
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <script dangerouslySetInnerHTML={{ __html: EARLY_RECOVERY }} />
         <HeadContent />
       </head>

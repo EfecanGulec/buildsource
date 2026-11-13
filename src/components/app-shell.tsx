@@ -18,6 +18,7 @@ import { useI18n } from "@/lib/i18n";
 import { NAV, type Area } from "@/lib/nav";
 import { LangToggle } from "@/components/lang-toggle";
 import { LensButton } from "@/components/lens/material-lens";
+import { ThemeMenuItems } from "@/components/theme-toggle";
 
 export function AppShell({ area, children }: { area: Area; children: ReactNode }) {
   const { t } = useI18n();
@@ -71,7 +72,7 @@ export function AppShell({ area, children }: { area: Area; children: ReactNode }
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-background/90 px-4 backdrop-blur">
+        <header className="glass sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-hairline px-4">
           <SidebarTrigger />
           <div className="relative hidden max-w-md flex-1 sm:block">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -96,6 +97,7 @@ export function AppShell({ area, children }: { area: Area; children: ReactNode }
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel className="truncate">{name}<span className="block text-xs font-normal text-muted-foreground">{account?.company?.name}</span></DropdownMenuLabel>
+                <ThemeMenuItems />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut}>{t("top.signOut")}</DropdownMenuItem>
               </DropdownMenuContent>
