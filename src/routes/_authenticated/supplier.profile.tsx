@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { IntegrationLevelBadge } from "@/components/catalog/level-badge";
 import { TrustBadge, type Breakdown } from "@/components/trust-badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccount } from "@/hooks/use-account";
@@ -25,6 +26,7 @@ function Profile() {
         <div>
           <p className="font-display text-lg font-semibold">{account?.company?.name}</p>
           <p className="text-sm text-muted-foreground">{account?.company?.city} · {account?.company?.company_code}</p>
+          {cid && <div className="mt-2"><IntegrationLevelBadge companyId={cid} /></div>}
         </div>
         {q.data && <div className="text-right"><p className="text-xs text-muted-foreground mb-1">Trust Score</p>
           <TrustBadge score={q.data.score} breakdown={q.data.breakdown as Breakdown} dataDate={q.data.public_data_date} /></div>}
