@@ -241,6 +241,7 @@ export type Database = {
       categories: {
         Row: {
           commission_group: string
+          commission_rate: number | null
           created_at: string
           default_unit: string | null
           field_template: Json
@@ -254,6 +255,7 @@ export type Database = {
         }
         Insert: {
           commission_group?: string
+          commission_rate?: number | null
           created_at?: string
           default_unit?: string | null
           field_template?: Json
@@ -267,6 +269,7 @@ export type Database = {
         }
         Update: {
           commission_group?: string
+          commission_rate?: number | null
           created_at?: string
           default_unit?: string | null
           field_template?: Json
@@ -1446,6 +1449,7 @@ export type Database = {
           company_name: string | null
           country: string | null
           created_at: string
+          default_delivery: Json | null
           email: string | null
           full_name: string | null
           id: string
@@ -1462,6 +1466,7 @@ export type Database = {
           company_name?: string | null
           country?: string | null
           created_at?: string
+          default_delivery?: Json | null
           email?: string | null
           full_name?: string | null
           id: string
@@ -1478,6 +1483,7 @@ export type Database = {
           company_name?: string | null
           country?: string | null
           created_at?: string
+          default_delivery?: Json | null
           email?: string | null
           full_name?: string | null
           id?: string
@@ -2518,6 +2524,21 @@ export type Database = {
         Args: { _offer: Json; _profile: string; _rec: string }
         Returns: string
       }
+      admin_order_commissions: {
+        Args: never
+        Returns: {
+          buyer_name: string
+          categories: string
+          commission_amount: number
+          commission_rate: number
+          created_at: string
+          order_id: string
+          order_number: string
+          status: Database["public"]["Enums"]["order_status"]
+          supplier_name: string
+          total: number
+        }[]
+      }
       admin_resolve_dispute: {
         Args: {
           _dispute: string
@@ -2525,6 +2546,10 @@ export type Database = {
           _outcome: Database["public"]["Enums"]["dispute_status"]
           _refund: number
         }
+        Returns: undefined
+      }
+      admin_set_category_commission: {
+        Args: { _category: string; _rate: number }
         Returns: undefined
       }
       admin_set_integration: {
@@ -2601,6 +2626,7 @@ export type Database = {
       }
       can_read_scan_photo: { Args: { _path: string }; Returns: boolean }
       cancel_agreement: { Args: { _agreement: string }; Returns: undefined }
+      category_commission_rate: { Args: { _category: string }; Returns: number }
       choose_account_type: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: undefined
@@ -2637,6 +2663,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      invoice_detail: { Args: { _order: string }; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       is_order_party: { Args: { _order: string }; Returns: boolean }
       is_rfq_buyer: { Args: { _rfq: string }; Returns: boolean }
@@ -2678,6 +2705,23 @@ export type Database = {
       mark_smart_id_verified: { Args: never; Returns: undefined }
       match_rfq: { Args: { _rfq: string }; Returns: number }
       my_company_id: { Args: never; Returns: string }
+      my_invoices: {
+        Args: never
+        Returns: {
+          commission_amount: number
+          counterparty: string
+          created_at: string
+          order_id: string
+          order_number: string
+          paid: boolean
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          side: string
+          status: Database["public"]["Enums"]["order_status"]
+          supplier_payout: number
+          title: string
+          total: number
+        }[]
+      }
       my_order_commission: {
         Args: { _order: string }
         Returns: {
@@ -2686,6 +2730,7 @@ export type Database = {
           supplier_payout: number
         }[]
       }
+      my_profile: { Args: never; Returns: Json }
       order_lines: { Args: { _order: string }; Returns: Json }
       payment_deadline_minutes: { Args: never; Returns: number }
       pool_confirm: { Args: { _code: string; _pool: string }; Returns: string }
@@ -2735,6 +2780,17 @@ export type Database = {
           _name: string
         }
         Returns: string
+      }
+      save_my_default_delivery: { Args: { _details: Json }; Returns: undefined }
+      save_my_profile: {
+        Args: {
+          _address: string
+          _full_name: string
+          _language: string
+          _phone: string
+          _vat_code: string
+        }
+        Returns: undefined
       }
       scheduler_tick: { Args: { _jobs: string[] }; Returns: number }
       seed_demo_base: { Args: never; Returns: Json }
