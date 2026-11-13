@@ -1,3 +1,4 @@
 - Catalogue feeds: logic in `catalog.ts` (tested); `importFeed` adds AI mapping + live shop fetch (key from env var named by `credentials_secret_ref`) and writes only via `supplier_import_products`; confirmed categories survive re-imports.
 - Notification emails: SQL only writes `notifications`; `notify-email.server.ts` (rules in tested `notify-email.ts`) emails new rows every 2 min via `/api/public/notifications/dispatch` and the admin button, tracking `email_status`; demo companies are never emailed.
 - Company data: VAT checks call EU VIES live from `company-data.functions.ts` (parsing in tested `vies.ts`), saved to `company_public_data` then `compute_trust_score`; register/Sodra/VMI imports remain seeded.
+- Go-live: checklist/test data in tested `go-live.ts`; admin `/admin/go-live` reads `integrations` + server readiness, ticks kept in localStorage.

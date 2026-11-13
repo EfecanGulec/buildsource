@@ -19,5 +19,7 @@
 - [x] Step 18 – Catalogue: feeds, mapping, AI category check, price hints, integration level, shop connectors (demo)
 - [x] Step 19 – Notification emails
 - [x] Step 20 – Company data: admin Companies page, live VIES VAT check, contact emails
-- [ ] Steps 21–23 – see prompts PDF
+- [x] Step 23 – Go-live page: service status cards, launch checklist, TC15–TC22
+- [ ] Step 21 – Live Smart-ID — blocked: needs identity provider account + key
+- [ ] Step 22 – Live payments — blocked: user chose to wait
 - [x] Step 4 – Trust Score from real platform data
