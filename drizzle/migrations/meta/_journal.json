@@ -253,6 +253,13 @@
       "when": 1794606962477,
       "tag": "0035_tighten_reference_read_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1794607559511,
+      "tag": "0036_buyer_reject_delivery_date",
+      "breakpoints": true
     }
   ]
 }

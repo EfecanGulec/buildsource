@@ -22,6 +22,7 @@ export type Database = {
           buyer_signed_at: string | null
           created_at: string
           delivery_date: string | null
+          delivery_date_rejection: string | null
           delivery_details: Json | null
           delivery_details_required: boolean
           delivery_time_window: string | null
@@ -43,6 +44,7 @@ export type Database = {
           buyer_signed_at?: string | null
           created_at?: string
           delivery_date?: string | null
+          delivery_date_rejection?: string | null
           delivery_details?: Json | null
           delivery_details_required?: boolean
           delivery_time_window?: string | null
@@ -64,6 +66,7 @@ export type Database = {
           buyer_signed_at?: string | null
           created_at?: string
           delivery_date?: string | null
+          delivery_date_rejection?: string | null
           delivery_details?: Json | null
           delivery_details_required?: boolean
           delivery_time_window?: string | null
@@ -2541,6 +2544,10 @@ export type Database = {
           _order: string
           _term_days?: number
         }
+        Returns: undefined
+      }
+      buyer_reject_delivery_date: {
+        Args: { _agreement: string; _latest: string; _reason: string }
         Returns: undefined
       }
       buyer_reject_quote: {
