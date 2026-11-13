@@ -26,12 +26,15 @@ import { Route as AuthenticatedAdminDemoDataRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminTrustScoresRouteImport } from './routes/_authenticated/admin.trust-scores'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppSectionRouteImport } from './routes/_authenticated/app.$section'
+import { Route as AuthenticatedAppCompareRouteImport } from './routes/_authenticated/app.compare'
 import { Route as AuthenticatedAppCreateRfqRouteImport } from './routes/_authenticated/app.create-rfq'
 import { Route as AuthenticatedSupplierIndexRouteImport } from './routes/_authenticated/supplier.index'
 import { Route as AuthenticatedSupplierSectionRouteImport } from './routes/_authenticated/supplier.$section'
 import { Route as AuthenticatedSupplierProfileRouteImport } from './routes/_authenticated/supplier.profile'
+import { Route as AuthenticatedAppAgreementsAgreementIdRouteImport } from './routes/_authenticated/app.agreements.$agreementId'
 import { Route as AuthenticatedAppRfqsIndexRouteImport } from './routes/_authenticated/app.rfqs.index'
 import { Route as AuthenticatedAppRfqsRfqIdRouteImport } from './routes/_authenticated/app.rfqs.$rfqId'
+import { Route as AuthenticatedSupplierAgreementsAgreementIdRouteImport } from './routes/_authenticated/supplier.agreements.$agreementId'
 import { Route as AuthenticatedSupplierInboxIndexRouteImport } from './routes/_authenticated/supplier.inbox.index'
 import { Route as AuthenticatedSupplierInboxRfqIdRouteImport } from './routes/_authenticated/supplier.inbox.$rfqId'
 
@@ -122,6 +125,11 @@ const AuthenticatedAppSectionRoute = AuthenticatedAppSectionRouteImport.update({
   path: '/$section',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppCompareRoute = AuthenticatedAppCompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppCreateRfqRoute =
   AuthenticatedAppCreateRfqRouteImport.update({
     id: '/create-rfq',
@@ -146,6 +154,12 @@ const AuthenticatedSupplierProfileRoute =
     path: '/profile',
     getParentRoute: () => AuthenticatedSupplierRoute,
   } as any)
+const AuthenticatedAppAgreementsAgreementIdRoute =
+  AuthenticatedAppAgreementsAgreementIdRouteImport.update({
+    id: '/agreements/$agreementId',
+    path: '/agreements/$agreementId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppRfqsIndexRoute =
   AuthenticatedAppRfqsIndexRouteImport.update({
     id: '/rfqs/',
@@ -157,6 +171,12 @@ const AuthenticatedAppRfqsRfqIdRoute =
     id: '/rfqs/$rfqId',
     path: '/rfqs/$rfqId',
     getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedSupplierAgreementsAgreementIdRoute =
+  AuthenticatedSupplierAgreementsAgreementIdRouteImport.update({
+    id: '/agreements/$agreementId',
+    path: '/agreements/$agreementId',
+    getParentRoute: () => AuthenticatedSupplierRoute,
   } as any)
 const AuthenticatedSupplierInboxIndexRoute =
   AuthenticatedSupplierInboxIndexRouteImport.update({
@@ -186,13 +206,16 @@ export interface FileRoutesByFullPath {
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
+  '/app/compare': typeof AuthenticatedAppCompareRoute
   '/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/supplier/': typeof AuthenticatedSupplierIndexRoute
+  '/app/agreements/$agreementId': typeof AuthenticatedAppAgreementsAgreementIdRoute
   '/app/rfqs/$rfqId': typeof AuthenticatedAppRfqsRfqIdRoute
+  '/supplier/agreements/$agreementId': typeof AuthenticatedSupplierAgreementsAgreementIdRoute
   '/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/app/rfqs/': typeof AuthenticatedAppRfqsIndexRoute
   '/supplier/inbox/': typeof AuthenticatedSupplierInboxIndexRoute
@@ -209,13 +232,16 @@ export interface FileRoutesByTo {
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
+  '/app/compare': typeof AuthenticatedAppCompareRoute
   '/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/supplier': typeof AuthenticatedSupplierIndexRoute
+  '/app/agreements/$agreementId': typeof AuthenticatedAppAgreementsAgreementIdRoute
   '/app/rfqs/$rfqId': typeof AuthenticatedAppRfqsRfqIdRoute
+  '/supplier/agreements/$agreementId': typeof AuthenticatedSupplierAgreementsAgreementIdRoute
   '/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/app/rfqs': typeof AuthenticatedAppRfqsIndexRoute
   '/supplier/inbox': typeof AuthenticatedSupplierInboxIndexRoute
@@ -237,13 +263,16 @@ export interface FileRoutesById {
   '/_authenticated/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/_authenticated/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/_authenticated/app/$section': typeof AuthenticatedAppSectionRoute
+  '/_authenticated/app/compare': typeof AuthenticatedAppCompareRoute
   '/_authenticated/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
   '/_authenticated/supplier/$section': typeof AuthenticatedSupplierSectionRoute
   '/_authenticated/supplier/profile': typeof AuthenticatedSupplierProfileRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/supplier/': typeof AuthenticatedSupplierIndexRoute
+  '/_authenticated/app/agreements/$agreementId': typeof AuthenticatedAppAgreementsAgreementIdRoute
   '/_authenticated/app/rfqs/$rfqId': typeof AuthenticatedAppRfqsRfqIdRoute
+  '/_authenticated/supplier/agreements/$agreementId': typeof AuthenticatedSupplierAgreementsAgreementIdRoute
   '/_authenticated/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/_authenticated/app/rfqs/': typeof AuthenticatedAppRfqsIndexRoute
   '/_authenticated/supplier/inbox/': typeof AuthenticatedSupplierInboxIndexRoute
@@ -265,13 +294,16 @@ export interface FileRouteTypes {
     | '/admin/demo-data'
     | '/admin/trust-scores'
     | '/app/$section'
+    | '/app/compare'
     | '/app/create-rfq'
     | '/supplier/$section'
     | '/supplier/profile'
     | '/admin/'
     | '/app/'
     | '/supplier/'
+    | '/app/agreements/$agreementId'
     | '/app/rfqs/$rfqId'
+    | '/supplier/agreements/$agreementId'
     | '/supplier/inbox/$rfqId'
     | '/app/rfqs/'
     | '/supplier/inbox/'
@@ -288,13 +320,16 @@ export interface FileRouteTypes {
     | '/admin/demo-data'
     | '/admin/trust-scores'
     | '/app/$section'
+    | '/app/compare'
     | '/app/create-rfq'
     | '/supplier/$section'
     | '/supplier/profile'
     | '/admin'
     | '/app'
     | '/supplier'
+    | '/app/agreements/$agreementId'
     | '/app/rfqs/$rfqId'
+    | '/supplier/agreements/$agreementId'
     | '/supplier/inbox/$rfqId'
     | '/app/rfqs'
     | '/supplier/inbox'
@@ -315,13 +350,16 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/demo-data'
     | '/_authenticated/admin/trust-scores'
     | '/_authenticated/app/$section'
+    | '/_authenticated/app/compare'
     | '/_authenticated/app/create-rfq'
     | '/_authenticated/supplier/$section'
     | '/_authenticated/supplier/profile'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/supplier/'
+    | '/_authenticated/app/agreements/$agreementId'
     | '/_authenticated/app/rfqs/$rfqId'
+    | '/_authenticated/supplier/agreements/$agreementId'
     | '/_authenticated/supplier/inbox/$rfqId'
     | '/_authenticated/app/rfqs/'
     | '/_authenticated/supplier/inbox/'
@@ -456,6 +494,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSectionRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/compare': {
+      id: '/_authenticated/app/compare'
+      path: '/compare'
+      fullPath: '/app/compare'
+      preLoaderRoute: typeof AuthenticatedAppCompareRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/create-rfq': {
       id: '/_authenticated/app/create-rfq'
       path: '/create-rfq'
@@ -484,6 +529,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupplierProfileRouteImport
       parentRoute: typeof AuthenticatedSupplierRoute
     }
+    '/_authenticated/app/agreements/$agreementId': {
+      id: '/_authenticated/app/agreements/$agreementId'
+      path: '/agreements/$agreementId'
+      fullPath: '/app/agreements/$agreementId'
+      preLoaderRoute: typeof AuthenticatedAppAgreementsAgreementIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/rfqs/': {
       id: '/_authenticated/app/rfqs/'
       path: '/rfqs'
@@ -497,6 +549,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/rfqs/$rfqId'
       preLoaderRoute: typeof AuthenticatedAppRfqsRfqIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/supplier/agreements/$agreementId': {
+      id: '/_authenticated/supplier/agreements/$agreementId'
+      path: '/agreements/$agreementId'
+      fullPath: '/supplier/agreements/$agreementId'
+      preLoaderRoute: typeof AuthenticatedSupplierAgreementsAgreementIdRouteImport
+      parentRoute: typeof AuthenticatedSupplierRoute
     }
     '/_authenticated/supplier/inbox/': {
       id: '/_authenticated/supplier/inbox/'
@@ -534,16 +593,21 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSectionRoute: typeof AuthenticatedAppSectionRoute
+  AuthenticatedAppCompareRoute: typeof AuthenticatedAppCompareRoute
   AuthenticatedAppCreateRfqRoute: typeof AuthenticatedAppCreateRfqRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+  AuthenticatedAppAgreementsAgreementIdRoute: typeof AuthenticatedAppAgreementsAgreementIdRoute
   AuthenticatedAppRfqsRfqIdRoute: typeof AuthenticatedAppRfqsRfqIdRoute
   AuthenticatedAppRfqsIndexRoute: typeof AuthenticatedAppRfqsIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppSectionRoute: AuthenticatedAppSectionRoute,
+  AuthenticatedAppCompareRoute: AuthenticatedAppCompareRoute,
   AuthenticatedAppCreateRfqRoute: AuthenticatedAppCreateRfqRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+  AuthenticatedAppAgreementsAgreementIdRoute:
+    AuthenticatedAppAgreementsAgreementIdRoute,
   AuthenticatedAppRfqsRfqIdRoute: AuthenticatedAppRfqsRfqIdRoute,
   AuthenticatedAppRfqsIndexRoute: AuthenticatedAppRfqsIndexRoute,
 }
@@ -555,6 +619,7 @@ interface AuthenticatedSupplierRouteChildren {
   AuthenticatedSupplierSectionRoute: typeof AuthenticatedSupplierSectionRoute
   AuthenticatedSupplierProfileRoute: typeof AuthenticatedSupplierProfileRoute
   AuthenticatedSupplierIndexRoute: typeof AuthenticatedSupplierIndexRoute
+  AuthenticatedSupplierAgreementsAgreementIdRoute: typeof AuthenticatedSupplierAgreementsAgreementIdRoute
   AuthenticatedSupplierInboxRfqIdRoute: typeof AuthenticatedSupplierInboxRfqIdRoute
   AuthenticatedSupplierInboxIndexRoute: typeof AuthenticatedSupplierInboxIndexRoute
 }
@@ -563,6 +628,8 @@ const AuthenticatedSupplierRouteChildren: AuthenticatedSupplierRouteChildren = {
   AuthenticatedSupplierSectionRoute: AuthenticatedSupplierSectionRoute,
   AuthenticatedSupplierProfileRoute: AuthenticatedSupplierProfileRoute,
   AuthenticatedSupplierIndexRoute: AuthenticatedSupplierIndexRoute,
+  AuthenticatedSupplierAgreementsAgreementIdRoute:
+    AuthenticatedSupplierAgreementsAgreementIdRoute,
   AuthenticatedSupplierInboxRfqIdRoute: AuthenticatedSupplierInboxRfqIdRoute,
   AuthenticatedSupplierInboxIndexRoute: AuthenticatedSupplierInboxIndexRoute,
 }
