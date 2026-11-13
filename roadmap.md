@@ -10,5 +10,7 @@
 - [x] Step 10 – Private chat per supplier thread (contact-info warning, auto-refresh), quote expiry
 - [x] Step 11 – Compare quotes, accept, agreement signed by both via Smart-ID, order + commission
 - [x] Step 12 – Checkout (escrow, pay later, 30/70 staged), orders + timeline, supplier status + photos, milestones, accept delivery, disputes + admin resolution, reviews
-- [ ] Steps 13–23 – see prompts PDF
+- [x] Step 13 – Group Buy (pools, tiers, join/leave, close, 24 h confirm, keep-tier, auto-RFQ, admin close)
+- [ ] Pool deadlines close automatically — blocked: no scheduler on the backend yet (admin "Close pool now" works); revisit in Step 16 (pg_cron)
+- [ ] Steps 14–23 – see prompts PDF
 - [x] Step 4 – Trust Score from real platform data
