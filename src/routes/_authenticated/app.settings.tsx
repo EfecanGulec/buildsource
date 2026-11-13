@@ -10,12 +10,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QueryState } from "@/components/query-state";
 import { supabase } from "@/integrations/supabase/client";
-import { useI18n, type Lang } from "@/lib/i18n";
+import { useI18n } from "@/lib/i18n";
 import { emptyDeliveryDetails, type DeliveryDetails } from "@/lib/delivery-details";
 import type { TKey } from "@/lib/translations";
 
 export const Route = createFileRoute("/_authenticated/app/settings")({
-  head: () => ({ meta: [{ title: "Profile & settings — BuildSource LT" }, { name: "description", content: "Update your personal details, company details and default delivery address." }] }),
+  head: () => ({ meta: [{ title: "Profile & settings — BuildSource LT" }, { name: "description", content: "Update your personal details, company details and default delivery address." }, { property: "og:title", content: "Profile & settings — BuildSource LT" }, { property: "og:description", content: "Manage your BuildSource LT profile and saved delivery details." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Settings,
 });
 
@@ -23,7 +23,7 @@ type Me = { full_name: string | null; phone: string | null; email: string | null
   company: { name: string; company_code: string; vat_code: string | null; city: string | null; country: string; address: string | null; buyer_segment: string | null } | null };
 
 function Settings() {
-  const { t, setLang } = useI18n();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["my-profile"], queryFn: async () => {
     const { data, error } = await supabase.rpc("my_profile");
@@ -36,7 +36,7 @@ function Settings() {
   const [busy, setBusy] = useState(false);
   useEffect(() => {
     const m = q.data; if (!m) return;
-    setP({ full_name: m.full_name ?? "", phone: m.phone ?? "", language: m.language ?? "en", address: m.company?.address ?? "", vat_code: m.company?.vat_code ?? "" });
+    setP({ full_name: m.full_name ?? "", phone: m.phone ?? "", language: "en", address: m.company?.address ?? "", vat_code: m.company?.vat_code ?? "" });
     setC({ name: m.company?.name ?? "", company_code: m.company?.company_code ?? "", city: m.company?.city ?? "", country: m.company?.country ?? "LT", buyer_segment: m.company?.buyer_segment ?? "" });
     setD({ ...emptyDeliveryDetails, ...(m.default_delivery ?? {}) });
   }, [q.data]);
@@ -50,7 +50,6 @@ function Settings() {
   }
   const saveProfile = () => run(async () => {
     const r = await supabase.rpc("save_my_profile", { _full_name: p.full_name, _phone: p.phone, _language: p.language, _address: p.address, _vat_code: p.vat_code });
-    if (!r.error) setLang(p.language as Lang);
     return r;
   });
   const saveCompany = () => run(() => supabase.rpc("save_my_company", { _name: c.name, _company_code: c.company_code, _city: c.city, _country: c.country, _buyer_segment: (c.buyer_segment || null) as never }));
@@ -69,9 +68,6 @@ function Settings() {
           {field("set.fullName", p.full_name, (v) => setP({ ...p, full_name: v }), { id: "fn" })}
           {field("set.email", q.data.email ?? "", () => {}, { id: "em", disabled: true })}
           {field("set.phone", p.phone, (v) => setP({ ...p, phone: v }), { id: "ph", type: "tel" })}
-          <div className="space-y-1.5"><Label htmlFor="lg">{t("set.language")}</Label>
-            <Select value={p.language} onValueChange={(v) => setP({ ...p, language: v })}><SelectTrigger id="lg"><SelectValue /></SelectTrigger>
-              <SelectContent><SelectItem value="en">English</SelectItem><SelectItem value="lt">Lietuvių</SelectItem></SelectContent></Select></div>
           {field("set.billingAddress", p.address, (v) => setP({ ...p, address: v }), { id: "ba", wide: true })}
           {field("inv.vat", p.vat_code, (v) => setP({ ...p, vat_code: v }), { id: "vat" })}
         </div><Button onClick={saveProfile} disabled={busy}>{t("cd.save")}</Button></CardContent></Card>

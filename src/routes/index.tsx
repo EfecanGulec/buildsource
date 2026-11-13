@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Camera, Check, ShieldCheck, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LangToggle } from "@/components/lang-toggle";
 import { useI18n } from "@/lib/i18n";
 import type { TKey } from "@/lib/translations";
 
@@ -37,7 +36,6 @@ function Index() {
             <span className="font-display text-lg font-bold">BuildSource LT</span>
           </Link>
           <nav className="flex items-center gap-2">
-            <LangToggle />
             <Button asChild variant="ghost" size="sm" className="text-ink-foreground hover:bg-accent/10 hover:text-ink-foreground">
               <Link to="/auth" search={{ mode: "signin" }}>{t("landing.signIn")}</Link>
             </Button>
