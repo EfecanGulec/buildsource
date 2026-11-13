@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminHome,
 });
 
-async function count(table: "companies" | "rfqs" | "orders" | "disputes" | "group_pools" | "integrations", f?: (q: any) => any) {
+async function count(table: "companies" | "rfqs" | "orders" | "disputes" | "group_buy_pools" | "integrations", f?: (q: any) => any) {
   let q: any = supabase.from(table).select("id", { count: "exact", head: true });
   if (f) q = f(q);
   const { count: n, error } = await q;
@@ -26,7 +26,7 @@ function AdminHome() {
       const [companies, rfqs, orders, disputes, pools, live] = await Promise.all([
         count("companies"), count("rfqs"), count("orders"),
         count("disputes", (x) => x.eq("status", "open")),
-        count("group_pools", (x) => x.eq("status", "open")),
+        count("group_buy_pools", (x) => x.eq("status", "open")),
         count("integrations", (x) => x.eq("mode", "live")),
       ]);
       return { companies, rfqs, orders, disputes, pools, live };
