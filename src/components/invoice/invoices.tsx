@@ -32,7 +32,7 @@ export function InvoicesPage({ side }: { side: "buyer" | "supplier" }) {
     <div className="max-w-5xl space-y-6">
       <div><h1 className="font-display text-2xl font-semibold">{t("nav.invoices")}</h1>
         <p className="text-sm text-muted-foreground">{t(side === "buyer" ? "inv.helpBuyer" : "inv.helpSupplier")}</p></div>
-      {q.isPending ? <StatSkeleton /> : q.isError ? <QueryState query={q} /> : (<>
+      {q.isPending ? <StatSkeleton /> : q.isError ? <QueryState isLoading={q.isPending} error={q.error} onRetry={() => q.refetch()} /> : (<>
         <div className="grid gap-4 sm:grid-cols-3">
           <Stat label={t("inv.count")} value={String(rows.length)} />
           <Stat label={t(side === "buyer" ? "inv.spent" : "earn.sales")} value={eur(sum((r) => Number(r.total)))} />
@@ -86,7 +86,7 @@ function InvoiceDetail({ orderId }: { orderId: string }) {
     if (error) throw error;
     return data as unknown as Detail;
   } });
-  if (q.isPending || q.isError) return <><DialogHeader><DialogTitle>{t("inv.invoice")}</DialogTitle><DialogDescription className="sr-only">{t("inv.invoice")}</DialogDescription></DialogHeader><QueryState query={q} /></>;
+  if (q.isPending || q.isError) return <><DialogHeader><DialogTitle>{t("inv.invoice")}</DialogTitle><DialogDescription className="sr-only">{t("inv.invoice")}</DialogDescription></DialogHeader><QueryState isLoading={q.isPending} error={q.error} onRetry={() => q.refetch()} /></>;
   const d = q.data;
   return <div id="invoice-print" className="space-y-5">
     <DialogHeader className="flex-row items-start justify-between gap-4 space-y-0">
@@ -108,6 +108,6 @@ function InvoiceDetail({ orderId }: { orderId: string }) {
         <div className="font-medium"><dt>{t("agr.payout")}</dt><dd className="tabular-nums">{eur(Number(d.supplier_payout))}</dd></div>
       </>}
     </dl>
-    <p className="text-xs text-muted-foreground">{t("inv.payment")}: {t(`pay.${d.payment_method}` as never) || d.payment_method}</p>
+    <p className="text-xs text-muted-foreground">{t("inv.payment")}: {d.payment_method.replace(/_/g, " ")}</p>
   </div>;
 }
