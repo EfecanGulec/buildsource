@@ -56,3 +56,5 @@ use the editor.
 - Delivery tables change only via shipment RPCs funnelled through `_shipment_event`, which also moves the order status (so on-time rate keeps reading `order_events`); rules mirrored in `src/lib/shipment.ts`.
 - Public `/d/$token` uses only `driver_*` RPCs (token = credential); photos in private `delivery-photos/<driver_token>/`; site contact sits in `rfq_site_contacts`, hidden from suppliers until an order exists.
 - Material Lens: logic and flow notes in `src/lib/AGENTS.md`.
+- Invoices are built from orders by the `my_invoices`/`invoice_detail` RPCs (commission shown only to the supplier side/admin); buyer profile + default delivery are written only via `save_my_profile`/`save_my_default_delivery`, and accepting an offer refreshes the saved default.
+- Category commission: `categories.commission_rate` (subcategory → parent → standard tiers via `category_commission_rate`) is applied inside `calc_commission`, so there is still one commission formula; admins change it via `admin_set_category_commission`.
