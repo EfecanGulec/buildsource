@@ -15,7 +15,7 @@ import { hasContactInfo } from "@/lib/chat";
 /** Private chat for one supplier thread (rfq_recipient). Refreshes every few seconds. */
 export function ChatPanel({ rfqId, recipientId, viewer, canSend, title, onOfferDraft }: {
   rfqId: string; recipientId: string; viewer: "buyer" | "supplier"; canSend: boolean; title?: string;
-  onOfferDraft?: (d: OfferDraft) => void;
+  onOfferDraft?: ((d: OfferDraft) => void) | undefined;
 }) {
   const { t, lang } = useI18n();
   const ask = useServerFn(askAgent);

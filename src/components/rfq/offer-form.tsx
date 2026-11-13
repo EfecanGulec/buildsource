@@ -19,7 +19,7 @@ export type Offer = {
 export type PriceHint = { name: string; price: number; unit: string | null; updated: string | null };
 
 export function OfferForm({ items, hints, initial, draftMessage, submitLabel, onSubmit, onCancel }: {
-  items: OfferItem[]; hints?: Record<string, PriceHint>; initial?: VersionLike | null | undefined; draftMessage?: string | null; submitLabel: string;
+  items: OfferItem[]; hints?: Record<string, PriceHint>; initial?: VersionLike | null | undefined; draftMessage?: string | null | undefined; submitLabel: string;
   onSubmit: (o: Offer) => Promise<boolean>; onCancel?: () => void;
 }) {
   const { t } = useI18n();
