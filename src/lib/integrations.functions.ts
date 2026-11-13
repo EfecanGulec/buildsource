@@ -48,3 +48,13 @@ export const setIntegrationMode = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Admin: send any pending notification emails now (same code the timed job runs). */
+export const sendPendingEmails = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const { dispatchNotificationEmails } = await import("./notify-email.server");
+    return dispatchNotificationEmails(new URL(getRequest().url).origin);
+  });
