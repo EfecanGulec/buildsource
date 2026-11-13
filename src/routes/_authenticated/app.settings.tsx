@@ -80,7 +80,7 @@ function Settings() {
         <CardContent className="space-y-4"><div className="grid gap-4 sm:grid-cols-2">
           {field("set.companyName", c.name, (v) => setC({ ...c, name: v }), { id: "cn" })}
           {field("inv.companyCode", c.company_code, (v) => setC({ ...c, company_code: v }), { id: "cc" })}
-          {field("rfq.city", c.city, (v) => setC({ ...c, city: v }), { id: "ci" })}
+          {field("set.city", c.city, (v) => setC({ ...c, city: v }), { id: "ci" })}
           {field("set.country", c.country, (v) => setC({ ...c, country: v.toUpperCase().slice(0, 2) }), { id: "co" })}
         </div><Button onClick={saveCompany} disabled={busy || !c.name || !c.company_code}>{t("cd.save")}</Button></CardContent></Card>
 
