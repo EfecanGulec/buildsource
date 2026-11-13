@@ -24,6 +24,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminSectionRouteImport } from './routes/_authenticated/admin.$section'
 import { Route as AuthenticatedAdminDemoDataRouteImport } from './routes/_authenticated/admin.demo-data'
 import { Route as AuthenticatedAdminDisputesRouteImport } from './routes/_authenticated/admin.disputes'
+import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
 import { Route as AuthenticatedAdminPoolsRouteImport } from './routes/_authenticated/admin.pools'
 import { Route as AuthenticatedAdminTrustScoresRouteImport } from './routes/_authenticated/admin.trust-scores'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
@@ -126,6 +127,12 @@ const AuthenticatedAdminDisputesRoute =
   AuthenticatedAdminDisputesRouteImport.update({
     id: '/disputes',
     path: '/disputes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminIntegrationsRoute =
+  AuthenticatedAdminIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminPoolsRoute = AuthenticatedAdminPoolsRouteImport.update({
@@ -295,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/disputes': typeof AuthenticatedAdminDisputesRoute
+  '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/pools': typeof AuthenticatedAdminPoolsRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
@@ -334,6 +342,7 @@ export interface FileRoutesByTo {
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/disputes': typeof AuthenticatedAdminDisputesRoute
+  '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/pools': typeof AuthenticatedAdminPoolsRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/app/$section': typeof AuthenticatedAppSectionRoute
@@ -378,6 +387,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/_authenticated/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/_authenticated/admin/disputes': typeof AuthenticatedAdminDisputesRoute
+  '/_authenticated/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/_authenticated/admin/pools': typeof AuthenticatedAdminPoolsRoute
   '/_authenticated/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
   '/_authenticated/app/$section': typeof AuthenticatedAppSectionRoute
@@ -422,6 +432,7 @@ export interface FileRouteTypes {
     | '/admin/$section'
     | '/admin/demo-data'
     | '/admin/disputes'
+    | '/admin/integrations'
     | '/admin/pools'
     | '/admin/trust-scores'
     | '/app/$section'
@@ -461,6 +472,7 @@ export interface FileRouteTypes {
     | '/admin/$section'
     | '/admin/demo-data'
     | '/admin/disputes'
+    | '/admin/integrations'
     | '/admin/pools'
     | '/admin/trust-scores'
     | '/app/$section'
@@ -504,6 +516,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/$section'
     | '/_authenticated/admin/demo-data'
     | '/_authenticated/admin/disputes'
+    | '/_authenticated/admin/integrations'
     | '/_authenticated/admin/pools'
     | '/_authenticated/admin/trust-scores'
     | '/_authenticated/app/$section'
@@ -646,6 +659,13 @@ declare module '@tanstack/react-router' {
       path: '/disputes'
       fullPath: '/admin/disputes'
       preLoaderRoute: typeof AuthenticatedAdminDisputesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/integrations': {
+      id: '/_authenticated/admin/integrations'
+      path: '/integrations'
+      fullPath: '/admin/integrations'
+      preLoaderRoute: typeof AuthenticatedAdminIntegrationsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/pools': {
@@ -837,6 +857,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSectionRoute: typeof AuthenticatedAdminSectionRoute
   AuthenticatedAdminDemoDataRoute: typeof AuthenticatedAdminDemoDataRoute
   AuthenticatedAdminDisputesRoute: typeof AuthenticatedAdminDisputesRoute
+  AuthenticatedAdminIntegrationsRoute: typeof AuthenticatedAdminIntegrationsRoute
   AuthenticatedAdminPoolsRoute: typeof AuthenticatedAdminPoolsRoute
   AuthenticatedAdminTrustScoresRoute: typeof AuthenticatedAdminTrustScoresRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -846,6 +867,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminSectionRoute: AuthenticatedAdminSectionRoute,
   AuthenticatedAdminDemoDataRoute: AuthenticatedAdminDemoDataRoute,
   AuthenticatedAdminDisputesRoute: AuthenticatedAdminDisputesRoute,
+  AuthenticatedAdminIntegrationsRoute: AuthenticatedAdminIntegrationsRoute,
   AuthenticatedAdminPoolsRoute: AuthenticatedAdminPoolsRoute,
   AuthenticatedAdminTrustScoresRoute: AuthenticatedAdminTrustScoresRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
