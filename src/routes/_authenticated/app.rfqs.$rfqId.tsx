@@ -18,9 +18,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { ScanPhotos } from "@/components/lens/scan-photos";
 import { useI18n } from "@/lib/i18n";
 import type { TKey } from "@/lib/translations";
+import { DeliveryAcceptance } from "@/components/rfq/delivery-acceptance";
 
 export const Route = createFileRoute("/_authenticated/app/rfqs/$rfqId")({
-  head: () => ({ meta: [{ title: "RFQ — BuildSource LT" }] }),
+  head: () => ({ meta: [{ title: "Request details — BuildSource LT" }, { name: "description", content: "Review supplier offers, negotiate and confirm delivery for your sourcing request." }, { property: "og:title", content: "Request details — BuildSource LT" }, { property: "og:description", content: "Review supplier offers, negotiate and confirm delivery for your sourcing request." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: RfqDetail,
 });
 
@@ -170,11 +171,6 @@ function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
     if (error) { toast.error(error.message); return false; }
     toast.success(t("quote.counterSent")); setCountering(false); onChange(); return true;
   }
-  async function accept() {
-    const { data, error } = await supabase.rpc("buyer_accept_quote", { _quote: quote.id });
-    if (error) { toast.error(error.message); return; }
-    navigate({ to: "/app/agreements/$agreementId", params: { agreementId: data } });
-  }
   async function reject() {
     const { error } = await supabase.rpc("buyer_reject_quote", { _quote: quote.id, _reason: reason });
     if (error) { toast.error(error.message); return; }
@@ -195,7 +191,7 @@ function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
         <div className="flex flex-wrap items-center gap-2">
           {acts.buyerCounter && <Button onClick={() => setCountering(true)}>{t("quote.makeCounter")}</Button>}
           <Button variant="outline" onClick={() => setRejecting(true)}>{t("quote.reject")}</Button>
-          {acts.buyerAccept && <Button variant="secondary" onClick={accept}>{t("compare.accept")}</Button>}
+          {acts.buyerAccept && <DeliveryAcceptance variant="secondary" rfqId={quote.rfq_id} quoteId={quote.id} />}
         </div>)}
       {countering && <OfferForm key={draftKey} items={items} initial={draft ? fromDraft(last, draft) : last} draftMessage={draft?.message} submitLabel={t("quote.sendCounter")} onSubmit={counter} onCancel={() => { setCountering(false); setDraft(null); }} />}
       <div className="border-t pt-4"><ChatPanel rfqId={quote.rfq_id} recipientId={quote.recipient_id} viewer="buyer" canSend={quote.status !== "rejected"} onOfferDraft={acts.buyerCounter ? useDraft : undefined} /></div>

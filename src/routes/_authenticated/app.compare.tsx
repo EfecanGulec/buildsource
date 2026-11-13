@@ -9,11 +9,12 @@ import { TrustBadge, type Breakdown } from "@/components/trust-badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { compareLabels, nextActions } from "@/lib/quote";
+import { DeliveryAcceptance } from "@/components/rfq/delivery-acceptance";
 
 type Search = { rfq?: string };
 export const Route = createFileRoute("/_authenticated/app/compare")({
   validateSearch: (s: Record<string, unknown>): Search => (typeof s["rfq"] === "string" ? { rfq: s["rfq"] } : {}),
-  head: () => ({ meta: [{ title: "Compare quotes — BuildSource LT" }] }),
+  head: () => ({ meta: [{ title: "Compare quotes — BuildSource LT" }, { name: "description", content: "Compare supplier offers and confirm delivery details with your chosen supplier." }, { property: "og:title", content: "Compare quotes — BuildSource LT" }, { property: "og:description", content: "Compare supplier offers and confirm delivery details with your chosen supplier." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Compare,
 });
 
@@ -35,10 +36,11 @@ function Compare() {
   const q = useQuery({
     queryKey: ["compare", selected], enabled: !!selected,
     queryFn: async () => {
+      if (!selected) return null;
       await supabase.rpc("expire_stale_quotes");
       const { data: rfq, error } = await supabase.from("rfqs")
         .select("id,rfq_number,title,status,delivery_city,negotiation_round_limit,rfq_items(id,description,quantity,unit,category_id,sort_order),quotes(*,companies(name,city),quote_versions(*)),agreements(id,status)")
-        .eq("id", selected!).maybeSingle();
+        .eq("id", selected).maybeSingle();
       if (error) throw error;
       if (!rfq) return null;
       const ids = rfq.quotes.map((x) => x.supplier_company_id);
@@ -56,12 +58,6 @@ function Compare() {
     },
   });
 
-  async function accept(quoteId: string) {
-    const { data, error } = await supabase.rpc("buyer_accept_quote", { _quote: quoteId });
-    if (error) { toast.error(error.message); return; }
-    navigate({ to: "/app/agreements/$agreementId", params: { agreementId: data } });
-  }
-
   const d = q.data;
   const items = d ? [...d.rfq.rfq_items].sort((a, b) => a.sort_order - b.sort_order) : [];
   const cols = d ? d.rfq.quotes.map((qu) => {
@@ -70,7 +66,7 @@ function Compare() {
     return { qu, latest, supplierV, lines: new Map(((supplierV?.lines as Line[]) ?? []).map((l) => [l.rfq_item_id, l])) };
   }) : [];
   const open = cols.filter((c) => c.supplierV && (c.qu.status === "sent" || c.qu.status === "negotiating"));
-  const labels = compareLabels(open.map((c) => ({ id: c.qu.id, total: Number(c.supplierV!.total), leadDays: c.supplierV!.lead_time_days })));
+  const labels = compareLabels(open.flatMap((c) => c.supplierV ? [{ id: c.qu.id, total: Number(c.supplierV.total), leadDays: c.supplierV.lead_time_days }] : []));
   const pending = d?.rfq.agreements.find((a) => a.status !== "cancelled");
 
   return (
@@ -120,7 +116,7 @@ function Compare() {
               <tr className="[&>td]:px-4 [&>td]:py-3"><td />
                 {cols.map((c) => { const a = nextActions({ status: c.qu.status, lastParty: c.latest?.party ?? null, roundCount: c.qu.round_count, roundLimit: d.rfq.negotiation_round_limit }); return (
                   <td key={c.qu.id} className="space-y-2">
-                    {a.buyerAccept && !pending && <Button className="w-full" onClick={() => accept(c.qu.id)}>{t("compare.accept")}</Button>}
+                    {a.buyerAccept && !pending && <DeliveryAcceptance className="w-full" rfqId={d.rfq.id} quoteId={c.qu.id} />}
                     <Button asChild variant="outline" className="w-full"><Link to="/app/rfqs/$rfqId" params={{ rfqId: d.rfq.id }}>{t("compare.negotiate")}</Link></Button>
                   </td>); })}</tr>
             </tbody>

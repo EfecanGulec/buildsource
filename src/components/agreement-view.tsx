@@ -8,6 +8,8 @@ import { SmartIdDialog } from "@/components/smart-id-dialog";
 import { eur } from "@/components/rfq/quote-thread";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
+import { DeliveryAcceptance, DeliverySummary } from "@/components/rfq/delivery-acceptance";
+import { deliveryDetailsSchema, needsDeliveryDetails } from "@/lib/delivery-details";
 
 type Line = { rfq_item_id: string; unit_price: number; quantity: number; line_total: number };
 
@@ -35,6 +37,8 @@ export function AgreementView({ id, side }: { id: string; side: "buyer" | "suppl
   const v = a.quote_versions;
   const names = new Map((a.rfqs?.rfq_items ?? []).map((i) => [i.id, `${i.description}`]));
   const mySigned = side === "buyer" ? a.buyer_signed_at : a.supplier_signed_at;
+  const missingDelivery = needsDeliveryDetails(a.delivery_details_required, a.delivery_details);
+  const delivery = deliveryDetailsSchema.safeParse(a.delivery_details);
   const refresh = () => { qc.invalidateQueries({ queryKey: ["agreement", id] }); qc.invalidateQueries({ queryKey: ["rfqs"] }); };
 
   async function signed(code: string) {
@@ -70,13 +74,18 @@ export function AgreementView({ id, side }: { id: string; side: "buyer" | "suppl
         <p className="text-muted-foreground">{t("rfq.leadTime")}: {a.lead_time_days ?? "—"} {t("rfq.days")} · {t("rfq.date")}: {a.delivery_date ?? "—"} · {t("quote.terms")}: {a.payment_terms ?? "—"}</p>
         <p className="text-muted-foreground">{t("rfq.address")}: {a.rfqs?.delivery_city} {a.rfqs?.delivery_address ?? ""}</p>
       </div>
+      {delivery.success && <DeliverySummary details={delivery.data} />}
+      {a.status === "pending" && missingDelivery && <div className="space-y-3">
+        <p className="text-sm text-muted-foreground">{t(side === "buyer" ? "delivery.beforeSign" : "delivery.waitBuyer")}</p>
+        {side === "buyer" && <DeliveryAcceptance rfqId={a.rfq_id} agreementId={id} onSaved={refresh} />}
+      </div>}
       <div className="space-y-2">
         <Sig label={t("agr.buyer")} at={a.buyer_signed_at} />
         <Sig label={t("agr.supplier")} at={a.supplier_signed_at} />
       </div>
       {a.status === "pending" && !mySigned && (
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => setSigning(true)}>{t("agr.sign")}</Button>
+          <Button disabled={missingDelivery} onClick={() => setSigning(true)}>{t("agr.sign")}</Button>
           <Button variant="ghost" onClick={cancel}>{t("agr.cancel")}</Button>
         </div>)}
       {a.status === "pending" && mySigned && <p className="text-sm text-muted-foreground">{t("agr.waitOther")}</p>}
