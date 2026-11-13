@@ -10,7 +10,7 @@ export const SERVICES: Record<Service, { label: string; secrets: string[]; demo:
   financing: { label: "Pay later / financing", secrets: ["PAYSERA_API_KEY"], demo: "Auto-approve up to €20,000" },
   company_data: { label: "Company register, Sodra, VMI, VIES", secrets: ["REGISTRUCENTRAS_API_KEY"], demo: "Seeded public company data" },
   places: { label: "Google reviews", secrets: ["GOOGLE_PLACES_API_KEY"], demo: "Seeded ratings" },
-  email: { label: "Email", secrets: ["RESEND_API_KEY"], demo: "In-app notifications + copyable links" },
+  email: { label: "Email", secrets: ["LOVABLE_API_KEY"], demo: "In-app notifications + copyable links" },
   whatsapp: { label: "WhatsApp", secrets: ["META_WHATSAPP_TOKEN"], demo: "Not sent" },
   sms: { label: "SMS", secrets: ["TWILIO_AUTH_TOKEN"], demo: "Not sent" },
   carrier: { label: "Carrier tracking", secrets: ["DPD_API_KEY"], demo: "Manual status updates" },
