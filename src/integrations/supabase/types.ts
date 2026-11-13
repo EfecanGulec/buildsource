@@ -1695,6 +1695,7 @@ export type Database = {
       }
       compute_buyer_reliability: { Args: { _company: string }; Returns: number }
       compute_trust_score: { Args: { _company: string }; Returns: number }
+      expire_stale_quotes: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -7,5 +7,6 @@
 - [x] Step 7 – Matching on submit, supplier inbox, decline + reroute, questions, admin "Simulate 48 h"
 - [x] Step 8 – Magic link page /q/:token for unclaimed suppliers (view, ask, decline, claim banner) + admin link list
 - [x] Step 9 – Quotes, counter-offers, revisions, 3-round limit, reject (signed-in + magic link)
-- [ ] Steps 10–23 – see prompts PDF
+- [x] Step 10 – Private chat per supplier thread (contact-info warning, auto-refresh), quote expiry
+- [ ] Steps 11–23 – see prompts PDF
 - [x] Step 4 – Trust Score from real platform data

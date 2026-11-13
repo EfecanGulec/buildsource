@@ -273,6 +273,11 @@ export const en = {
   "quote.history": "Negotiation",
   "quote.overview": "Overview",
   "quote.deliveryCost": "Delivery",
+  "chat.title": "Messages",
+  "chat.placeholder": "Write a message…",
+  "chat.contactWarn": "Contact details are shared after the order is confirmed.",
+  "chat.priceNote": "Price changes go through quote versions, not chat.",
+  "chat.with": "Chat with {name}",
 } as const;
 
 export type TKey = keyof typeof en;

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/rfq/status-badge";
 import { specsSummary } from "@/components/rfq/spec-fields";
+import { ChatPanel } from "@/components/rfq/chat-panel";
 import { OfferForm, type Offer } from "@/components/rfq/offer-form";
 import { QuoteThread, type ThreadVersion } from "@/components/rfq/quote-thread";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +32,7 @@ function RfqDetail() {
   const q = useQuery({
     queryKey: ["rfqs", rfqId],
     queryFn: async () => {
+      await supabase.rpc("expire_stale_quotes");
       const { data: rfq, error } = await supabase.from("rfqs")
         .select("*, rfq_items(*, categories(name_en)), rfq_recipients(*, companies(name,city)), quotes(*, quote_versions(*), companies(name))")
         .eq("id", rfqId).maybeSingle();
@@ -96,7 +98,12 @@ function RfqDetail() {
             </tbody></table>)}
         </TabsContent>
         <TabsContent value="quotes" className="space-y-4">
+          {rfq.quotes.length === 0 && <p className="rounded-lg border bg-card p-8 text-center text-muted-foreground">{t("rfq.noQuotes")}</p>}
           {rfq.quotes.map((qu) => <BuyerQuote key={qu.id} quote={qu} items={items} roundLimit={rfq.negotiation_round_limit} onChange={() => qc.invalidateQueries({ queryKey: ["rfqs"] })} />)}
+          {recipients.filter((r) => !rfq.quotes.some((qu) => qu.recipient_id === r.id) && r.status !== "rerouted").map((r) => (
+            <div key={r.id} className="rounded-lg border bg-card p-6">
+              <ChatPanel rfqId={rfqId} recipientId={r.id} viewer="buyer" canSend={r.status !== "declined"} title={t("chat.with").replace("{name}", r.companies?.name ?? "")} />
+            </div>))}
         </TabsContent>
         <TabsContent value="summary" className="rounded-lg border bg-card">
           {rfq.quotes.length === 0 ? <p className="p-8 text-center text-muted-foreground">{t("rfq.noQuotes")}</p> : (
@@ -136,7 +143,7 @@ function RfqDetail() {
 }
 
 type BuyerQuoteProps = {
-  quote: { id: string; status: string; round_count: number; companies: { name: string } | null; quote_versions: ThreadVersion[] };
+  quote: { id: string; rfq_id: string; recipient_id: string; status: string; round_count: number; companies: { name: string } | null; quote_versions: ThreadVersion[] };
   items: { id: string; description: string; quantity: number; unit: string | null }[];
   roundLimit: number; onChange: () => void;
 };
@@ -177,6 +184,7 @@ function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
           <span className="text-xs text-muted-foreground">{t("quote.acceptSoon")}</span>
         </div>)}
       {countering && <OfferForm items={items} initial={last} submitLabel={t("quote.sendCounter")} onSubmit={counter} onCancel={() => setCountering(false)} />}
+      <div className="border-t pt-4"><ChatPanel rfqId={quote.rfq_id} recipientId={quote.recipient_id} viewer="buyer" canSend={quote.status !== "rejected"} /></div>
       {rejecting && (
         <div className="space-y-2">
           <Textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("quote.rejectReason")} aria-label={t("quote.rejectReason")} />

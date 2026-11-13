@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/rfq/status-badge";
+import { ChatPanel } from "@/components/rfq/chat-panel";
 import { OfferForm, type Offer } from "@/components/rfq/offer-form";
 import { QuoteThread, type ThreadVersion } from "@/components/rfq/quote-thread";
 import { nextActions } from "@/lib/quote";
@@ -47,6 +48,7 @@ function SupplierRfq() {
       if (error) throw error;
       if (!rec) return null;
       const { data: msgs } = await supabase.from("messages").select("id,body,sender_party,created_at").eq("recipient_id", rec.id).order("created_at");
+      await supabase.rpc("expire_stale_quotes");
       const { data: quote } = await supabase.from("quotes").select("*, quote_versions(*)").eq("rfq_id", rfqId).maybeSingle();
       return { rec, msgs: msgs ?? [], quote };
     },
@@ -156,18 +158,8 @@ function SupplierRfq() {
         </div>
       )}
 
-      <div className="rounded-lg border bg-card p-6 space-y-4">
-        <h2 className="flex items-center gap-2 font-display text-lg font-semibold"><MessageSquare className="h-5 w-5 text-primary" />{t("inbox.questions")}</h2>
-        {msgs.length === 0 ? <p className="text-sm text-muted-foreground">{t("inbox.noMessages")}</p> : (
-          <ul className="space-y-2 text-sm">{msgs.map((m) => (
-            <li key={m.id} className={m.sender_party === "supplier" ? "ml-auto max-w-[80%] rounded-lg bg-primary/10 p-3" : "max-w-[80%] rounded-lg bg-muted p-3"}>
-              <p>{m.body}</p><p className="mt-1 text-xs text-muted-foreground">{new Date(m.created_at).toLocaleString("en-GB")}</p></li>))}
-          </ul>)}
-        {rec.status !== "declined" && rec.status !== "rerouted" && (
-          <div className="flex gap-2">
-            <Textarea value={question} onChange={(e) => setQuestion(e.target.value)} placeholder={t("inbox.askPh")} rows={2} aria-label={t("inbox.ask")} />
-            <Button onClick={ask} disabled={busy || !question.trim()}>{t("inbox.send")}</Button>
-          </div>)}
+      <div className="rounded-lg border bg-card p-6">
+        <ChatPanel rfqId={rfqId} recipientId={rec.id} viewer="supplier" canSend={rec.status !== "declined" && rec.status !== "rerouted"} />
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
