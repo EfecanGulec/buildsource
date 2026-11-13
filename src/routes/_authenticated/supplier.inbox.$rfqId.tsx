@@ -8,6 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/rfq/status-badge";
+import { OfferForm, type Offer } from "@/components/rfq/offer-form";
+import { QuoteThread, type ThreadVersion } from "@/components/rfq/quote-thread";
+import { nextActions } from "@/lib/quote";
 import { specsSummary } from "@/components/rfq/spec-fields";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccount } from "@/hooks/use-account";
@@ -33,6 +36,7 @@ function SupplierRfq() {
   const [msg, setMsg] = useState("");
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);
+  const [quoting, setQuoting] = useState(false);
 
   const q = useQuery({
     queryKey: ["supplier-rfq", rfqId],
@@ -43,7 +47,8 @@ function SupplierRfq() {
       if (error) throw error;
       if (!rec) return null;
       const { data: msgs } = await supabase.from("messages").select("id,body,sender_party,created_at").eq("recipient_id", rec.id).order("created_at");
-      return { rec, msgs: msgs ?? [] };
+      const { data: quote } = await supabase.from("quotes").select("*, quote_versions(*)").eq("rfq_id", rfqId).maybeSingle();
+      return { rec, msgs: msgs ?? [], quote };
     },
   });
 
@@ -55,10 +60,13 @@ function SupplierRfq() {
 
   if (q.isLoading) return <p className="text-muted-foreground">…</p>;
   if (!q.data?.rec.rfqs) return <p className="text-muted-foreground">{t("rfq.notFound")}</p>;
-  const { rec, msgs } = q.data;
+  const { rec, msgs, quote } = q.data;
   const rfq = rec.rfqs!;
   const items = [...rfq.rfq_items].sort((a, b) => a.sort_order - b.sort_order);
   const canAct = rec.status === "sent" || rec.status === "viewed";
+  const versions = [...(quote?.quote_versions ?? [])].sort((a, b) => a.version - b.version);
+  const last = versions[versions.length - 1];
+  const acts = quote ? nextActions({ status: quote.status, lastParty: last?.party ?? null, roundCount: quote.round_count, roundLimit: rfq.negotiation_round_limit }) : null;
   const refresh = () => { qc.invalidateQueries({ queryKey: ["supplier-rfq", rfqId] }); qc.invalidateQueries({ queryKey: ["supplier-inbox"] }); };
 
   async function decline() {
@@ -67,6 +75,16 @@ function SupplierRfq() {
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     setOpen(false); toast.success(t("inbox.declined")); refresh();
+  }
+  async function sendOffer(o: Offer) {
+    const { error } = await supabase.rpc("supplier_send_quote", { _rfq: rfqId, _offer: o });
+    if (error) { toast.error(error.message); return false; }
+    toast.success(t("quote.sent")); setQuoting(false); refresh(); return true;
+  }
+  async function rejectCounter() {
+    const { error } = await supabase.rpc("supplier_reject_counter", { _rfq: rfqId });
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("quote.rejected")); refresh();
   }
   async function ask() {
     if (!question.trim() || !account) return;
@@ -106,10 +124,35 @@ function SupplierRfq() {
         </table>
       </div>
 
-      {canAct && (
+      {canAct && !quoting && (
         <div className="flex flex-wrap gap-2">
-          <Button disabled title={t("inbox.quoteSoon")}><Send className="mr-2 h-4 w-4" />{t("inbox.sendQuote")}</Button>
+          <Button onClick={() => setQuoting(true)}><Send className="mr-2 h-4 w-4" />{t("inbox.sendQuote")}</Button>
           <Button variant="outline" onClick={() => setOpen(true)}><X className="mr-2 h-4 w-4" />{t("inbox.decline")}</Button>
+        </div>
+      )}
+      {quote && (
+        <div className="rounded-lg border bg-card p-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-display text-lg font-semibold">{t("quote.history")}</h2>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              {t("quote.rounds").replace("{n}", String(quote.round_count)).replace("{m}", String(rfq.negotiation_round_limit))}
+              <StatusBadge kind="quote" status={quote.status} /></div>
+          </div>
+          <QuoteThread versions={versions as ThreadVersion[]} viewer="supplier" items={items} />
+          {acts?.supplierRevise && !quoting && (
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={() => setQuoting(true)}>{t("quote.revise")}</Button>
+              <Button variant="outline" onClick={rejectCounter}>{t("quote.rejectCounter")}</Button>
+              <span className="self-center text-xs text-muted-foreground">{t("quote.acceptSoon")}</span>
+            </div>)}
+          {quote.status === "sent" && <p className="text-sm text-muted-foreground">{t("quote.waitBuyer")}</p>}
+          {(quote.status === "rejected" || quote.status === "expired" || quote.status === "withdrawn") && <p className="text-sm text-muted-foreground">{t("quote.closed")}</p>}
+        </div>
+      )}
+      {quoting && (
+        <div className="rounded-lg border bg-card p-6 space-y-4">
+          <h2 className="font-display text-lg font-semibold">{quote ? t("quote.revise") : t("quote.yourQuote")}</h2>
+          <OfferForm items={items} initial={last} submitLabel={quote ? t("quote.revise") : t("quote.send")} onSubmit={sendOffer} onCancel={() => setQuoting(false)} />
         </div>
       )}
 

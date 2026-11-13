@@ -8,6 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/rfq/status-badge";
+import { OfferForm, type Offer, type OfferItem } from "@/components/rfq/offer-form";
+import { QuoteThread, type ThreadVersion } from "@/components/rfq/quote-thread";
+import { nextActions } from "@/lib/quote";
 import { specsSummary } from "@/components/rfq/spec-fields";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
@@ -56,6 +59,15 @@ function MagicPage() {
       return data as unknown as Magic | null;
     },
   });
+  const qs = useQuery({
+    queryKey: ["magic", token, "quote"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("magic_quote_state", { _token: token });
+      if (error) throw error;
+      return data as unknown as { items: OfferItem[]; quote: { status: string; round_count: number; round_limit: number; versions: ThreadVersion[] } | null } | null;
+    },
+  });
+  const [quoting, setQuoting] = useState(false);
   const refresh = () => qc.invalidateQueries({ queryKey: ["magic", token] });
 
   if (q.isLoading) return <div className="p-6 text-muted-foreground">…</div>;
@@ -63,6 +75,16 @@ function MagicPage() {
   const d = q.data;
   const active = d.status === "sent" || d.status === "viewed";
 
+  const quote = qs.data?.quote ?? null;
+  const qItems = qs.data?.items ?? [];
+  const versions = quote?.versions ?? [];
+  const last = versions[versions.length - 1];
+  const acts = quote ? nextActions({ status: quote.status, lastParty: last?.party ?? null, roundCount: quote.round_count, roundLimit: quote.round_limit }) : null;
+  async function sendOffer(o: Offer) {
+    const { error } = await supabase.rpc("magic_send_quote", { _token: token, _offer: o });
+    if (error) { toast.error(error.message); return false; }
+    toast.success(t("quote.sent")); setQuoting(false); refresh(); return true;
+  }
   async function ask() {
     setBusy(true);
     const { error } = await supabase.rpc("magic_ask", { _token: token, _body: question });
@@ -109,9 +131,20 @@ function MagicPage() {
             </div>))}
         </section>
 
-        {active && (
+        {quote && (
+          <section className="rounded-lg border bg-card p-4 space-y-3">
+            <div className="flex items-center justify-between gap-2"><h3 className="font-medium">{t("quote.history")}</h3><StatusBadge kind="quote" status={quote.status} /></div>
+            <QuoteThread versions={versions} viewer="supplier" items={qItems} />
+            {acts?.supplierRevise && !quoting && <Button className="w-full" onClick={() => setQuoting(true)}>{t("quote.revise")}</Button>}
+            {quote.status === "sent" && <p className="text-sm text-muted-foreground">{t("quote.waitBuyer")}</p>}
+          </section>)}
+        {quoting && (
+          <section className="rounded-lg border bg-card p-4">
+            <OfferForm items={qItems} initial={last} submitLabel={quote ? t("quote.revise") : t("quote.send")} onSubmit={sendOffer} onCancel={() => setQuoting(false)} />
+          </section>)}
+        {active && !quoting && (
           <div className="grid gap-2 sm:grid-cols-2">
-            <Button size="lg" disabled title={t("inbox.quoteSoon")}><Send className="mr-2 h-4 w-4" />{t("inbox.sendQuote")}</Button>
+            <Button size="lg" onClick={() => setQuoting(true)}><Send className="mr-2 h-4 w-4" />{t("inbox.sendQuote")}</Button>
             <Button size="lg" variant="outline" onClick={() => setOpen(true)}><X className="mr-2 h-4 w-4" />{t("inbox.decline")}</Button>
           </div>)}
         {d.status === "declined" && <p className="rounded-md bg-muted p-3 text-sm">{t("magic.closed")}</p>}
