@@ -197,6 +197,13 @@
       "when": 1794573821726,
       "tag": "0027_notification_emails",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1794579454908,
+      "tag": "0028_ai_chat_assistant",
+      "breakpoints": true
     }
   ]
 }

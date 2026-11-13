@@ -87,6 +87,74 @@ export type Database = {
           },
         ]
       }
+      ai_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+          recipient_id: string
+          rfq_id: string
+          scope: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+          recipient_id: string
+          rfq_id: string
+          scope: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+          recipient_id?: string
+          rfq_id?: string
+          scope?: string
+        }
+        Relationships: []
+      }
+      ai_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          profile_id: string
+          role: string
+          tokens: number | null
+          tool_calls: Json | null
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          profile_id: string
+          role: string
+          tokens?: number | null
+          tool_calls?: Json | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          profile_id?: string
+          role?: string
+          tokens?: number | null
+          tool_calls?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -716,6 +784,7 @@ export type Database = {
           contains_contact_info: boolean
           created_at: string
           id: string
+          is_ai: boolean
           quote_id: string | null
           read_at: string | null
           recipient_id: string
@@ -730,6 +799,7 @@ export type Database = {
           contains_contact_info?: boolean
           created_at?: string
           id?: string
+          is_ai?: boolean
           quote_id?: string | null
           read_at?: string | null
           recipient_id: string
@@ -744,6 +814,7 @@ export type Database = {
           contains_contact_info?: boolean
           created_at?: string
           id?: string
+          is_ai?: boolean
           quote_id?: string | null
           read_at?: string | null
           recipient_id?: string
