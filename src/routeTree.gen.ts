@@ -53,6 +53,7 @@ import { Route as AuthenticatedSupplierInboxIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedSupplierInboxRfqIdRouteImport } from './routes/_authenticated/supplier.inbox.$rfqId'
 import { Route as AuthenticatedSupplierOrdersIndexRouteImport } from './routes/_authenticated/supplier.orders.index'
 import { Route as AuthenticatedSupplierOrdersOrderIdRouteImport } from './routes/_authenticated/supplier.orders.$orderId'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -300,6 +301,12 @@ const AuthenticatedSupplierOrdersOrderIdRoute =
     path: '/orders/$orderId',
     getParentRoute: () => AuthenticatedSupplierRoute,
   } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -339,6 +346,7 @@ export interface FileRoutesByFullPath {
   '/supplier/agreements/$agreementId': typeof AuthenticatedSupplierAgreementsAgreementIdRoute
   '/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/supplier/orders/$orderId': typeof AuthenticatedSupplierOrdersOrderIdRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/app/group-buy/': typeof AuthenticatedAppGroupBuyIndexRoute
   '/app/orders/': typeof AuthenticatedAppOrdersIndexRoute
   '/app/rfqs/': typeof AuthenticatedAppRfqsIndexRoute
@@ -381,6 +389,7 @@ export interface FileRoutesByTo {
   '/supplier/agreements/$agreementId': typeof AuthenticatedSupplierAgreementsAgreementIdRoute
   '/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/supplier/orders/$orderId': typeof AuthenticatedSupplierOrdersOrderIdRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/app/group-buy': typeof AuthenticatedAppGroupBuyIndexRoute
   '/app/orders': typeof AuthenticatedAppOrdersIndexRoute
   '/app/rfqs': typeof AuthenticatedAppRfqsIndexRoute
@@ -428,6 +437,7 @@ export interface FileRoutesById {
   '/_authenticated/supplier/agreements/$agreementId': typeof AuthenticatedSupplierAgreementsAgreementIdRoute
   '/_authenticated/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/_authenticated/supplier/orders/$orderId': typeof AuthenticatedSupplierOrdersOrderIdRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/_authenticated/app/group-buy/': typeof AuthenticatedAppGroupBuyIndexRoute
   '/_authenticated/app/orders/': typeof AuthenticatedAppOrdersIndexRoute
   '/_authenticated/app/rfqs/': typeof AuthenticatedAppRfqsIndexRoute
@@ -475,6 +485,7 @@ export interface FileRouteTypes {
     | '/supplier/agreements/$agreementId'
     | '/supplier/inbox/$rfqId'
     | '/supplier/orders/$orderId'
+    | '/lovable/email/transactional/preview'
     | '/app/group-buy/'
     | '/app/orders/'
     | '/app/rfqs/'
@@ -517,6 +528,7 @@ export interface FileRouteTypes {
     | '/supplier/agreements/$agreementId'
     | '/supplier/inbox/$rfqId'
     | '/supplier/orders/$orderId'
+    | '/lovable/email/transactional/preview'
     | '/app/group-buy'
     | '/app/orders'
     | '/app/rfqs'
@@ -563,6 +575,7 @@ export interface FileRouteTypes {
     | '/_authenticated/supplier/agreements/$agreementId'
     | '/_authenticated/supplier/inbox/$rfqId'
     | '/_authenticated/supplier/orders/$orderId'
+    | '/lovable/email/transactional/preview'
     | '/_authenticated/app/group-buy/'
     | '/_authenticated/app/orders/'
     | '/_authenticated/app/rfqs/'
@@ -578,6 +591,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   DTokenRoute: typeof DTokenRoute
   QTokenRoute: typeof QTokenRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -890,6 +904,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupplierOrdersOrderIdRouteImport
       parentRoute: typeof AuthenticatedSupplierRoute
     }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1018,6 +1039,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   DTokenRoute: DTokenRoute,
   QTokenRoute: QTokenRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
