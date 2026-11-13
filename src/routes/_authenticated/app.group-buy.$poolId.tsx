@@ -12,8 +12,9 @@ import { TrustBadge, type Breakdown } from "@/components/trust-badge";
 import { SmartIdDialog } from "@/components/smart-id-dialog";
 import { eur } from "@/components/rfq/quote-thread";
 import { supabase } from "@/integrations/supabase/client";
+import { Countdown } from "@/components/countdown";
 import { useI18n } from "@/lib/i18n";
-import { timeLeft, unitPrice, type Tier } from "@/lib/pool";
+import { unitPrice, type Tier } from "@/lib/pool";
 import { POOL_COLS, withTotals } from "@/lib/pool-data";
 
 export const Route = createFileRoute("/_authenticated/app/group-buy/$poolId")({
@@ -70,7 +71,7 @@ function PoolPage() {
         <div className="flex flex-wrap justify-between gap-2">
           <span>{t("pool.maxPrice")} <strong>{eur(Number(p.base_price))}</strong> / {p.unit}</span>
           <span>{t("pool.minQty")}: {p.min_qty} {p.unit}</span>
-          <span>{p.totals.members} {t("pool.members")} · {t("pool.endsIn")} {timeLeft(p.deadline)}</span>
+          <span>{p.totals.members} {t("pool.members")} · {t("pool.endsIn")} <Countdown to={p.deadline} /></span>
         </div>
         <TierBar tiers={tiers} qty={p.totals.total_qty} unit={p.unit} />
         <div><p className="mb-1 font-medium">{t("pool.tiers")}</p>
@@ -100,7 +101,7 @@ function PoolPage() {
 
       {p.status === "confirming" && me?.status === "joined" && (
         <div className="rounded-lg border border-primary/40 bg-primary/5 p-6 space-y-3 text-sm">
-          <p className="font-display text-lg font-semibold">{t("pool.confirmTitle")} · {timeLeft(p.confirm_until)}</p>
+          <p className="font-display text-lg font-semibold">{t("pool.confirmTitle")} · <Countdown to={p.confirm_until} /></p>
           <p>{t("pool.confirmBody").replace("{p}", eur(Number(p.final_unit_price))).replace("{u}", p.unit).replace("{t}", eur(Number(me.quantity) * Number(p.final_unit_price)))}</p>
           <Button onClick={() => setSigning(true)}>{t("pool.confirm")}</Button>
         </div>)}
