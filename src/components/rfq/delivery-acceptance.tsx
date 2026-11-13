@@ -42,7 +42,7 @@ export function DeliveryAcceptance({ rfqId, quoteId, agreementId, onSaved, varia
 }
 
 function DeliveryForm({ initial, quoteId, agreementId, onCancel, onSaved }: {
-  initial: Record<string, string>; quoteId?: string; agreementId?: string; onCancel: () => void; onSaved: () => void;
+  initial: Record<string, string>; quoteId?: string | undefined; agreementId?: string | undefined; onCancel: () => void; onSaved: () => void;
 }) {
   const { t } = useI18n();
   const id = useId();
@@ -86,7 +86,7 @@ function DeliveryForm({ initial, quoteId, agreementId, onCancel, onSaved }: {
       </div>)}
       {([{ key: "unloading", label: "rfq.unloading", options: ["manual", "crane_needed", "forklift_on_site"], prefix: "unl" }, { key: "window", label: "rfq.window", options: ["any", "morning", "afternoon"], prefix: "win" }] as const).map((f) => <div key={f.key} className="space-y-1.5">
         <Label htmlFor={`${id}-${f.key}`}>{t(f.label)}</Label>
-        <Select value={values[f.key]} onValueChange={(v) => set(f.key, v)}><SelectTrigger id={`${id}-${f.key}`}><SelectValue /></SelectTrigger><SelectContent>{f.options.map((v) => <SelectItem key={v} value={v}>{t(`${f.prefix}.${v}` as TKey)}</SelectItem>)}</SelectContent></Select>
+        <Select value={values[f.key] ?? ""} onValueChange={(v) => set(f.key, v)}><SelectTrigger id={`${id}-${f.key}`}><SelectValue /></SelectTrigger><SelectContent>{f.options.map((v) => <SelectItem key={v} value={v}>{t(`${f.prefix}.${v}` as TKey)}</SelectItem>)}</SelectContent></Select>
       </div>)}
     </div>
     <div className="space-y-1.5"><Label htmlFor={`${id}-access`}>{t("rfq.access")}</Label><Textarea id={`${id}-access`} rows={3} maxLength={2000} value={values["access"]} onChange={(e) => set("access", e.target.value)} /></div>

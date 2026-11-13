@@ -691,6 +691,20 @@ export const en = {
 
 export type TKey = keyof typeof en;
 export const lt: Partial<Record<TKey, string>> = {
+  "delivery.title": "Pristatymo duomenys",
+  "delivery.summary": "Patvirtinkite pristatymą su pasirinktu tiekėju prieš pasirašydami. Pageidaujama data nepakeičia tiekėjo sutartos datos.",
+  "delivery.phone": "Kontaktinio asmens telefonas",
+  "delivery.add": "Pridėti pristatymo duomenis",
+  "delivery.confirm": "Patvirtinti pristatymą ir priimti pasiūlymą",
+  "delivery.save": "Išsaugoti pristatymo duomenis",
+  "delivery.saving": "Išsaugoma…",
+  "delivery.saved": "Pristatymo duomenys išsaugoti",
+  "delivery.required": "Įveskite pristatymo miestą, adresą, datą ir kontaktinį asmenį.",
+  "delivery.loadError": "Nepavyko įkelti pristatymo duomenų.",
+  "delivery.saveError": "Nepavyko išsaugoti. Patikrinkite datą ir pasiūlymo galiojimą ir bandykite dar kartą.",
+  "delivery.retry": "Bandyti dar kartą",
+  "delivery.beforeSign": "Pridėkite pristatymo duomenis prieš pasirašant bet kuriai šaliai.",
+  "delivery.waitBuyer": "Laukiama pirkėjo pristatymo duomenų prieš pasirašant.",
   "ai.title": "BuildSource AI · privatu",
   "ai.privateNote": "Matote tik jūs. AI tik paruošia juodraštį — siunčiate visada jūs.",
   "ai.placeholder": "Klauskite apie šį pasiūlymą…",
