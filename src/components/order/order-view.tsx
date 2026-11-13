@@ -268,7 +268,7 @@ function PayDeadline({ due, side }: { due: string; side: "buyer" | "supplier" })
   return (
     <div role="status" className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
       <span>{text}</span>
-      {ms > 0 && <span className="font-display text-xl font-semibold tabular-nums text-warning-foreground">{left}</span>}
+      {ms > 0 && <span className="font-display text-xl font-semibold tabular-nums">{left}</span>}
     </div>
   );
 }
