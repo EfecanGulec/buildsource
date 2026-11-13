@@ -92,6 +92,13 @@
       "when": 1794528001535,
       "tag": "0012_magic_link_rpcs",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794528267911,
+      "tag": "0013_quotes_negotiation",
+      "breakpoints": true
     }
   ]
 }

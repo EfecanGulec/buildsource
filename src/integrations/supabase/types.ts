@@ -1657,6 +1657,15 @@ export type Database = {
       }
     }
     Functions: {
+      _add_quote_version: {
+        Args: {
+          _offer: Json
+          _party: Database["public"]["Enums"]["offer_party"]
+          _profile: string
+          _quote: string
+        }
+        Returns: number
+      }
       _invite_supplier: {
         Args: {
           _claimed: boolean
@@ -1667,7 +1676,19 @@ export type Database = {
         }
         Returns: undefined
       }
+      _supplier_offer: {
+        Args: { _offer: Json; _profile: string; _rec: string }
+        Returns: string
+      }
       admin_simulate_48h: { Args: never; Returns: Json }
+      buyer_counter_quote: {
+        Args: { _offer: Json; _quote: string }
+        Returns: number
+      }
+      buyer_reject_quote: {
+        Args: { _quote: string; _reason: string }
+        Returns: undefined
+      }
       choose_account_type: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: undefined
@@ -1695,6 +1716,11 @@ export type Database = {
         Returns: undefined
       }
       magic_get: { Args: { _token: string }; Returns: Json }
+      magic_quote_state: { Args: { _token: string }; Returns: Json }
+      magic_send_quote: {
+        Args: { _offer: Json; _token: string }
+        Returns: string
+      }
       mark_smart_id_verified: { Args: never; Returns: undefined }
       match_rfq: { Args: { _rfq: string }; Returns: number }
       my_company_id: { Args: never; Returns: string }
@@ -1733,6 +1759,11 @@ export type Database = {
           _rfq: string
         }
         Returns: undefined
+      }
+      supplier_reject_counter: { Args: { _rfq: string }; Returns: undefined }
+      supplier_send_quote: {
+        Args: { _offer: Json; _rfq: string }
+        Returns: string
       }
       supplier_view_rfq: { Args: { _rfq: string }; Returns: undefined }
     }
