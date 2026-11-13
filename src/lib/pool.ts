@@ -41,10 +41,3 @@ export function validTiers(tiers: Tier[]): boolean {
     (i === 0 || (t.min_qty > s[i - 1]!.min_qty && t.discount_pct > s[i - 1]!.discount_pct)));
 }
 
-export function timeLeft(deadline: string | null, now = Date.now()): string {
-  if (!deadline) return "—";
-  const ms = new Date(deadline).getTime() - now;
-  if (ms <= 0) return "0h";
-  const d = Math.floor(ms / 86400000), h = Math.floor((ms % 86400000) / 3600000), m = Math.floor((ms % 3600000) / 60000);
-  return d > 0 ? `${d}d ${h}h` : `${h}h ${m}m`;
-}

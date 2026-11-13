@@ -2,8 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { TierBar } from "@/components/pool/tier-bar";
 import { eur } from "@/components/rfq/quote-thread";
+import { Countdown } from "@/components/countdown";
 import { useI18n } from "@/lib/i18n";
-import { timeLeft, type Tier } from "@/lib/pool";
+import type { Tier } from "@/lib/pool";
 import type { TKey } from "@/lib/translations";
 
 export type PoolRow = { id: string; product_name: string; unit: string; base_price: number; tiers: unknown; deadline: string | null;
@@ -25,7 +26,7 @@ export function PoolCard({ p }: { p: PoolRow }) {
       </div>
       <p className="text-sm">{t("pool.maxPrice")} <strong>{eur(Number(p.base_price))}</strong> / {p.unit}</p>
       <TierBar tiers={(p.tiers as Tier[]) ?? []} qty={Number(p.totals?.total_qty ?? 0)} unit={p.unit} />
-      <p className="text-xs text-muted-foreground">{p.totals?.members ?? 0} {t("pool.members")} · {t("pool.endsIn")} {timeLeft(p.deadline)}</p>
+      <p className="text-xs text-muted-foreground">{p.totals?.members ?? 0} {t("pool.members")} · {t("pool.endsIn")} <Countdown to={p.deadline} /></p>
     </Link>
   );
 }

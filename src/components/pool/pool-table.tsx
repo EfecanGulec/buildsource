@@ -2,8 +2,9 @@ import { Button } from "@/components/ui/button";
 import { PoolStatus } from "@/components/pool/pool-card";
 import { TierBar } from "@/components/pool/tier-bar";
 import { eur } from "@/components/rfq/quote-thread";
+import { Countdown } from "@/components/countdown";
 import { useI18n } from "@/lib/i18n";
-import { timeLeft, type Tier } from "@/lib/pool";
+import type { Tier } from "@/lib/pool";
 
 type Row = { id: string; product_name: string; unit: string; base_price: number; tiers: unknown; deadline: string | null; status: string;
   final_unit_price: number | null; companies: { name: string } | null; totals: { total_qty: number; members: number; confirmed_qty: number } };
@@ -17,7 +18,7 @@ export function PoolTable({ rows, onClose, onEndWindow }: { rows: Row[]; onClose
       <div key={p.id} className="rounded-lg border bg-card p-5 space-y-3 text-sm">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div><p className="font-medium">{p.product_name}</p>
-            <p className="text-muted-foreground">{p.companies?.name} · {t("pool.maxPrice")} {eur(Number(p.base_price))} · {p.totals.members} {t("pool.members")} · {t("pool.endsIn")} {timeLeft(p.deadline)}
+            <p className="text-muted-foreground">{p.companies?.name} · {t("pool.maxPrice")} {eur(Number(p.base_price))} · {p.totals.members} {t("pool.members")} · {t("pool.endsIn")} <Countdown to={p.deadline} />
               {p.final_unit_price != null && <> · {t("pool.finalPrice")} {eur(Number(p.final_unit_price))}</>}
               {p.status !== "open" && <> · {p.totals.confirmed_qty} {p.unit} {t("pool.confirmedQty")}</>}</p></div>
           <div className="flex items-center gap-2"><PoolStatus status={p.status} />
