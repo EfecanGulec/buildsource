@@ -610,6 +610,23 @@ export const en = {
 
 export type TKey = keyof typeof en;
 export const lt: Partial<Record<TKey, string>> = {
+  "ai.title": "BuildSource AI · privatu",
+  "ai.privateNote": "Matote tik jūs. AI tik paruošia juodraštį — siunčiate visada jūs.",
+  "ai.placeholder": "Klauskite apie šį pasiūlymą…",
+  "ai.ask": "Klausti",
+  "ai.chipCheck": "Patikrinti pasiūlymą",
+  "ai.chipCounter": "Paruošti kontrpasiūlymą",
+  "ai.chipQuote": "Paruošti pasiūlymo eilutes",
+  "ai.chipSummary": "Apibendrinti",
+  "ai.chipBefore": "Prieš priimant",
+  "ai.chipMissing": "Ko trūksta pasiūlymui?",
+  "ai.useDraft": "Įkelti į pokalbį",
+  "ai.openForm": "Atidaryti užpildytą formą",
+  "ai.formFilled": "AI užpildė formą — peržiūrėkite ir spauskite Siųsti.",
+  "ai.label": "BuildSource AI · sugeneruota AI, patikrinkite prieš remdamiesi",
+  "ai.sharedHint": "Pradėkite žinutę @AI — neutralų atsakymą matys abi pusės.",
+  "ai.thinking": "BuildSource AI galvoja…",
+  "ai.demo": "demo atsakymas",
   "nav.catalogue": "Katalogas",
   "cat.title": "Katalogas ir srautai",
   "cat.import": "Importuoti produktus",
