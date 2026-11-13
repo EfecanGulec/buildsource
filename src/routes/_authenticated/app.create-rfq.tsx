@@ -83,7 +83,7 @@ function CreateRfq() {
             : <div key={path} className="grid h-24 w-24 place-items-center rounded-md bg-surface-2 sm:h-32 sm:w-32">{photoUrls.isPending && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}</div>;
         })}
       </div>
-      {photoUrls.isError && <Button size="sm" variant="outline" onClick={() => photoUrls.refetch()}>{t("lens.photo")} · {t("lens.upload")}</Button>}
+      {photoUrls.isError && <Button size="sm" variant="outline" onClick={() => photoUrls.refetch()}>{t("qs.retry")}</Button>}
     </div>
   ) : null;
 
