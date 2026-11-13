@@ -525,6 +525,122 @@ export type Database = {
           },
         ]
       }
+      identity_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          profile_id: string
+          provider_session_id: string | null
+          purpose: string
+          result_personal_code_hash: string | null
+          status: string
+          verification_code: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          profile_id: string
+          provider_session_id?: string | null
+          purpose: string
+          result_personal_code_hash?: string | null
+          status?: string
+          verification_code?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          profile_id?: string
+          provider_session_id?: string | null
+          purpose?: string
+          result_personal_code_hash?: string | null
+          status?: string
+          verification_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "identity_sessions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integration_logs: {
+        Row: {
+          action: string
+          created_at: string
+          duration_ms: number | null
+          error: string | null
+          id: string
+          provider: string | null
+          request_summary: Json
+          response_status: number | null
+          service: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          id?: string
+          provider?: string | null
+          request_summary?: Json
+          response_status?: number | null
+          service: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          id?: string
+          provider?: string | null
+          request_summary?: Json
+          response_status?: number | null
+          service?: string
+        }
+        Relationships: []
+      }
+      integrations: {
+        Row: {
+          config: Json
+          id: string
+          is_enabled: boolean
+          last_error: string | null
+          last_success_at: string | null
+          mode: string
+          provider: string
+          service: string
+          updated_at: string
+        }
+        Insert: {
+          config?: Json
+          id?: string
+          is_enabled?: boolean
+          last_error?: string | null
+          last_success_at?: string | null
+          mode?: string
+          provider: string
+          service: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json
+          id?: string
+          is_enabled?: boolean
+          last_error?: string | null
+          last_success_at?: string | null
+          mode?: string
+          provider?: string
+          service?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       kits: {
         Row: {
           created_at: string
@@ -820,7 +936,11 @@ export type Database = {
           id: string
           milestone: string
           order_id: string
+          platform_fee_cents: number | null
           provider: string
+          provider_payment_id: string | null
+          provider_refund_id: string | null
+          provider_transfer_id: string | null
           refunded_amount: number
           released_at: string | null
           status: Database["public"]["Enums"]["payment_status"]
@@ -832,7 +952,11 @@ export type Database = {
           id?: string
           milestone?: string
           order_id: string
+          platform_fee_cents?: number | null
           provider?: string
+          provider_payment_id?: string | null
+          provider_refund_id?: string | null
+          provider_transfer_id?: string | null
           refunded_amount?: number
           released_at?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
@@ -844,7 +968,11 @@ export type Database = {
           id?: string
           milestone?: string
           order_id?: string
+          platform_fee_cents?: number | null
           provider?: string
+          provider_payment_id?: string | null
+          provider_refund_id?: string | null
+          provider_transfer_id?: string | null
           refunded_amount?: number
           released_at?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
@@ -1056,6 +1184,41 @@ export type Database = {
           {
             foreignKeyName: "projects_buyer_company_id_fkey"
             columns: ["buyer_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provider_accounts: {
+        Row: {
+          company_id: string
+          onboarding_status: string
+          payouts_enabled: boolean
+          provider: string
+          provider_account_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          onboarding_status?: string
+          payouts_enabled?: boolean
+          provider: string
+          provider_account_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          onboarding_status?: string
+          payouts_enabled?: boolean
+          provider?: string
+          provider_account_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_accounts_company_id_fkey"
+            columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
@@ -1586,6 +1749,39 @@ export type Database = {
           },
         ]
       }
+      sync_jobs: {
+        Row: {
+          attempts: number
+          created_at: string
+          id: string
+          job: string
+          result: Json | null
+          run_after: string
+          status: string
+          target_id: string | null
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          job: string
+          result?: Json | null
+          run_after?: string
+          status?: string
+          target_id?: string | null
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          job?: string
+          result?: Json | null
+          run_after?: string
+          status?: string
+          target_id?: string | null
+        }
+        Relationships: []
+      }
       trust_scores: {
         Row: {
           breakdown: Json
@@ -1639,6 +1835,42 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_events: {
+        Row: {
+          created_at: string
+          error: string | null
+          event_type: string
+          external_id: string | null
+          id: string
+          payload: Json
+          processed_at: string | null
+          provider: string
+          signature_valid: boolean
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          event_type: string
+          external_id?: string | null
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          provider: string
+          signature_valid?: boolean
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          event_type?: string
+          external_id?: string | null
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          provider?: string
+          signature_valid?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       price_index: {
@@ -1673,6 +1905,7 @@ export type Database = {
         Returns: number
       }
       _close_pool: { Args: { _pool: string }; Returns: string }
+      _exec_job: { Args: { _job: string }; Returns: Json }
       _finalize_pool: { Args: { _pool: string }; Returns: undefined }
       _invite_supplier: {
         Args: {
@@ -1715,6 +1948,10 @@ export type Database = {
           _outcome: Database["public"]["Enums"]["dispute_status"]
           _refund: number
         }
+        Returns: undefined
+      }
+      admin_set_integration: {
+        Args: { _enabled: boolean; _mode: string; _service: string }
         Returns: undefined
       }
       admin_simulate_48h: { Args: never; Returns: Json }
@@ -1768,6 +2005,7 @@ export type Database = {
       compute_buyer_reliability: { Args: { _company: string }; Returns: number }
       compute_trust_score: { Args: { _company: string }; Returns: number }
       end_pool_window_now: { Args: { _pool: string }; Returns: undefined }
+      enqueue_job: { Args: { _job: string; _target?: string }; Returns: string }
       expire_stale_quotes: { Args: never; Returns: number }
       has_role: {
         Args: {
@@ -1780,6 +2018,7 @@ export type Database = {
       is_order_party: { Args: { _order: string }; Returns: boolean }
       is_rfq_buyer: { Args: { _rfq: string }; Returns: boolean }
       is_rfq_supplier: { Args: { _rfq: string }; Returns: boolean }
+      job_backoff: { Args: { _attempts: number }; Returns: string }
       magic_ask: { Args: { _body: string; _token: string }; Returns: undefined }
       magic_decline: {
         Args: {
@@ -1842,6 +2081,7 @@ export type Database = {
       recompute_all_scores: { Args: never; Returns: number }
       reroute_rfq: { Args: { _rfq: string }; Returns: string }
       reset_demo_data: { Args: never; Returns: Json }
+      run_sync_jobs: { Args: never; Returns: number }
       save_my_company: {
         Args: {
           _buyer_segment?: Database["public"]["Enums"]["buyer_segment"]
@@ -1852,6 +2092,7 @@ export type Database = {
         }
         Returns: string
       }
+      scheduler_tick: { Args: { _jobs: string[] }; Returns: number }
       seed_demo_base: { Args: never; Returns: Json }
       seed_demo_scored: { Args: never; Returns: Json }
       sign_agreement: {
