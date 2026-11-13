@@ -16,5 +16,6 @@
 - [x] Step 15 – Demo polish: café starts outside the pool, supplier Earnings / My quotes / Agreements pages, Lithuanian labels, mobile magic link check
 - [x] Step 16 – Integrations page + scheduler
 - [x] Step 17 – Delivery: shipments, driver page /d/:token (phone-checked), proof of delivery, mismatch → dispute, daily late alerts
-- [ ] Steps 16–23 – see prompts PDF
+- [x] Step 18 – Catalogue: feeds, mapping, AI category check, price hints, integration level, shop connectors (demo)
+- [ ] Steps 19–23 – see prompts PDF
 - [x] Step 4 – Trust Score from real platform data
