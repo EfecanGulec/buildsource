@@ -64,7 +64,7 @@ export const en = {
   "int.service": "Service", "int.provider": "Provider", "int.status": "Mode", "int.lastOk": "Last success", "int.lastError": "Last error",
   "int.live": "Live", "int.test": "Test connection", "int.modeLive": "Live", "int.modeDemo": "Demo", "int.needs": "Needs:",
   "int.realProvider": "Real provider", "int.jobs": "Scheduled jobs", "int.jobsHint": "Pool closing, RFQ timeouts and quote expiry run every 5 minutes; Trust Scores nightly at 03:00. Failed jobs retry after 1, 5, 30 min, then 2 h (max 5 tries).",
-  "int.runNow": "Run jobs now", "int.noJobs": "No jobs have run yet.", "int.ran": "Ran {n} jobs",
+  "int.runNow": "Run jobs now", "int.sendEmails": "Send pending emails", "int.emailsSent": "Email run finished —", "int.noJobs": "No jobs have run yet.", "int.ran": "Ran {n} jobs",
   "rfq.step.project": "Project",
   "rfq.step.items": "Items",
   "rfq.step.delivery": "Delivery",
