@@ -35,6 +35,26 @@ export const lensResultSchema = z.object({
 });
 export type LensResult = z.infer<typeof lensResultSchema>;
 
+export type LensProduct = LensResult & { photo_indices: number[] };
+
+/** Every input photo must be accounted for, including uncertain or non-product photos. */
+export function parseLensProducts(text: string, allowedSlugs: string[], photoCount: number): LensProduct[] | null {
+  let raw: unknown;
+  try { raw = JSON.parse(text); } catch { return null; }
+  const parsed = z.object({ products: z.array(lensResultSchema.extend({
+    photo_indices: z.array(z.number().int().min(0).max(photoCount - 1)).min(1),
+  })).min(1).max(LENS_MAX_PHOTOS * 4) }).safeParse(raw);
+  if (!parsed.success) return null;
+  const covered = new Set(parsed.data.products.flatMap((p) => p.photo_indices));
+  if (covered.size !== photoCount) return null;
+  return parsed.data.products.map((p) => ({ ...normaliseLens(p, allowedSlugs), photo_indices: [...new Set(p.photo_indices)] }));
+}
+
+/** Old saved scans remain readable; new scans retain every distinct product. */
+export function lensProducts(result: LensResult & { products?: LensProduct[] }): LensProduct[] {
+  return result.products?.length ? result.products : [{ ...result, photo_indices: [0] }];
+}
+
 /** Validates model output, forces allowed categories and derives status from confidence. Null = unusable. */
 export function parseLensResult(text: string, allowedSlugs: string[]): LensResult | null {
   let raw: unknown;
