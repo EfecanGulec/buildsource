@@ -274,6 +274,13 @@
       "when": 1794609908552,
       "tag": "0038_profile_settings_invoices_category_commission",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1794611716203,
+      "tag": "0039_restrict_platform_settings_to_admins",
+      "breakpoints": true
     }
   ]
 }
