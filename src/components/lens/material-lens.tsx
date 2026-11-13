@@ -95,6 +95,7 @@ export function MaterialLensDialog({ open, onOpenChange }: { open: boolean; onOp
     try { await persist({ saved: true }); toast.success(t("lens.saved")); } catch { toast.error(t("lens.failed")); }
   }
   const pickAlt = (a: { item_name: string; category_slug: string | null }) => { setName(a.item_name); setSlug(a.category_slug); };
+  const toggle = (id: string) => setChosen((c) => c.includes(id) ? c.filter((x) => x !== id) : [...c, id]);
   const r = res?.result;
   const iSupply = isSupplier && suppliers.data?.some((s) => s.company_id === account?.company?.id);
 
@@ -164,9 +165,9 @@ export function MaterialLensDialog({ open, onOpenChange }: { open: boolean; onOp
             {suppliers.data?.map((s) => {
               const on = chosen.includes(s.company_id);
               return (
-                <button key={s.company_id} type="button" disabled={isSupplier}
-                  onClick={() => setChosen((c) => on ? c.filter((x) => x !== s.company_id) : [...c, s.company_id])}
-                  className={cn("w-full rounded-md border p-3 text-left text-sm", on && !isSupplier && "border-primary bg-primary/5")}>
+                <div key={s.company_id} role={isSupplier ? undefined : "checkbox"} aria-checked={isSupplier ? undefined : on} tabIndex={isSupplier ? undefined : 0}
+                  onClick={() => !isSupplier && toggle(s.company_id)} onKeyDown={(e) => { if (!isSupplier && (e.key === " " || e.key === "Enter")) { e.preventDefault(); toggle(s.company_id); } }}
+                  className={cn("w-full rounded-md border p-3 text-left text-sm", !isSupplier && "cursor-pointer", on && !isSupplier && "border-primary bg-primary/5")}>
                   <div className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-2 font-medium">{!isSupplier && <span className={cn("grid h-4 w-4 place-items-center rounded border", on && "border-primary bg-primary text-primary-foreground")}>{on && <Check className="h-3 w-3" />}</span>}{s.name}</span>
                     <TrustBadge score={s.trust_score} breakdown={null} />
@@ -175,7 +176,7 @@ export function MaterialLensDialog({ open, onOpenChange }: { open: boolean; onOp
                   {s.product_name && <p className="mt-1 flex items-center gap-1 text-xs"><Package className="h-3 w-3 text-primary" />{s.product_name}
                     {s.product_price != null && ` · ${s.product_price} ${s.product_currency}`}{s.product_stock != null && ` · ${t("lens.stock")} ${s.product_stock}`}
                     {s.price_updated_at && <span className="text-muted-foreground"> · {t("lens.priceUpdated")} {new Date(s.price_updated_at).toLocaleDateString()}</span>}</p>}
-                </button>);
+                </div>);
             })}
           </div>)}
 
