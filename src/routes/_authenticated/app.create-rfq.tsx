@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MatchingPools } from "@/components/pool/matching-pools";
 import { useEffect, useState } from "react";
+import { lensProducts, type LensResult, type LensProduct } from "@/lib/lens";
 import { LensButton } from "@/components/lens/material-lens";
 import { Building2, Camera, Check, Hammer, Loader2, Package, Plus, Sofa, Store, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
@@ -26,7 +27,7 @@ type ProjectType = Database["public"]["Enums"]["project_type"];
 type Item = { category_id: string; description: string; specs: Record<string, string | number | boolean>; quantity: number; unit: string; standard: string; waste_pct: number; confidence: number | null; confirmed: boolean; reasoning?: string };
 
 export const Route = createFileRoute("/_authenticated/app/create-rfq")({
-  head: () => ({ meta: [{ title: "Create RFQ — BuildSource LT" }] }),
+  head: () => ({ meta: [{ title: "Create RFQ — BuildSource LT" }, { name: "description", content: "Review materials, photos and potential suppliers before sending your BuildSource LT request." }, { property: "og:title", content: "Create RFQ — BuildSource LT" }, { property: "og:description", content: "Prepare a multi-product request and choose your suppliers." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   validateSearch: (s: Record<string, unknown>): { scan?: string } => (typeof s["scan"] === "string" ? { scan: s["scan"] } : {}),
   component: CreateRfq,
 });
@@ -75,18 +76,23 @@ function CreateRfq() {
   const parents = cats.filter((c) => !c.parent_id);
   const catById = new Map(cats.map((c) => [c.id, c]));
 
-  // Material Lens hand-off: one item with specs, chosen suppliers first; buyer still adds quantity and delivery.
+  // Every distinct product becomes an editable item; quantities and confirmation remain buyer-owned.
   useEffect(() => {
     if (!scan || scan === scanId || !cats.length) return;
     setScanId(scan);
     supabase.from("material_scans").select("id,result,note").eq("id", scan).maybeSingle().then(({ data }) => {
-      const r = data?.result as { item_name?: string; rfq_item_draft?: { category_slug: string | null; description: string; specs: Item["specs"]; unit: string } | null; chosen_suppliers?: string[]; standards_to_ask_for?: string[] } | undefined;
-      const d = r?.rfq_item_draft;
-      if (!d) return;
-      const cat = cats.find((c) => c.slug === d.category_slug);
-      setItems([{ ...blankItem(), category_id: cat?.id ?? "", description: d.description, specs: d.specs ?? {}, unit: d.unit || cat?.default_unit || "", standard: (r?.standards_to_ask_for ?? [])[0] ?? "", quantity: 0 }]);
-      setPreferred(r?.chosen_suppliers ?? []);
-      if (!title) setTitle(r?.item_name ?? d.description);
+      const r = data?.result as (LensResult & { products?: LensProduct[]; chosen_suppliers?: string[] }) | undefined;
+      if (!r) return;
+      const products = lensProducts(r).filter((p) => p.rfq_item_draft);
+      if (!products.length) return;
+      setItems(products.map((p) => {
+        const d = p.rfq_item_draft;
+        const cat = cats.find((c) => c.slug === d?.category_slug);
+        return { ...blankItem(), category_id: cat?.id ?? "", description: d?.description ?? p.item_name,
+          specs: d?.specs ?? {}, unit: d?.unit || cat?.default_unit || "", standard: p.standards_to_ask_for[0] ?? "", quantity: 0, confidence: p.confidence, confirmed: false };
+      }));
+      setPreferred(r.chosen_suppliers ?? []);
+      if (!title) setTitle(products.map((p) => p.item_name).join(" · "));
       if (data?.note && !description) setDescription(data.note);
       if (!projectType) setProjectType("renovation");
       setStep(0);

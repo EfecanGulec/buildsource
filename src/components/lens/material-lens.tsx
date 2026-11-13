@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Bookmark, Camera, Check, Loader2, Package, Send, X } from "lucide-react";
+import { AlertTriangle, Bookmark, Camera, Check, Loader2, Package, Send, X, Images, Plus, ScanLine, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,8 +12,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAccount } from "@/hooks/use-account";
 import { useI18n } from "@/lib/i18n";
 import { identifyMaterial, type LensResponse } from "@/lib/lens.functions";
-import { LENS_MAX_PHOTOS, LENS_MAX_PX, lensCanSubmit } from "@/lib/lens";
+import { LENS_MAX_PHOTOS, LENS_MAX_PX, lensCanSubmit, lensProducts, type LensProduct } from "@/lib/lens";
 import { prepPhoto } from "@/lib/image-prep";
+import { useLensWorkspace } from "@/lib/lens-workspace";
 import { cn } from "@/lib/utils";
 
 type Spec = string | number | boolean;
@@ -34,31 +35,46 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
   const nav = useNavigate();
   const { data: account } = useAccount();
   const run = useServerFn(identifyMaterial);
-  const [files, setFiles] = useState<File[]>([]);
-  const [note, setNote] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [res, setRes] = useState<LensResponse | null>(null);
-  const [specs, setSpecs] = useState<Record<string, Spec>>({});
-  const [slug, setSlug] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [chosen, setChosen] = useState<string[]>([]);
+  const { state, set } = useLensWorkspace(`${account?.user.id ?? "pending"}:${onAskInChat ? "chat" : "composer"}`);
+  const { files, note, busy, res, products, active, chosen } = state;
+  const setFiles = (v: File[] | ((old: File[]) => File[])) => set("files", v);
+  const setNote = (v: string) => set("note", v);
+  const setBusy = (v: boolean) => set("busy", v);
+  const setRes = (v: LensResponse | null) => set("res", v);
+  const setChosen = (v: string[] | ((old: string[]) => string[])) => set("chosen", v);
+  const r = products[active];
+  const specs = r?.rfq_item_draft?.specs ?? r?.likely_specs ?? {};
+  const slug = r?.rfq_item_draft?.category_slug ?? r?.category_slug ?? null;
+  const name = r?.rfq_item_draft?.description ?? r?.item_name ?? "";
+  function edit(patch: Partial<LensProduct>) { set("products", (xs) => xs.map((x, i) => i === active ? { ...x, ...patch } : x)); }
+  const setName = (description: string) => { if (r) edit({ item_name: description, rfq_item_draft: { ...(r.rfq_item_draft ?? { category_slug: slug, specs, unit: "pcs", quantity: null }), description } }); };
+  const setSlug = (category_slug: string | null) => { if (r) edit({ category_slug, rfq_item_draft: r.rfq_item_draft ? { ...r.rfq_item_draft, category_slug } : null }); };
+  const setSpecs = (fn: (old: typeof specs) => typeof specs) => { if (r) edit({ likely_specs: fn(specs), rfq_item_draft: r.rfq_item_draft ? { ...r.rfq_item_draft, specs: fn(specs) } : null }); };
   const [targetRfq, setTargetRfq] = useState("");
   const [qty, setQty] = useState(0);
-  const previews = files.map((f) => URL.createObjectURL(f));
+  const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
+  useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
+  const ready = products.filter((p) => p.rfq_item_draft);
+  function addPhotos(incoming: File[]) {
+    const photos = incoming.filter((f) => f.type.startsWith("image/"));
+    if (files.length + photos.length > LENS_MAX_PHOTOS) toast.warning(t("lens.limit"));
+    setFiles((xs) => [...xs, ...photos].slice(0, LENS_MAX_PHOTOS));
+    setRes(null); set("products", []); set("active", 0);
+  }
   const isSupplier = account?.role === "supplier";
 
   const drafts = useQuery({
     queryKey: ["lens-drafts", account?.company?.id], enabled: !!res && !isSupplier && !onAskInChat,
-    queryFn: async () => (await supabase.from("rfqs").select("id,rfq_number,title").eq("buyer_company_id", account!.company!.id).eq("status", "draft").order("created_at", { ascending: false }).limit(10)).data ?? [],
+    queryFn: async () => (await supabase.from("rfqs").select("id,rfq_number,title").eq("buyer_company_id", account?.company?.id ?? "").eq("status", "draft").order("created_at", { ascending: false }).limit(10)).data ?? [],
   });
   const suppliers = useQuery({
     queryKey: ["lens-suppliers", slug, account?.company?.city],
     enabled: !!slug,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("lens_suppliers", { _category_slug: slug!, _city: isSupplier ? null as never : (account?.company?.city ?? null) as never });
+      const { data, error } = await supabase.rpc("lens_suppliers", { _category_slug: slug ?? "", _city: isSupplier ? null as never : (account?.company?.city ?? null) as never });
       if (error) throw error;
       const rows = data ?? [];
-      setChosen(rows.filter((r) => r.in_region).slice(0, 4).map((r) => r.company_id));
+      setChosen((old) => [...new Set([...old, ...rows.filter((r) => r.in_region).slice(0, 4).map((r) => r.company_id)])]);
       return rows;
     },
   });
@@ -77,9 +93,7 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
       }
       const r = await run({ data: { paths, note, hint: files.map((f) => f.name).join(" "), lang } });
       setRes(r);
-      setSpecs(r.result.rfq_item_draft?.specs ?? r.result.likely_specs);
-      setSlug(r.result.rfq_item_draft?.category_slug ?? r.result.category_slug);
-      setName(r.result.rfq_item_draft?.description ?? r.result.item_name);
+      set("products", lensProducts(r.result)); set("active", 0);
       if (r.source === "demo") toast.warning(t("lens.demo"));
     } catch (e) { console.error(e); toast.error(t("lens.failed")); }
     finally { setBusy(false); }
@@ -87,14 +101,16 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
 
   async function persist(extra: { saved?: boolean }) {
     if (!res) return;
-    const draft = { ...(res.result.rfq_item_draft ?? { unit: "pcs", quantity: null }), category_slug: slug, description: name, specs };
+    const first = products[0];
+    if (!first) return;
     const { error } = await supabase.from("material_scans").update({
-      ...extra, result: { ...res.result, rfq_item_draft: draft, chosen_suppliers: chosen } as never,
+      ...extra, result: { ...first, products, chosen_suppliers: chosen } as never,
     }).eq("id", res.scanId);
     if (error) throw error;
   }
   async function requestOffers() {
-    try { await persist({}); onOpenChange(false); nav({ to: "/app/create-rfq", search: { scan: res!.scanId } }); }
+    if (!res || !ready.length) return;
+    try { await persist({}); onOpenChange(false); nav({ to: "/app/create-rfq", search: { scan: res.scanId } }); }
     catch { toast.error(t("lens.failed")); }
   }
   async function save() {
@@ -103,48 +119,58 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
   async function addToRfq() {
     const rfq = drafts.data?.find((d) => d.id === targetRfq);
     if (!rfq || !lensCanSubmit(qty)) return;
-    const { data: cat } = await supabase.from("categories").select("id,default_unit").eq("slug", slug!).maybeSingle();
+    const { data: cats } = await supabase.from("categories").select("id,slug,default_unit");
     const { count } = await supabase.from("rfq_items").select("id", { count: "exact", head: true }).eq("rfq_id", rfq.id);
-    const { error } = await supabase.from("rfq_items").insert({ rfq_id: rfq.id, category_id: cat?.id ?? null, description: name, specs: specs as never,
-      quantity: qty, unit: res?.result.rfq_item_draft?.unit || cat?.default_unit || null, standard: res?.result.standards_to_ask_for[0] ?? null,
-      sort_order: (count ?? 0) + 1, buyer_confirmed: true, ai_confidence: res?.result.confidence ?? null });
+    const { error } = await supabase.from("rfq_items").insert(ready.map((p, index) => {
+      const d = p.rfq_item_draft;
+      const cat = cats?.find((c) => c.slug === d?.category_slug);
+      return { rfq_id: rfq.id, category_id: cat?.id ?? null, description: d?.description ?? p.item_name,
+        specs: (d?.specs ?? p.likely_specs) as never, quantity: qty, unit: d?.unit || cat?.default_unit || "pcs",
+        standard: p.standards_to_ask_for[0] ?? null, sort_order: (count ?? 0) + index + 1,
+        buyer_confirmed: true, ai_confidence: p.confidence };
+    }));
     if (error) { toast.error(error.message); return; }
     try { await persist({ saved: true }); } catch { /* scan already stored */ }
     toast.success(t("lens.added").replace("{n}", rfq.rfq_number));
     onOpenChange(false); nav({ to: "/app/rfqs/$rfqId", params: { rfqId: rfq.id } });
   }
   function askChat() {
-    const sp = Object.entries(specs).map(([k, v]) => `${k}: ${v}`).join(", ");
-    onAskInChat?.(t("lens.chatSummary").replace("{name}", name.replace(/\.+$/, "")).replace("{specs}", sp || "—"));
+    onAskInChat?.(ready.map((p) => t("lens.chatSummary").replace("{name}", p.rfq_item_draft?.description ?? p.item_name)
+      .replace("{specs}", Object.entries(p.rfq_item_draft?.specs ?? p.likely_specs).map(([k, v]) => `${k}: ${v}`).join(", ") || "—")).join("\n\n"));
     persist({ saved: true }).catch(() => undefined);
     onOpenChange(false);
   }
   const pickAlt = (a: { item_name: string; category_slug: string | null }) => { setName(a.item_name); setSlug(a.category_slug); };
   const toggle = (id: string) => setChosen((c) => c.includes(id) ? c.filter((x) => x !== id) : [...c, id]);
-  const r = res?.result;
   const iSupply = isSupplier && suppliers.data?.some((s) => s.company_id === account?.company?.id);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="max-h-[92dvh] w-[calc(100%-1rem)] max-w-2xl overflow-y-auto rounded-3xl border-hairline bg-card p-4 shadow-lg sm:p-6">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><Camera className="h-5 w-5 text-primary" />{t("lens.title")}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2"><ScanLine className="h-5 w-5 text-ai" />{t("lens.title")}</DialogTitle>
           <DialogDescription>{t("lens.hint")}</DialogDescription>
         </DialogHeader>
 
         {!r && (<div className="space-y-3">
-          <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-primary/40 bg-primary/5 p-6 text-center text-sm"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => { e.preventDefault(); setFiles((xs) => [...xs, ...Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"))].slice(0, LENS_MAX_PHOTOS)); }}>
-            <Camera className="h-6 w-6 text-primary" /><span className="font-medium">{t("lens.take")}</span>
-            <span className="text-xs text-muted-foreground">{t("lens.photoTips")}</span>
-            <input type="file" accept="image/*" capture="environment" multiple className="sr-only" aria-label={t("lens.take")}
-              onChange={(e) => setFiles((xs) => [...xs, ...Array.from(e.target.files ?? [])].slice(0, LENS_MAX_PHOTOS))} />
-          </label>
-          {files.length > 0 && <div className="flex flex-wrap gap-2">{previews.map((u, i) => (
-            <div key={u} className="relative"><img src={u} alt="" className="h-20 w-20 rounded-md object-cover" />
-              <button type="button" aria-label="Remove" onClick={() => setFiles((xs) => xs.filter((_, j) => j !== i))}
-                className="absolute -right-1 -top-1 rounded-full bg-background p-0.5 shadow"><X className="h-3 w-3" /></button></div>))}</div>}
+          <div className="relative overflow-hidden rounded-2xl bg-surface-2 p-5" onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => { e.preventDefault(); if (!busy) addPhotos(Array.from(e.dataTransfer.files)); }}>
+            <div className="mb-5 flex items-center justify-between"><span className="flex items-center gap-2 text-sm font-medium text-ai"><Sparkles className="h-4 w-4" />{t("lens.photos")}</span><span className="text-xs tabular-nums text-muted-foreground">{files.length} / {LENS_MAX_PHOTOS}</span></div>
+            <div className="grid grid-cols-2 gap-3">
+              {previews.map((u, i) => <div key={u} className="group relative aspect-square overflow-hidden rounded-xl bg-background shadow-sm">
+                <img src={u} alt={`${t("lens.photo")} ${i + 1}`} className="h-full w-full object-cover" />
+                <Button type="button" size="icon" variant="secondary" disabled={busy} aria-label={`${t("lens.removePhoto")} ${i + 1}`} title={t("lens.removePhoto")}
+                  onClick={() => setFiles((xs) => xs.filter((_, j) => j !== i))} className="absolute right-2 top-2 h-11 w-11 rounded-full shadow-sm"><X className="h-4 w-4" /></Button>
+              </div>)}
+              {!files.length && <div className="col-span-2 flex min-h-36 flex-col items-center justify-center gap-3 text-ai"><ScanLine className="h-12 w-12 stroke-1" /><span className="text-sm font-medium text-foreground">{t("lens.photoTips")}</span></div>}
+            </div>
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              <Button variant="default" disabled={busy || files.length >= LENS_MAX_PHOTOS} onClick={() => document.getElementById("lens-camera")?.click()}><Camera className="mr-2 h-4 w-4" />{t("lens.camera")}</Button>
+              <Button variant="outline" disabled={busy || files.length >= LENS_MAX_PHOTOS} onClick={() => document.getElementById("lens-upload")?.click()}><Images className="mr-2 h-4 w-4" />{t("lens.upload")}</Button>
+            </div>
+            <input id="lens-camera" type="file" accept="image/*" capture="environment" className="sr-only" aria-label={t("lens.camera")} onChange={(e) => { addPhotos(Array.from(e.target.files ?? [])); e.target.value = ""; }} />
+            <input id="lens-upload" type="file" accept="image/*" multiple className="sr-only" aria-label={t("lens.take")} onChange={(e) => { addPhotos(Array.from(e.target.files ?? [])); e.target.value = ""; }} />
+          </div>
           <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("lens.note")} />
           <p className="text-xs text-muted-foreground">{t("lens.privacy")}</p>
           <Button className="w-full" onClick={identify} disabled={!files.length || busy}>
@@ -153,13 +179,15 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
         </div>)}
 
         {r && (<div className="space-y-4">
+          <div className="flex flex-wrap gap-2" role="tablist" aria-label={t("lens.products")}>{products.map((p, i) => <Button key={i} role="tab" aria-selected={i === active} variant={i === active ? "default" : "outline"} onClick={() => set("active", i)} className="h-auto min-h-11 max-w-full whitespace-normal text-left">{i + 1}. {p.item_name || t("lens.uncertain")}</Button>)}</div>
+          <div className="flex gap-2 overflow-x-auto">{r.photo_indices.map((i) => previews[i] && <img key={i} src={previews[i]} alt={`${t("lens.photo")} ${i + 1}`} className="h-20 w-20 shrink-0 rounded-xl object-cover" />)}</div>
           {r.safety_note && <div className="flex gap-2 rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
             <AlertTriangle className="h-4 w-4 shrink-0" /><div><p className="font-semibold">{t("lens.safety")}</p><p>{r.safety_note}</p></div></div>}
           {(r.status === "not_a_material" || r.status === "failed") ? (
             <p className="rounded-md border p-4 text-sm">{t(r.status === "failed" ? "lens.failed" : "lens.notMaterial")}</p>
           ) : (<div className="rounded-lg border p-4 space-y-3">
             <div className="flex gap-3">
-              {previews[0] && <img src={previews[0]} alt="" className="h-20 w-20 rounded-md object-cover" />}
+              {previews[r.photo_indices[0] ?? 0] && <img src={previews[r.photo_indices[0] ?? 0]} alt="" className="h-20 w-20 rounded-md object-cover" />}
               <div className="flex-1 space-y-1">
                 <Input value={name} onChange={(e) => setName(e.target.value)} className="font-semibold" aria-label={t("lens.itemName")} />
                 <span className={cn("inline-block rounded-full px-2 py-0.5 text-xs font-medium", r.status === "identified" ? "bg-primary/15 text-primary" : "bg-warning/20")}>
@@ -207,12 +235,12 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
 
           <div className="flex flex-wrap gap-2">
             {onAskInChat && r.status !== "not_a_material" && <Button onClick={askChat}><Send className="mr-2 h-4 w-4" />{t("lens.askChat")}</Button>}
-            {!isSupplier && !onAskInChat && slug && <Button onClick={requestOffers}><Send className="mr-2 h-4 w-4" />{t("lens.request")}</Button>}
+            {!isSupplier && !onAskInChat && ready.length > 0 && <Button onClick={requestOffers}><Send className="mr-2 h-4 w-4" />{t("lens.request")}</Button>}
             {isSupplier && <Button variant="outline" onClick={() => { onOpenChange(false); nav({ to: "/supplier/catalogue" }); }}><Package className="mr-2 h-4 w-4" />{t("lens.addCatalogue")}</Button>}
             <Button variant="outline" onClick={save}><Bookmark className="mr-2 h-4 w-4" />{t("lens.save")}</Button>
-            <Button variant="ghost" onClick={() => { setRes(null); setFiles([]); setSlug(null); }}>{t("lens.again")}</Button>
+            <Button variant="ghost" onClick={() => { setRes(null); set("products", []); set("active", 0); }}><Plus className="mr-2 h-4 w-4" />{t("lens.editPhotos")}</Button>
           </div>
-          {!isSupplier && !onAskInChat && slug && (
+          {!isSupplier && !onAskInChat && ready.length > 0 && (
             <div className="space-y-2 rounded-md border p-3">
               <p className="text-sm font-medium">{t("lens.addExisting")}</p>
               {drafts.data?.length === 0 ? <p className="text-xs text-muted-foreground">{t("lens.noDrafts")}</p> : (
