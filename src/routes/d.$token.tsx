@@ -50,7 +50,7 @@ function DriverPage() {
     if (share && "geolocation" in navigator) {
       await new Promise<void>((res) => navigator.geolocation.getCurrentPosition((p) => { lat = p.coords.latitude; lng = p.coords.longitude; res(); }, () => res(), { timeout: 8000 }));
     }
-    const { error } = await supabase.rpc("driver_update", { _token: token, _status: status, _lat: lat, _lng: lng });
+    const { error } = await supabase.rpc("driver_update", { _token: token, _status: status, ...(lat !== undefined && lng !== undefined ? { _lat: lat, _lng: lng } : {}) });
     if (error) toast.error(error.message); else qc.invalidateQueries({ queryKey: ["driver", token] });
     setBusy(false);
   }
