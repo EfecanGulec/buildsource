@@ -18,6 +18,7 @@ import { useI18n } from "@/lib/i18n";
 import type { TKey } from "@/lib/translations";
 import type { Database } from "@/integrations/supabase/types";
 import { canDispute, canPayLater, nextSupplierStatuses, stagedSplit } from "@/lib/order";
+import { countdownText, useNow } from "@/lib/use-now";
 
 type OrderStatus = Database["public"]["Enums"]["order_status"];
 const MILESTONES = ["drawing_approved", "sample_approved", "in_production", "ready"] as const;
@@ -259,12 +260,15 @@ function ReviewForm({ onSend }: { onSend: (r: number, c: string) => Promise<bool
 
 function PayDeadline({ due, side }: { due: string; side: "buyer" | "supplier" }) {
   const { t } = useI18n();
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => { const i = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(i); }, []);
+  const now = useNow(1000);
   const ms = new Date(due).getTime() - now;
   const time = new Date(due).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
-  const s = Math.max(0, Math.floor(ms / 1000));
-  const left = `${Math.floor(s / 3600) ? Math.floor(s / 3600) + "h " : ""}${Math.floor((s % 3600) / 60)}m ${s % 60}s`;
+  const left = countdownText(due, now);
   const text = ms <= 0 ? t("ord.payExpired") : (side === "buyer" ? t("ord.payDue") : t("ord.payDueSupplier")).replace("{time}", time).replace("{left}", left);
-  return <div role="status" className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm tabular-nums">{text}</div>;
+  return (
+    <div role="status" className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
+      <span>{text}</span>
+      {ms > 0 && <span className="font-display text-xl font-semibold tabular-nums text-warning-foreground">{left}</span>}
+    </div>
+  );
 }
