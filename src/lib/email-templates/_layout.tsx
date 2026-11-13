@@ -1,7 +1,7 @@
 import React from 'react'
 import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from '@react-email/components'
 
-export function Shell({ preview, title, children, cta, href }: { preview: string; title: string; children: React.ReactNode; cta: string; href?: string }) {
+export function Shell({ preview, title, children, cta, href }: { preview: string; title: string; children: React.ReactNode; cta: string; href?: string | undefined }) {
   return (
     <Html lang="en" dir="ltr">
       <Head />
