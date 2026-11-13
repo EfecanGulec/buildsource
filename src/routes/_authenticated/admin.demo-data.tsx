@@ -64,18 +64,18 @@ function DemoData() {
         <h2 className="font-display text-lg font-semibold">{t("magic.links")}</h2>
         <p className="text-sm text-muted-foreground">{t("magic.linksHint")}</p>
         {(links.data ?? []).length === 0 ? <p className="text-sm text-muted-foreground">{t("magic.none")}</p> : (
-          <table className="w-full text-sm"><tbody>{links.data!.map((l) => (
+          <div className="overflow-x-auto"><table className="w-full text-sm"><tbody>{links.data!.map((l) => (
             <tr key={l.id} className="border-t [&>td]:py-2">
               <td className="font-mono">{l.rfqs?.rfq_number}</td><td>{l.companies?.name}</td>
               <td><StatusBadge kind="recipient" status={l.status} /></td>
               <td className="text-right space-x-1">
                 <a href={`/q/${l.magic_token}`} target="_blank" rel="noreferrer" className="text-primary underline">/q/…{l.magic_token!.slice(-6)}</a>
                 <Button size="sm" variant="ghost" onClick={() => copy(l.magic_token!)} aria-label={t("magic.copy")}><Copy className="h-4 w-4" /></Button>
-              </td></tr>))}</tbody></table>)}
+              </td></tr>))}</tbody></table></div>)}
       </div>
       <div className="rounded-lg border bg-card p-6">
         <h2 className="font-display text-lg font-semibold mb-3">{t("demo.logins")}</h2>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto"><table className="w-full text-sm">
           <tbody>
             {DEMO_ACCOUNTS.map((a) => (
               <tr key={a.email} className="border-t">
@@ -85,7 +85,7 @@ function DemoData() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
         <p className="mt-3 text-sm text-muted-foreground">{t("demo.password")} <span className="font-mono">{DEMO_PASSWORD}</span></p>
       </div>
     </div>

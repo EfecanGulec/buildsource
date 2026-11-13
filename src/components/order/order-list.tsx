@@ -21,7 +21,7 @@ export function OrderList({ side }: { side: "buyer" | "supplier" }) {
     <div className="max-w-5xl space-y-6">
       <h1 className="font-display text-2xl font-semibold">{t("nav.orders")}</h1>
       {q.data?.length === 0 ? <p className="rounded-lg border bg-card p-8 text-center text-muted-foreground">{t("ord.empty")}</p> : (
-        <div className="rounded-lg border bg-card"><table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-lg border bg-card"><table className="w-full text-sm">
           <thead className="text-left text-muted-foreground"><tr className="[&>th]:px-4 [&>th]:py-3"><th>{t("ord.number")}</th><th>{t("ord.counterparty")}</th><th className="text-right">{t("rfq.total")}</th><th>{t("rfq.status")}</th><th>{t("ord.created")}</th></tr></thead>
           <tbody>{(q.data ?? []).map((o) => (
             <tr key={o.id} className="border-t [&>td]:px-4 [&>td]:py-3">

@@ -51,8 +51,8 @@ function PriceIndex() {
       <div className="grid gap-4 lg:grid-cols-2">{shown.map((s) => {
         const last = s.points.at(-1)!;
         return (
-          <div key={`${s.category_id}${s.region}`} className="rounded-lg border bg-card p-5 space-y-3">
-            <div className="flex items-start justify-between gap-2">
+          <div key={`${s.category_id}${s.region}`} className="min-w-0 rounded-lg border bg-card p-4 sm:p-5 space-y-3">
+            <div className="flex flex-wrap items-start justify-between gap-2">
               <div><p className="font-display font-semibold">{name(s.category_id)}</p><p className="text-sm text-muted-foreground">{s.region}</p></div>
               <div className="text-right"><p className="font-display text-lg font-semibold tabular-nums">{eur(last.avg)}</p>
                 <p className="text-xs text-muted-foreground">/ {unit(s.category_id)} · {last.month} · {last.n} {t("pi.samples")}</p></div>

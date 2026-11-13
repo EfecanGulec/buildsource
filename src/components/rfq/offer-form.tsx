@@ -50,7 +50,7 @@ export function OfferForm({ items, hints, initial, draftMessage, submitLabel, on
 
   return (
     <div className="space-y-4 text-sm">
-      <table className="w-full">
+      <div className="overflow-x-auto"><table className="w-full">
         <thead className="text-left text-muted-foreground"><tr><th className="py-1">{t("rfq.itemDescription")}</th><th className="text-right">{t("rfq.quantity")}</th><th className="w-32 text-right">{t("quote.unitPrice")}</th><th className="w-28 text-right">{t("rfq.total")}</th></tr></thead>
         <tbody>{items.map((i) => (
           <tr key={i.id} className="border-t">
@@ -63,7 +63,7 @@ export function OfferForm({ items, hints, initial, draftMessage, submitLabel, on
               value={prices[i.id]} onChange={(e) => setPrices({ ...prices, [i.id]: e.target.value })} className="text-right" /></td>
             <td className="text-right tabular-nums">{prices[i.id] !== "" ? eur(Number(prices[i.id]) * Number(i.quantity)) : "—"}</td>
           </tr>))}</tbody>
-      </table>
+      </table></div>
       {hints && Object.keys(hints).length > 0 && <p className="text-xs text-muted-foreground">{t("cat.hintNote")}</p>}
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="space-y-1"><span>{t("quote.delivery")}</span><Input type="number" min={0} value={delivery} onChange={(e) => setDelivery(e.target.value)} /></label>
