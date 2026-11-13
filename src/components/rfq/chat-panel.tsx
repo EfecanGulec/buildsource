@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, MessageSquare, Sparkles } from "lucide-react";
+import { AlertTriangle, Camera, MessageSquare, Sparkles } from "lucide-react";
+import { MaterialLensDialog } from "@/components/lens/material-lens";
 import { useServerFn } from "@tanstack/react-start";
 import { askAgent, type AgentResult } from "@/lib/ai-agent.functions";
 import { sharedAiPrompt, type OfferDraft } from "@/lib/ai-agent";
@@ -20,6 +21,7 @@ export function ChatPanel({ rfqId, recipientId, viewer, canSend, title, onOfferD
   const { t, lang } = useI18n();
   const ask = useServerFn(askAgent);
   const [aiOpen, setAiOpen] = useState(false);
+  const [lensOpen, setLensOpen] = useState(false);
   const [aiQ, setAiQ] = useState("");
   const [aiBusy, setAiBusy] = useState(false);
   const [aiLog, setAiLog] = useState<{ q: string; r: AgentResult }[]>([]);
@@ -66,7 +68,11 @@ export function ChatPanel({ rfqId, recipientId, viewer, canSend, title, onOfferD
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <h3 className="flex items-center gap-2 font-medium"><MessageSquare className="h-4 w-4 text-primary" />{title ?? t("chat.title")}</h3>
-        <Button size="sm" variant={aiOpen ? "default" : "outline"} onClick={() => setAiOpen((o) => !o)}>{t("ai.button")}</Button>
+        <div className="flex gap-1">
+          {canSend && <Button size="sm" variant="outline" aria-label={t("lens.button")} onClick={() => setLensOpen(true)}><Camera className="h-4 w-4" /></Button>}
+          <Button size="sm" variant={aiOpen ? "default" : "outline"} onClick={() => setAiOpen((o) => !o)}>{t("ai.button")}</Button>
+        </div>
+        {lensOpen && <MaterialLensDialog open={lensOpen} onOpenChange={setLensOpen} onAskInChat={(txt) => setBody(txt)} />}
       </div>
       {aiOpen && (
         <div className="space-y-2 rounded-lg border border-primary/30 bg-accent/30 p-3 text-sm">

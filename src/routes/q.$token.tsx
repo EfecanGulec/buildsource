@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MagicLens } from "@/components/lens/magic-lens";
 import { StatusBadge } from "@/components/rfq/status-badge";
 import { OfferForm, type Offer, type OfferItem } from "@/components/rfq/offer-form";
 import { QuoteThread, type ThreadVersion } from "@/components/rfq/quote-thread";
@@ -130,6 +131,8 @@ function MagicPage() {
               {specsSummary(it.specs) && <p className="mt-1 text-xs text-muted-foreground">{specsSummary(it.specs)}</p>}
             </div>))}
         </section>
+
+        <MagicLens token={token} />
 
         {quote && (
           <section className="rounded-lg border bg-card p-4 space-y-3">

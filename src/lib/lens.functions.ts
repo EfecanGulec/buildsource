@@ -29,8 +29,19 @@ export const identifyMaterial = createServerFn({ method: "POST" })
       urls.push(s.signedUrl);
     }
 
+    const { result, source } = await runLens(urls, data.note, data.hint, data.lang, slugs);
+
+    const { data: scan, error } = await supabase.from("material_scans").insert({
+      company_id: prof.company_id, profile_id: userId, photo_paths: data.paths, note: data.note || null,
+      status: result.status, result: result as never, source,
+    }).select("id").single();
+    if (error || !scan) throw new Error(error?.message ?? "Could not save scan");
+    return { scanId: scan.id, result, source };
+  });
+
+async function runLens(urls: string[], note: string, hint: string, lang: "en" | "lt", slugs: string[]): Promise<{ result: LensResult; source: "ai" | "demo" }> {
     const prompt = `You identify construction materials, furniture and equipment from photos for buyers in Lithuania.
-User note: ${data.note || "none"}. Answer text fields in ${data.lang === "lt" ? "Lithuanian" : "English"}.
+User note: ${note || "none"}. Answer text fields in ${lang === "lt" ? "Lithuanian" : "English"}.
 Allowed category_slug values: ${JSON.stringify(slugs)} (use null if none fits).
 Rules: status "identified" only when confidence >= 0.6, else "uncertain" with alternatives; "not_a_material" if the photo shows something else.
 Read brand/model text only if visible; never guess prices; never invent quantities (quantity is always null).
@@ -55,12 +66,25 @@ Return JSON only with keys: status, item_name, category_slug, confidence, altern
         if (!result) console.warn("identify-material unparseable", text.slice(0, 1500));
       }
     } catch (e) { console.error("identify-material AI error", e); }
-    if (!result) { result = normaliseLens(pickDemoLens(`${data.hint} ${data.note}`), slugs); source = "demo"; }
+    if (!result) { result = normaliseLens(pickDemoLens(`${hint} ${note}`), slugs); source = "demo"; }
 
-    const { data: scan, error } = await supabase.from("material_scans").insert({
-      company_id: prof.company_id, profile_id: userId, photo_paths: data.paths, note: data.note || null,
-      status: result.status, result: result as never, source,
-    }).select("id").single();
-    if (error || !scan) throw new Error(error?.message ?? "Could not save scan");
-    return { scanId: scan.id, result, source };
+    return { result, source };
+}
+
+const tokenInput = z.object({
+  token: z.string().min(10).max(200),
+  images: z.array(z.string().startsWith("data:image/").max(4_000_000)).min(1).max(LENS_MAX_PHOTOS),
+  note: z.string().max(500).default(""),
+  lang: z.enum(["en", "lt"]).default("en"),
+});
+// Magic-link suppliers have no account: the invite token is the credential (checked via magic_get); nothing is stored.
+export const identifyMaterialByToken = createServerFn({ method: "POST" })
+  .inputValidator((d) => tokenInput.parse(d))
+  .handler(async ({ data }): Promise<{ result: LensResult; source: "ai" | "demo" }> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: inv, error } = await supabaseAdmin.rpc("magic_get", { _token: data.token });
+    if (error || !inv) throw new Error("Link not valid");
+    const { data: cats } = await supabaseAdmin.from("categories").select("slug,parent_id");
+    const slugs = (cats ?? []).filter((c) => c.parent_id).map((c) => c.slug);
+    return runLens(data.images, data.note, "", data.lang, slugs);
   });
