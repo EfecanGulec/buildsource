@@ -26,6 +26,7 @@ import { Route as AuthenticatedAdminSectionRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin.companies'
 import { Route as AuthenticatedAdminDemoDataRouteImport } from './routes/_authenticated/admin.demo-data'
 import { Route as AuthenticatedAdminDisputesRouteImport } from './routes/_authenticated/admin.disputes'
+import { Route as AuthenticatedAdminGoLiveRouteImport } from './routes/_authenticated/admin.go-live'
 import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
 import { Route as AuthenticatedAdminPoolsRouteImport } from './routes/_authenticated/admin.pools'
 import { Route as AuthenticatedAdminTrustScoresRouteImport } from './routes/_authenticated/admin.trust-scores'
@@ -143,6 +144,12 @@ const AuthenticatedAdminDisputesRoute =
   AuthenticatedAdminDisputesRouteImport.update({
     id: '/disputes',
     path: '/disputes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminGoLiveRoute =
+  AuthenticatedAdminGoLiveRouteImport.update({
+    id: '/go-live',
+    path: '/go-live',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminIntegrationsRoute =
@@ -338,6 +345,7 @@ export interface FileRoutesByFullPath {
   '/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/disputes': typeof AuthenticatedAdminDisputesRoute
+  '/admin/go-live': typeof AuthenticatedAdminGoLiveRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/pools': typeof AuthenticatedAdminPoolsRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
@@ -383,6 +391,7 @@ export interface FileRoutesByTo {
   '/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/disputes': typeof AuthenticatedAdminDisputesRoute
+  '/admin/go-live': typeof AuthenticatedAdminGoLiveRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/pools': typeof AuthenticatedAdminPoolsRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
@@ -433,6 +442,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/_authenticated/admin/disputes': typeof AuthenticatedAdminDisputesRoute
+  '/_authenticated/admin/go-live': typeof AuthenticatedAdminGoLiveRoute
   '/_authenticated/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/_authenticated/admin/pools': typeof AuthenticatedAdminPoolsRoute
   '/_authenticated/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
@@ -483,6 +493,7 @@ export interface FileRouteTypes {
     | '/admin/companies'
     | '/admin/demo-data'
     | '/admin/disputes'
+    | '/admin/go-live'
     | '/admin/integrations'
     | '/admin/pools'
     | '/admin/trust-scores'
@@ -528,6 +539,7 @@ export interface FileRouteTypes {
     | '/admin/companies'
     | '/admin/demo-data'
     | '/admin/disputes'
+    | '/admin/go-live'
     | '/admin/integrations'
     | '/admin/pools'
     | '/admin/trust-scores'
@@ -577,6 +589,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/companies'
     | '/_authenticated/admin/demo-data'
     | '/_authenticated/admin/disputes'
+    | '/_authenticated/admin/go-live'
     | '/_authenticated/admin/integrations'
     | '/_authenticated/admin/pools'
     | '/_authenticated/admin/trust-scores'
@@ -740,6 +753,13 @@ declare module '@tanstack/react-router' {
       path: '/disputes'
       fullPath: '/admin/disputes'
       preLoaderRoute: typeof AuthenticatedAdminDisputesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/go-live': {
+      id: '/_authenticated/admin/go-live'
+      path: '/go-live'
+      fullPath: '/admin/go-live'
+      preLoaderRoute: typeof AuthenticatedAdminGoLiveRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/integrations': {
@@ -960,6 +980,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
   AuthenticatedAdminDemoDataRoute: typeof AuthenticatedAdminDemoDataRoute
   AuthenticatedAdminDisputesRoute: typeof AuthenticatedAdminDisputesRoute
+  AuthenticatedAdminGoLiveRoute: typeof AuthenticatedAdminGoLiveRoute
   AuthenticatedAdminIntegrationsRoute: typeof AuthenticatedAdminIntegrationsRoute
   AuthenticatedAdminPoolsRoute: typeof AuthenticatedAdminPoolsRoute
   AuthenticatedAdminTrustScoresRoute: typeof AuthenticatedAdminTrustScoresRoute
@@ -971,6 +992,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
   AuthenticatedAdminDemoDataRoute: AuthenticatedAdminDemoDataRoute,
   AuthenticatedAdminDisputesRoute: AuthenticatedAdminDisputesRoute,
+  AuthenticatedAdminGoLiveRoute: AuthenticatedAdminGoLiveRoute,
   AuthenticatedAdminIntegrationsRoute: AuthenticatedAdminIntegrationsRoute,
   AuthenticatedAdminPoolsRoute: AuthenticatedAdminPoolsRoute,
   AuthenticatedAdminTrustScoresRoute: AuthenticatedAdminTrustScoresRoute,
