@@ -16,12 +16,15 @@ export type Database = {
     Tables: {
       agreements: {
         Row: {
+          buyer_delivery_note: string | null
+          buyer_latest_date: string | null
           buyer_signature_code: string | null
           buyer_signed_at: string | null
           created_at: string
           delivery_date: string | null
           delivery_details: Json | null
           delivery_details_required: boolean
+          delivery_time_window: string | null
           id: string
           lead_time_days: number | null
           payment_terms: string | null
@@ -34,12 +37,15 @@ export type Database = {
           total: number
         }
         Insert: {
+          buyer_delivery_note?: string | null
+          buyer_latest_date?: string | null
           buyer_signature_code?: string | null
           buyer_signed_at?: string | null
           created_at?: string
           delivery_date?: string | null
           delivery_details?: Json | null
           delivery_details_required?: boolean
+          delivery_time_window?: string | null
           id?: string
           lead_time_days?: number | null
           payment_terms?: string | null
@@ -52,12 +58,15 @@ export type Database = {
           total: number
         }
         Update: {
+          buyer_delivery_note?: string | null
+          buyer_latest_date?: string | null
           buyer_signature_code?: string | null
           buyer_signed_at?: string | null
           created_at?: string
           delivery_date?: string | null
           delivery_details?: Json | null
           delivery_details_required?: boolean
+          delivery_time_window?: string | null
           id?: string
           lead_time_days?: number | null
           payment_terms?: string | null
@@ -2542,6 +2551,15 @@ export type Database = {
         Args: { _agreement: string; _details: Json }
         Returns: undefined
       }
+      buyer_sign_agreement: {
+        Args: {
+          _agreement: string
+          _code: string
+          _latest: string
+          _note: string
+        }
+        Returns: string
+      }
       calc_commission: {
         Args: { _buyer: string; _supplier: string; _version: string }
         Returns: {
@@ -2760,6 +2778,15 @@ export type Database = {
       }
       supplier_send_quote: {
         Args: { _offer: Json; _rfq: string }
+        Returns: string
+      }
+      supplier_sign_agreement: {
+        Args: {
+          _agreement: string
+          _code: string
+          _date: string
+          _time: string
+        }
         Returns: string
       }
       supplier_update_order: {

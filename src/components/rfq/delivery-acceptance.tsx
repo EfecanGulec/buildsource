@@ -23,11 +23,11 @@ export function DeliveryAcceptance({ rfqId, quoteId, agreementId, onSaved, varia
     queryKey: ["delivery-prefill", rfqId], enabled: open,
     queryFn: async () => {
       const [{ data: r, error }, { data: c, error: ce }] = await Promise.all([
-        supabase.from("rfqs").select("delivery_city,delivery_address,delivery_date_requested,unloading,delivery_window,site_access_notes").eq("id", rfqId).single(),
+        supabase.from("rfqs").select("delivery_city,delivery_address,unloading,delivery_window,site_access_notes").eq("id", rfqId).single(),
         supabase.from("rfq_site_contacts").select("name,phone").eq("rfq_id", rfqId).maybeSingle(),
       ]);
       if (error || ce) throw error ?? ce;
-      return { ...emptyDeliveryDetails, city: r.delivery_city ?? "", address: r.delivery_address ?? "", date: r.delivery_date_requested ?? "", contact: c?.name ?? "", phone: c?.phone ?? "", unloading: r.unloading ?? "manual", window: r.delivery_window ?? "any", access: r.site_access_notes ?? "" };
+      return { ...emptyDeliveryDetails, city: r.delivery_city ?? "", address: r.delivery_address ?? "", contact: c?.name ?? "", phone: c?.phone ?? "", unloading: r.unloading ?? "manual", window: r.delivery_window ?? "any", access: r.site_access_notes ?? "" };
     },
   });
   return <>
@@ -75,7 +75,7 @@ function DeliveryForm({ initial, quoteId, agreementId, onCancel, onSaved }: {
     finally { setSaving(false); }
   }
   const fields: { key: string; label: TKey; type?: string }[] = [
-    { key: "city", label: "rfq.city" }, { key: "address", label: "rfq.address" }, { key: "date", label: "rfq.date", type: "date" },
+    { key: "city", label: "rfq.city" }, { key: "address", label: "rfq.address" },
     { key: "contact", label: "rfq.siteContact" }, { key: "phone", label: "delivery.phone", type: "tel" },
   ];
   return <form onSubmit={submit} className="space-y-4">
@@ -100,7 +100,7 @@ export function DeliverySummary({ details }: { details: DeliveryDetails }) {
   return <section className="space-y-2 text-sm">
     <h2 className="font-semibold">{t("delivery.title")}</h2>
     <p>{t("rfq.address")}: {details.city}, {details.address}</p>
-    <p>{t("rfq.date")}: {details.date} · {t(`win.${details.window}`)}</p>
+    <p>{t("rfq.window")}: {t(`win.${details.window}`)}</p>
     <p>{t("rfq.unloading")}: {t(`unl.${details.unloading}`)}</p>
     {details.access && <p>{t("rfq.access")}: {details.access}</p>}
     <p>{t("rfq.siteContact")}: {details.contact} · {details.phone}</p>

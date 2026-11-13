@@ -4,6 +4,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Clock, FileSignature } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { SmartIdDialog } from "@/components/smart-id-dialog";
 import { eur } from "@/components/rfq/quote-thread";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +21,11 @@ export function AgreementView({ id, side }: { id: string; side: "buyer" | "suppl
   const { t } = useI18n();
   const qc = useQueryClient();
   const [signing, setSigning] = useState(false);
+  const [estDate, setEstDate] = useState("");
+  const [estTime, setEstTime] = useState("");
+  const [latest, setLatest] = useState("");
+  const [note, setNote] = useState("");
+  const today = new Date().toISOString().slice(0, 10);
   const q = useQuery({
     queryKey: ["agreement", id],
     queryFn: async () => {
@@ -42,7 +50,9 @@ export function AgreementView({ id, side }: { id: string; side: "buyer" | "suppl
   const refresh = () => { qc.invalidateQueries({ queryKey: ["agreement", id] }); qc.invalidateQueries({ queryKey: ["rfqs"] }); };
 
   async function signed(code: string) {
-    const { error } = await supabase.rpc("sign_agreement", { _agreement: id, _code: code });
+    const { error } = side === "supplier"
+      ? await supabase.rpc("supplier_sign_agreement", { _agreement: id, _code: code, _date: estDate, _time: estTime })
+      : await supabase.rpc("buyer_sign_agreement", { _agreement: id, _code: code, _latest: (latest || null) as string, _note: note });
     if (error) { toast.error(error.message); return; }
     toast.success(t("agr.signedToast")); refresh();
   }
@@ -71,7 +81,7 @@ export function AgreementView({ id, side }: { id: string; side: "buyer" | "suppl
             <span className="tabular-nums">{Number(l.quantity)} × {eur(Number(l.unit_price))} = {eur(Number(l.line_total))}</span></li>))}</ul>
         <div className="flex justify-between border-t pt-2"><span>{t("quote.deliveryCost")}</span><span className="tabular-nums">{eur(Number(v?.delivery_cost ?? 0))}</span></div>
         <div className="flex justify-between font-display text-lg font-semibold"><span>{t("rfq.total")}</span><span className="tabular-nums">{eur(Number(a.total))}</span></div>
-        <p className="text-muted-foreground">{t("rfq.leadTime")}: {a.lead_time_days ?? "—"} {t("rfq.days")} · {t("rfq.date")}: {a.delivery_date ?? "—"} · {t("quote.terms")}: {a.payment_terms ?? "—"}</p>
+        <p className="text-muted-foreground">{t("rfq.leadTime")}: {a.lead_time_days ?? "—"} {t("rfq.days")} · {t("agr.estDate")}: {a.delivery_date ?? t("agr.estPending")}{a.delivery_time_window ? ` (${a.delivery_time_window})` : ""} · {t("quote.terms")}: {a.payment_terms ?? "—"}</p>
         <p className="text-muted-foreground">{t("rfq.address")}: {a.rfqs?.delivery_city} {a.rfqs?.delivery_address ?? ""}</p>
       </div>
       {delivery.success && <DeliverySummary details={delivery.data} />}
@@ -79,13 +89,27 @@ export function AgreementView({ id, side }: { id: string; side: "buyer" | "suppl
         <p className="text-sm text-muted-foreground">{t(side === "buyer" ? "delivery.beforeSign" : "delivery.waitBuyer")}</p>
         {side === "buyer" && <DeliveryAcceptance rfqId={a.rfq_id} agreementId={id} onSaved={refresh} />}
       </div>}
+      {(a.buyer_latest_date || a.buyer_delivery_note) && <p className="rounded-md border p-3 text-sm">{a.buyer_latest_date && <>{t("agr.latest")}: <strong>{a.buyer_latest_date}</strong>. </>}{a.buyer_delivery_note}</p>}
       <div className="space-y-2">
         <Sig label={t("agr.buyer")} at={a.buyer_signed_at} />
         <Sig label={t("agr.supplier")} at={a.supplier_signed_at} />
       </div>
+      {a.status === "pending" && !mySigned && side === "buyer" && !a.supplier_signed_at && !missingDelivery && <p className="text-sm text-muted-foreground">{t("agr.waitSupplierDate")}</p>}
+      {a.status === "pending" && !mySigned && !missingDelivery && side === "supplier" && (
+        <div className="grid gap-3 rounded-lg border p-4 sm:grid-cols-2">
+          <p className="text-sm text-muted-foreground sm:col-span-2">{t("agr.supplierDateHelp")}</p>
+          <div className="space-y-1.5"><Label htmlFor="est-date">{t("agr.estDate")} *</Label><Input id="est-date" type="date" min={today} value={estDate} onChange={(e) => setEstDate(e.target.value)} /></div>
+          <div className="space-y-1.5"><Label htmlFor="est-time">{t("agr.estTime")}</Label><Input id="est-time" maxLength={100} placeholder="09:00–12:00" value={estTime} onChange={(e) => setEstTime(e.target.value)} /></div>
+        </div>)}
+      {a.status === "pending" && !mySigned && side === "buyer" && a.supplier_signed_at && (
+        <div className="grid gap-3 rounded-lg border p-4 sm:grid-cols-2">
+          <p className="text-sm text-muted-foreground sm:col-span-2">{t("agr.buyerConfirmHelp")}</p>
+          <div className="space-y-1.5"><Label htmlFor="latest">{t("agr.latest")}</Label><Input id="latest" type="date" min={today} value={latest} onChange={(e) => setLatest(e.target.value)} /></div>
+          <div className="space-y-1.5 sm:col-span-2"><Label htmlFor="dnote">{t("agr.deliveryNote")}</Label><Textarea id="dnote" rows={2} maxLength={1000} value={note} onChange={(e) => setNote(e.target.value)} /></div>
+        </div>)}
       {a.status === "pending" && !mySigned && (
         <div className="flex flex-wrap gap-2">
-          <Button disabled={missingDelivery} onClick={() => setSigning(true)}>{t("agr.sign")}</Button>
+          <Button disabled={missingDelivery || (side === "supplier" ? !estDate : !a.supplier_signed_at)} onClick={() => setSigning(true)}>{t(side === "buyer" ? "agr.confirmSign" : "agr.sign")}</Button>
           <Button variant="ghost" onClick={cancel}>{t("agr.cancel")}</Button>
         </div>)}
       {a.status === "pending" && mySigned && <p className="text-sm text-muted-foreground">{t("agr.waitOther")}</p>}
