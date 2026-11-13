@@ -12,7 +12,7 @@ import { compareLabels, nextActions } from "@/lib/quote";
 
 type Search = { rfq?: string };
 export const Route = createFileRoute("/_authenticated/app/compare")({
-  validateSearch: (s: Record<string, unknown>): Search => (typeof s.rfq === "string" ? { rfq: s.rfq } : {}),
+  validateSearch: (s: Record<string, unknown>): Search => (typeof s["rfq"] === "string" ? { rfq: s["rfq"] } : {}),
   head: () => ({ meta: [{ title: "Compare quotes — BuildSource LT" }] }),
   component: Compare,
 });
@@ -78,7 +78,7 @@ function Compare() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-display text-2xl font-semibold">{t("nav.compare")}</h1>
         {list.data && list.data.length > 0 && (
-          <Select value={selected} onValueChange={(v) => navigate({ to: "/app/compare", search: { rfq: v } })}>
+          <Select value={selected ?? ""} onValueChange={(v) => navigate({ to: "/app/compare", search: { rfq: v } })}>
             <SelectTrigger className="w-80" aria-label="RFQ"><SelectValue /></SelectTrigger>
             <SelectContent>{list.data.map((r) => <SelectItem key={r.id} value={r.id}>{r.rfq_number} · {r.title}</SelectItem>)}</SelectContent>
           </Select>)}
