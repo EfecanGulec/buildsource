@@ -48,7 +48,7 @@ function CreateRfq() {
   const [items, setItems] = useState<Item[]>([blankItem()]);
   const [kitId, setKitId] = useState<string>("");
   const [kitSize, setKitSize] = useState(40);
-  const [delivery, setDelivery] = useState({ city: account?.company?.city ?? "", address: "", date: "" });
+  const [delivery, setDelivery] = useState({ city: account?.company?.city ?? "", address: "", date: "", unloading: "manual", window: "any", access: "", contact: "", phone: "" });
   const [saving, setSaving] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [notes, setNotes] = useState("");
@@ -122,6 +122,7 @@ function CreateRfq() {
     const { data: rfq, error } = await supabase.from("rfqs").insert({
       buyer_company_id: account.company.id, project_type: projectType, title: title.trim(), description: description.trim() || null,
       delivery_city: delivery.city.trim(), delivery_address: delivery.address.trim() || null,
+      unloading: delivery.unloading, delivery_window: delivery.window, site_access_notes: delivery.access.trim() || null,
       delivery_date_requested: delivery.date || null, delivery_week: delivery.date ? isoWeek(delivery.date) : null,
       status: "draft", source: fromAi ? "snap_source" : kit ? "kit" : "manual", ai_upload_urls: fromAi ? uploadPaths : [],
     }).select("id,rfq_number").single();
@@ -256,6 +257,18 @@ function CreateRfq() {
               <Input type="date" value={delivery.date} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setDelivery({ ...delivery, date: e.target.value })} /></label>
             <div className="space-y-1 text-sm"><span>{t("rfq.week")}</span>
               <p className="flex h-10 items-center font-mono">{delivery.date ? isoWeek(delivery.date) : "—"}</p></div>
+            <label className="space-y-1 text-sm"><span>{t("rfq.unloading")}</span>
+              <Select value={delivery.unloading} onValueChange={(v) => setDelivery({ ...delivery, unloading: v })}><SelectTrigger aria-label={t("rfq.unloading")}><SelectValue /></SelectTrigger>
+                <SelectContent>{["manual", "crane_needed", "forklift_on_site"].map((u) => <SelectItem key={u} value={u}>{t(`unl.${u}` as TKey)}</SelectItem>)}</SelectContent></Select></label>
+            <label className="space-y-1 text-sm"><span>{t("rfq.window")}</span>
+              <Select value={delivery.window} onValueChange={(v) => setDelivery({ ...delivery, window: v })}><SelectTrigger aria-label={t("rfq.window")}><SelectValue /></SelectTrigger>
+                <SelectContent>{["morning", "afternoon", "any"].map((u) => <SelectItem key={u} value={u}>{t(`win.${u}` as TKey)}</SelectItem>)}</SelectContent></Select></label>
+            <label className="space-y-1 text-sm"><span>{t("rfq.siteContact")}</span>
+              <Input value={delivery.contact} onChange={(e) => setDelivery({ ...delivery, contact: e.target.value })} /></label>
+            <label className="space-y-1 text-sm"><span>{t("rfq.sitePhone")}</span>
+              <Input type="tel" value={delivery.phone} onChange={(e) => setDelivery({ ...delivery, phone: e.target.value })} /></label>
+            <label className="space-y-1 text-sm sm:col-span-2"><span>{t("rfq.access")}</span>
+              <Input value={delivery.access} onChange={(e) => setDelivery({ ...delivery, access: e.target.value })} /></label>
           </div>
         )}
 

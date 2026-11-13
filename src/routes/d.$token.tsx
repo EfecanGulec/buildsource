@@ -104,7 +104,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   const { t } = useI18n();
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-hero px-4 py-3 text-hero-foreground"><p className="font-display font-semibold">BuildSource LT · {t("drv.title")}</p></header>
+      <header className="bg-ink px-4 py-3 text-ink-foreground"><p className="font-display font-semibold">BuildSource LT · {t("drv.title")}</p></header>
       <main className="mx-auto max-w-md space-y-4 p-4">{children}</main>
     </div>);
 }
