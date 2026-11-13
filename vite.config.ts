@@ -7,6 +7,7 @@
 // the build fails. Never add compression (compressPublicAssets, vite-plugin-compression):
 // hosting already compresses at the edge.
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
+import path from "node:path";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
@@ -16,6 +17,13 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    resolve: {
+      alias: {
+        "entities/lib/decode.js": path.resolve(__dirname, "node_modules/entities/lib/decode.js"),
+        "entities/lib/encode.js": path.resolve(__dirname, "node_modules/entities/lib/encode.js"),
+        entities: path.resolve(__dirname, "node_modules/entities"),
+      },
+    },
     // Pre-bundle every UI primitive up front: otherwise the first page that uses a new one makes
     // Vite re-optimize mid-session, which breaks open tabs with "Importing a module script failed".
     optimizeDeps: {
