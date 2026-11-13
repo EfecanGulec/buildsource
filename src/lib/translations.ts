@@ -442,6 +442,20 @@ export const en = {
   "dash.toFulfil": "Orders to fulfil",
   "dash.wonMonth": "Won this month",
   "dash.responseRate": "Response rate",
+  "earn.sales": "Sales",
+  "earn.commission": "Commission",
+  "earn.paidOut": "Paid out",
+  "earn.pending": "Pending",
+  "earn.paid": "Paid out",
+  "earn.empty": "No orders yet. Your earnings appear here once a buyer signs an agreement.",
+  "sq.empty": "You have not sent any quotes yet. Open an RFQ in your inbox to quote.",
+  "sq.version": "Version",
+  "sq.buyerCounter": "buyer counter-offer",
+  "sq.yourOffer": "your offer",
+  "sa.empty": "No agreements yet.",
+  "sa.signed": "Signed by both",
+  "sa.cancelled": "Cancelled",
+  "sa.needsYou": "Your signature is needed",
 } as const;
 
 export type TKey = keyof typeof en;
