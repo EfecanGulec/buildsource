@@ -56,6 +56,7 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
     return () => urls.forEach((u) => URL.revokeObjectURL(u));
   }, [files]);
   const ready = products.filter((p) => p.rfq_item_draft);
+  const categorySlugs = [...new Set(ready.map((p) => p.rfq_item_draft?.category_slug).filter((s): s is string => !!s))];
   function addPhotos(incoming: File[]) {
     const photos = incoming.filter((f) => f.type.startsWith("image/"));
     if (files.length + photos.length > LENS_MAX_PHOTOS) toast.warning(t("lens.limit"));
@@ -69,12 +70,12 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
     queryFn: async () => (await supabase.from("rfqs").select("id,rfq_number,title").eq("buyer_company_id", account?.company?.id ?? "").eq("status", "draft").order("created_at", { ascending: false }).limit(10)).data ?? [],
   });
   const suppliers = useQuery({
-    queryKey: ["lens-suppliers", slug, account?.company?.city],
-    enabled: !!slug,
+    queryKey: ["lens-suppliers", categorySlugs.join(","), account?.company?.city],
+    enabled: categorySlugs.length > 0,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("lens_suppliers", { _category_slug: slug ?? "", _city: isSupplier ? null as never : (account?.company?.city ?? null) as never });
-      if (error) throw error;
-      const rows = data ?? [];
+      const responses = await Promise.all(categorySlugs.map((category) => supabase.rpc("lens_suppliers", { _category_slug: category, _city: isSupplier ? null as never : (account?.company?.city ?? null) as never })));
+      for (const response of responses) if (response.error) throw response.error;
+      const rows = [...new Map(responses.flatMap((response) => response.data ?? []).map((row) => [row.company_id, row])).values()];
       setChosen((old) => [...new Set([...old, ...rows.filter((r) => r.in_region).slice(0, 4).map((r) => r.company_id)])]);
       return rows;
     },
