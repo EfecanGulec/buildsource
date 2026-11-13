@@ -1872,6 +1872,22 @@ export type Database = {
         }
         Returns: undefined
       }
+      supplier_earnings: {
+        Args: never
+        Returns: {
+          buyer_name: string
+          commission_amount: number
+          commission_rate: number
+          created_at: string
+          order_id: string
+          order_number: string
+          paid_out: boolean
+          status: Database["public"]["Enums"]["order_status"]
+          supplier_payout: number
+          title: string
+          total: number
+        }[]
+      }
       supplier_reject_counter: { Args: { _rfq: string }; Returns: undefined }
       supplier_send_quote: {
         Args: { _offer: Json; _rfq: string }

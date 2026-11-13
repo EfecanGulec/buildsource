@@ -155,6 +155,13 @@
       "when": 1794534275137,
       "tag": "0021_reset_demo_cafe_pool",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1794534285919,
+      "tag": "0022_supplier_earnings",
+      "breakpoints": true
     }
   ]
 }
