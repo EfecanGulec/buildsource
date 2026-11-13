@@ -49,7 +49,7 @@ function SupplierDashboard() {
           {comps.length === 0 ? <p className="text-sm text-muted-foreground">—</p> :
             <ul className="grid gap-2 sm:grid-cols-2">{comps.map((c) => (
               <li key={c.key} className="space-y-1 text-sm">
-                <div className="flex justify-between"><span>{t(`trust.${c.key}` as TKey)}</span><span className="tabular-nums">{c.points}/{c.max}</span></div>
+                <div className="flex justify-between"><span>{t(`trust.c.${c.key}` as TKey)}</span><span className="tabular-nums">{c.points}/{c.max}</span></div>
                 <div className="h-1.5 rounded-full bg-muted"><div className="h-1.5 rounded-full bg-primary" style={{ width: `${c.max ? (c.points / c.max) * 100 : 0}%` }} /></div>
               </li>))}</ul>}
         </section>
