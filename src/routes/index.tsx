@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Camera, Check, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, Camera, Check, ShieldCheck, Users, Construction, PaintRoller, Lamp, Coffee } from "lucide-react";
+import { LandingScan } from "@/components/landing-scan";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import type { TKey } from "@/lib/translations";
@@ -10,7 +11,7 @@ export const Route = createFileRoute("/")({
       { title: "BuildSource LT — Snap a photo, get verified quotes, buy together" },
       { name: "description", content: "B2B sourcing in Lithuania: turn a photo or plan into an RFQ, get quotes from verified suppliers, compare, pay into escrow and buy together." },
       { property: "og:title", content: "BuildSource LT — verified quotes for construction & fit-out" },
-      { property: "og:description", content: "Snap a photo, get verified quotes, buy together. Kaunas & Vilnius." },
+      { property: "og:description", content: "Snap a photo, get verified supplier offers and buy construction materials together with BuildSource LT." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -24,12 +25,18 @@ const features = [
   { icon: Users, t: "landing.f3.t", d: "landing.f3.d" },
 ] as const;
 const steps: TKey[] = ["landing.s1", "landing.s2", "landing.s3", "landing.s4", "landing.s5"];
+const categories = [
+  { icon: Construction, title: "landing.new", desc: "landing.newDesc" },
+  { icon: PaintRoller, title: "landing.renovation", desc: "landing.renovationDesc" },
+  { icon: Lamp, title: "landing.interior", desc: "landing.interiorDesc" },
+  { icon: Coffee, title: "landing.business", desc: "landing.businessDesc" },
+] as const;
 
 function Index() {
   const { t } = useI18n();
   return (
     <div className="min-h-screen bg-background">
-      <section className="bg-ink text-ink-foreground">
+      <section className="landing-hero">
         <header className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Link to="/" className="flex items-center gap-2">
             <span className="grid h-8 w-8 place-items-center rounded-md bg-accent font-display text-xs font-extrabold text-accent-foreground">BS</span>
@@ -44,18 +51,22 @@ function Index() {
             </Button>
           </nav>
         </header>
-        <div className="mx-auto max-w-6xl px-6 pb-24 pt-16 md:pb-32 md:pt-24">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">{t("landing.eyebrow")}</p>
-          <h1 className="mt-6 max-w-4xl text-5xl leading-[1.05] md:text-7xl">{t("landing.title")}</h1>
-          <p className="mt-6 max-w-2xl text-lg opacity-80">{t("landing.sub")}</p>
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Link to="/auth" search={{ mode: "signup", type: "buyer" }}>{t("landing.ctaBuyer")} <ArrowRight /></Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="border-accent/40 bg-transparent text-ink-foreground hover:bg-accent/10 hover:text-ink-foreground">
-              <Link to="/auth" search={{ mode: "signup", type: "supplier" }}>{t("landing.ctaSupplier")}</Link>
-            </Button>
+        <div className="landing-hero-content mx-auto max-w-6xl px-6">
+          <div className="landing-hero-copy">
+            <h1 className="landing-headline"><span>{t("landing.head1")}</span><span className="text-sand">{t("landing.head2")}</span><span>{t("landing.head3")}</span></h1>
+            <p className="mt-7 max-w-lg text-base leading-relaxed text-ink-foreground md:text-lg">{t("landing.heroSub")}</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild size="lg"><Link to="/auth" search={{ mode: "signup", type: "buyer" }}>{t("landing.buying")}</Link></Button>
+              <Button asChild size="lg" variant="outline" className="border-sand/40 bg-transparent text-ink-foreground hover:bg-sand/10 hover:text-ink-foreground"><Link to="/auth" search={{ mode: "signup", type: "supplier" }}>{t("landing.supplying")}</Link></Button>
+            </div>
+            <ol className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold md:text-sm">
+              {(["landing.snap", "landing.compare", "landing.pay"] as const).map((key, i) => <li key={key} className="flex items-center gap-2"><span className="grid size-6 place-items-center rounded-full bg-sand/15 text-sand">{i + 1}</span>{t(key)}</li>)}
+            </ol>
           </div>
+          <LandingScan />
+        </div>
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 px-6 pb-8 pt-6 lg:grid-cols-4">
+          {categories.map(({ icon: Icon, title, desc }) => <Link key={title} to="/auth" search={{ mode: "signup", type: "buyer" }} className="landing-category flex items-center gap-3 rounded-2xl border border-sand/15 bg-sand/5 p-4 transition-colors hover:bg-sand/10"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sand/10 text-sand"><Icon className="size-5" /></span><div className="min-w-0"><h2 className="text-sm font-semibold">{t(title)}</h2><p className="mt-1 text-xs text-ink-foreground/70">{t(desc)}</p></div></Link>)}
         </div>
       </section>
 
@@ -108,7 +119,7 @@ function Index() {
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-4 px-6 py-8 text-sm text-muted-foreground">
           <span>© {new Date().getFullYear()} BuildSource LT</span>
-          <span>Kaunas · Vilnius</span>
+          <span>{t("landing.rights")}</span>
         </div>
       </footer>
     </div>
