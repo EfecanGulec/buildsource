@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/rfq/status-badge";
 import { specsSummary } from "@/components/rfq/spec-fields";
 import { ChatPanel } from "@/components/rfq/chat-panel";
 import { OfferForm, type Offer } from "@/components/rfq/offer-form";
+import type { OfferDraft } from "@/lib/ai-agent";
 import { QuoteThread, type ThreadVersion } from "@/components/rfq/quote-thread";
 import { Textarea } from "@/components/ui/textarea";
 import { nextActions } from "@/lib/quote";
@@ -153,6 +154,9 @@ function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [countering, setCountering] = useState(false);
+  const [draft, setDraft] = useState<OfferDraft | null>(null);
+  const [draftKey, setDraftKey] = useState(0);
+  const useDraft = (d: OfferDraft) => { setDraft(d); setDraftKey((k) => k + 1); setCountering(true); };
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState("");
   const versions = [...quote.quote_versions].sort((a, b) => a.version - b.version);
@@ -191,8 +195,8 @@ function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
           <Button variant="outline" onClick={() => setRejecting(true)}>{t("quote.reject")}</Button>
           {acts.buyerAccept && <Button variant="secondary" onClick={accept}>{t("compare.accept")}</Button>}
         </div>)}
-      {countering && <OfferForm items={items} initial={last} submitLabel={t("quote.sendCounter")} onSubmit={counter} onCancel={() => setCountering(false)} />}
-      <div className="border-t pt-4"><ChatPanel rfqId={quote.rfq_id} recipientId={quote.recipient_id} viewer="buyer" canSend={quote.status !== "rejected"} /></div>
+      {countering && <OfferForm key={draftKey} items={items} initial={draft ? fromDraft(last, draft) : last} draftMessage={draft?.message} submitLabel={t("quote.sendCounter")} onSubmit={counter} onCancel={() => { setCountering(false); setDraft(null); }} />}
+      <div className="border-t pt-4"><ChatPanel rfqId={quote.rfq_id} recipientId={quote.recipient_id} viewer="buyer" canSend={quote.status !== "rejected"} onOfferDraft={acts.buyerCounter ? useDraft : undefined} /></div>
       {rejecting && (
         <div className="space-y-2">
           <Textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("quote.rejectReason")} aria-label={t("quote.rejectReason")} />
@@ -201,4 +205,9 @@ function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
         </div>)}
     </div>
   );
+}
+
+function fromDraft<T extends object>(last: T | null | undefined, d: OfferDraft) {
+  return { ...(last ?? {}), lines: d.lines, delivery_cost: d.delivery_cost ?? (last as { delivery_cost?: number } | null)?.delivery_cost ?? 0,
+    lead_time_days: d.lead_time_days ?? (last as { lead_time_days?: number | null } | null)?.lead_time_days ?? null } as T & { lines: unknown; delivery_cost: number; lead_time_days: number | null; delivery_date: string | null; valid_until: string | null; payment_terms: string | null };
 }

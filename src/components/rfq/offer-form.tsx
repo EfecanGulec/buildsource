@@ -18,8 +18,8 @@ export type Offer = {
 
 export type PriceHint = { name: string; price: number; unit: string | null; updated: string | null };
 
-export function OfferForm({ items, hints, initial, submitLabel, onSubmit, onCancel }: {
-  items: OfferItem[]; hints?: Record<string, PriceHint>; initial?: VersionLike | null | undefined; submitLabel: string;
+export function OfferForm({ items, hints, initial, draftMessage, submitLabel, onSubmit, onCancel }: {
+  items: OfferItem[]; hints?: Record<string, PriceHint>; initial?: VersionLike | null | undefined; draftMessage?: string | null; submitLabel: string;
   onSubmit: (o: Offer) => Promise<boolean>; onCancel?: () => void;
 }) {
   const { t } = useI18n();
@@ -31,7 +31,7 @@ export function OfferForm({ items, hints, initial, submitLabel, onSubmit, onCanc
   const [origin, setOrigin] = useState(initial?.warehouse_origin ?? "");
   const [valid, setValid] = useState(initial?.valid_until ?? new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10));
   const [terms, setTerms] = useState(initial?.payment_terms ?? "");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(draftMessage ?? "");
   const [busy, setBusy] = useState(false);
 
   const lines = items.map((i) => ({ rfq_item_id: i.id, unit_price: Number(prices[i.id]), quantity: Number(i.quantity) }));
