@@ -108,7 +108,7 @@ function SupplierRfq() {
 
       {canAct && (
         <div className="flex flex-wrap gap-2">
-          <Button disabled title={t("inbox.quoteSoon")}><Send className="mr-2 h-4 w-4" />{t("inbox.quoteSoon")}</Button>
+          <Button disabled title={t("inbox.quoteSoon")}><Send className="mr-2 h-4 w-4" />{t("inbox.sendQuote")}</Button>
           <Button variant="outline" onClick={() => setOpen(true)}><X className="mr-2 h-4 w-4" />{t("inbox.decline")}</Button>
         </div>
       )}

@@ -111,7 +111,7 @@ function MagicPage() {
 
         {active && (
           <div className="grid gap-2 sm:grid-cols-2">
-            <Button size="lg" disabled><Send className="mr-2 h-4 w-4" />{t("inbox.quoteSoon")}</Button>
+            <Button size="lg" disabled title={t("inbox.quoteSoon")}><Send className="mr-2 h-4 w-4" />{t("inbox.sendQuote")}</Button>
             <Button size="lg" variant="outline" onClick={() => setOpen(true)}><X className="mr-2 h-4 w-4" />{t("inbox.decline")}</Button>
           </div>)}
         {d.status === "declined" && <p className="rounded-md bg-muted p-3 text-sm">{t("magic.closed")}</p>}
