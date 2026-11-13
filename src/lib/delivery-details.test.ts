@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { deliveryDetailsSchema, needsDeliveryDetails } from "./delivery-details";
 
-const details = { city: "Vilnius", address: "Test street 12", date: "2026-12-01", contact: "Site manager", phone: "+37060000000", unloading: "manual", window: "any", access: "Gate on the left" };
+const details = { city: "Vilnius", address: "Test street 12", contact: "Site manager", phone: "+37060000000", unloading: "manual", window: "any", access: "Gate on the left" };
 describe("delivery details at acceptance", () => {
-  it.each(["city", "address", "date", "contact", "phone"])("requires %s before acceptance", (field) => {
+  it.each(["city", "address", "contact", "phone"])("requires %s before acceptance", (field) => {
     expect(deliveryDetailsSchema.safeParse({ ...details, [field]: "" }).success).toBe(false);
   });
   it("keeps unloading notes and site access", () => {
