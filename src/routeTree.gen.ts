@@ -19,6 +19,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedSupplierRouteImport } from './routes/_authenticated/supplier'
 import { Route as AuthenticatedVerifyRouteImport } from './routes/_authenticated/verify'
+import { Route as DTokenRouteImport } from './routes/d.$token'
 import { Route as QTokenRouteImport } from './routes/q.$token'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminSectionRouteImport } from './routes/_authenticated/admin.$section'
@@ -100,6 +101,11 @@ const AuthenticatedVerifyRoute = AuthenticatedVerifyRouteImport.update({
   id: '/verify',
   path: '/verify',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const DTokenRoute = DTokenRouteImport.update({
+  id: '/d/$token',
+  path: '/d/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const QTokenRoute = QTokenRouteImport.update({
   id: '/q/$token',
@@ -298,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/supplier': typeof AuthenticatedSupplierRouteWithChildren
   '/verify': typeof AuthenticatedVerifyRoute
+  '/d/$token': typeof DTokenRoute
   '/q/$token': typeof QTokenRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
@@ -338,6 +345,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/verify': typeof AuthenticatedVerifyRoute
+  '/d/$token': typeof DTokenRoute
   '/q/$token': typeof QTokenRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
@@ -383,6 +391,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/supplier': typeof AuthenticatedSupplierRouteWithChildren
   '/_authenticated/verify': typeof AuthenticatedVerifyRoute
+  '/d/$token': typeof DTokenRoute
   '/q/$token': typeof QTokenRoute
   '/_authenticated/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/_authenticated/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
@@ -428,6 +437,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/supplier'
     | '/verify'
+    | '/d/$token'
     | '/q/$token'
     | '/admin/$section'
     | '/admin/demo-data'
@@ -468,6 +478,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/verify'
+    | '/d/$token'
     | '/q/$token'
     | '/admin/$section'
     | '/admin/demo-data'
@@ -512,6 +523,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/supplier'
     | '/_authenticated/verify'
+    | '/d/$token'
     | '/q/$token'
     | '/_authenticated/admin/$section'
     | '/_authenticated/admin/demo-data'
@@ -551,6 +563,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  DTokenRoute: typeof DTokenRoute
   QTokenRoute: typeof QTokenRoute
 }
 
@@ -625,6 +638,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/verify'
       preLoaderRoute: typeof AuthenticatedVerifyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/d/$token': {
+      id: '/d/$token'
+      path: '/d/$token'
+      fullPath: '/d/$token'
+      preLoaderRoute: typeof DTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/q/$token': {
       id: '/q/$token'
@@ -974,6 +994,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  DTokenRoute: DTokenRoute,
   QTokenRoute: QTokenRoute,
 }
 export const routeTree = rootRouteImport

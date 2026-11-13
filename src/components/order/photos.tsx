@@ -13,12 +13,12 @@ export async function uploadOrderPhotos(orderId: string, files: File[]) {
   return paths;
 }
 
-export function PhotoStrip({ paths }: { paths: string[] }) {
+export function PhotoStrip({ paths, bucket = "order-photos" }: { paths: string[]; bucket?: string }) {
   const [urls, setUrls] = useState<string[]>([]);
   useEffect(() => {
     if (!paths.length) return;
-    supabase.storage.from("order-photos").createSignedUrls(paths, 3600).then(({ data }) => setUrls((data ?? []).map((d) => d.signedUrl).filter(Boolean) as string[]));
-  }, [paths.join("|")]); // eslint-disable-line react-hooks/exhaustive-deps
+    supabase.storage.from(bucket).createSignedUrls(paths, 3600).then(({ data }) => setUrls((data ?? []).map((d) => d.signedUrl).filter(Boolean) as string[]));
+  }, [paths.join("|"), bucket]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!urls.length) return null;
   return <div className="mt-2 flex flex-wrap gap-2">{urls.map((u) => <a key={u} href={u} target="_blank" rel="noreferrer"><img src={u} alt="" className="h-16 w-16 rounded-md border object-cover" /></a>)}</div>;
 }

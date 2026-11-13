@@ -1190,6 +1190,50 @@ export type Database = {
           },
         ]
       }
+      proof_of_delivery: {
+        Row: {
+          created_at: string
+          id: string
+          line_quantities: Json
+          mismatch: boolean
+          notes: string | null
+          photo_urls: string[]
+          receiver_name: string
+          shipment_id: string
+          signature_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          line_quantities?: Json
+          mismatch?: boolean
+          notes?: string | null
+          photo_urls?: string[]
+          receiver_name: string
+          shipment_id: string
+          signature_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          line_quantities?: Json
+          mismatch?: boolean
+          notes?: string | null
+          photo_urls?: string[]
+          receiver_name?: string
+          shipment_id?: string
+          signature_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proof_of_delivery_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: true
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       provider_accounts: {
         Row: {
           company_id: string
@@ -1545,6 +1589,32 @@ export type Database = {
           },
         ]
       }
+      rfq_site_contacts: {
+        Row: {
+          name: string | null
+          phone: string | null
+          rfq_id: string
+        }
+        Insert: {
+          name?: string | null
+          phone?: string | null
+          rfq_id: string
+        }
+        Update: {
+          name?: string | null
+          phone?: string | null
+          rfq_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rfq_site_contacts_rfq_id_fkey"
+            columns: ["rfq_id"]
+            isOneToOne: true
+            referencedRelation: "rfqs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rfqs: {
         Row: {
           ai_upload_urls: string[]
@@ -1556,6 +1626,7 @@ export type Database = {
           delivery_city: string | null
           delivery_date_requested: string | null
           delivery_week: string | null
+          delivery_window: string | null
           description: string | null
           id: string
           max_suppliers: number
@@ -1564,10 +1635,12 @@ export type Database = {
           project_id: string | null
           project_type: Database["public"]["Enums"]["project_type"]
           rfq_number: string
+          site_access_notes: string | null
           source: string
           status: Database["public"]["Enums"]["rfq_status"]
           submitted_at: string | null
           title: string
+          unloading: string | null
           updated_at: string
         }
         Insert: {
@@ -1580,6 +1653,7 @@ export type Database = {
           delivery_city?: string | null
           delivery_date_requested?: string | null
           delivery_week?: string | null
+          delivery_window?: string | null
           description?: string | null
           id?: string
           max_suppliers?: number
@@ -1588,10 +1662,12 @@ export type Database = {
           project_id?: string | null
           project_type: Database["public"]["Enums"]["project_type"]
           rfq_number?: string
+          site_access_notes?: string | null
           source?: string
           status?: Database["public"]["Enums"]["rfq_status"]
           submitted_at?: string | null
           title: string
+          unloading?: string | null
           updated_at?: string
         }
         Update: {
@@ -1604,6 +1680,7 @@ export type Database = {
           delivery_city?: string | null
           delivery_date_requested?: string | null
           delivery_week?: string | null
+          delivery_window?: string | null
           description?: string | null
           id?: string
           max_suppliers?: number
@@ -1612,10 +1689,12 @@ export type Database = {
           project_id?: string | null
           project_type?: Database["public"]["Enums"]["project_type"]
           rfq_number?: string
+          site_access_notes?: string | null
           source?: string
           status?: Database["public"]["Enums"]["rfq_status"]
           submitted_at?: string | null
           title?: string
+          unloading?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1638,6 +1717,62 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipments: {
+        Row: {
+          carrier: string | null
+          created_at: string
+          driver_token: string | null
+          eta: string | null
+          id: string
+          last_location: Json | null
+          late_alerted_at: string | null
+          lines: Json
+          method: string
+          order_id: string
+          planned_date: string | null
+          status: string
+          tracking_number: string | null
+        }
+        Insert: {
+          carrier?: string | null
+          created_at?: string
+          driver_token?: string | null
+          eta?: string | null
+          id?: string
+          last_location?: Json | null
+          late_alerted_at?: string | null
+          lines?: Json
+          method: string
+          order_id: string
+          planned_date?: string | null
+          status?: string
+          tracking_number?: string | null
+        }
+        Update: {
+          carrier?: string | null
+          created_at?: string
+          driver_token?: string | null
+          eta?: string | null
+          id?: string
+          last_location?: Json | null
+          late_alerted_at?: string | null
+          lines?: Json
+          method?: string
+          order_id?: string
+          planned_date?: string | null
+          status?: string
+          tracking_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
         ]
@@ -1782,6 +1917,47 @@ export type Database = {
         }
         Relationships: []
       }
+      tracking_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          location: string | null
+          occurred_at: string
+          shipment_id: string
+          source: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          occurred_at?: string
+          shipment_id: string
+          source: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          occurred_at?: string
+          shipment_id?: string
+          source?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tracking_events_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trust_scores: {
         Row: {
           breakdown: Json
@@ -1905,6 +2081,30 @@ export type Database = {
         Returns: number
       }
       _close_pool: { Args: { _pool: string }; Returns: string }
+      _driver_shipment: {
+        Args: { _token: string }
+        Returns: {
+          carrier: string | null
+          created_at: string
+          driver_token: string | null
+          eta: string | null
+          id: string
+          last_location: Json | null
+          late_alerted_at: string | null
+          lines: Json
+          method: string
+          order_id: string
+          planned_date: string | null
+          status: string
+          tracking_number: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       _exec_job: { Args: { _job: string }; Returns: Json }
       _finalize_pool: { Args: { _pool: string }; Returns: undefined }
       _invite_supplier: {
@@ -1937,6 +2137,17 @@ export type Database = {
         }
         Returns: undefined
       }
+      _order_lines: { Args: { _order: string }; Returns: Json }
+      _shipment_event: {
+        Args: {
+          _desc: string
+          _location: string
+          _shipment: string
+          _source: string
+          _status: string
+        }
+        Returns: undefined
+      }
       _supplier_offer: {
         Args: { _offer: Json; _profile: string; _rec: string }
         Returns: string
@@ -1961,6 +2172,7 @@ export type Database = {
         Args: { _milestone: string }
         Returns: undefined
       }
+      buyer_confirm_pickup: { Args: { _shipment: string }; Returns: undefined }
       buyer_counter_quote: {
         Args: { _offer: Json; _quote: string }
         Returns: number
@@ -2004,6 +2216,24 @@ export type Database = {
       close_pool_now: { Args: { _pool: string }; Returns: string }
       compute_buyer_reliability: { Args: { _company: string }; Returns: number }
       compute_trust_score: { Args: { _company: string }; Returns: number }
+      delivery_photo_party: { Args: { _folder: string }; Returns: boolean }
+      driver_deliver: {
+        Args: {
+          _notes: string
+          _photos: string[]
+          _received: Json
+          _receiver: string
+          _signature: string
+          _token: string
+        }
+        Returns: boolean
+      }
+      driver_get: { Args: { _token: string }; Returns: Json }
+      driver_token_ok: { Args: { _token: string }; Returns: boolean }
+      driver_update: {
+        Args: { _lat?: number; _lng?: number; _status: string; _token: string }
+        Returns: undefined
+      }
       end_pool_window_now: { Args: { _pool: string }; Returns: undefined }
       enqueue_job: { Args: { _job: string; _target?: string }; Returns: string }
       expire_stale_quotes: { Args: never; Returns: number }
@@ -2045,6 +2275,7 @@ export type Database = {
           supplier_payout: number
         }[]
       }
+      order_lines: { Args: { _order: string }; Returns: Json }
       pool_confirm: { Args: { _code: string; _pool: string }; Returns: string }
       pool_join: {
         Args: { _if_fails?: string; _pool: string; _qty: number }
@@ -2095,6 +2326,8 @@ export type Database = {
       scheduler_tick: { Args: { _jobs: string[] }; Returns: number }
       seed_demo_base: { Args: never; Returns: Json }
       seed_demo_scored: { Args: never; Returns: Json }
+      shipment_late_alerts: { Args: never; Returns: number }
+      shipment_order: { Args: { _shipment: string }; Returns: string }
       sign_agreement: {
         Args: { _agreement: string; _code: string }
         Returns: string
@@ -2103,6 +2336,17 @@ export type Database = {
       supplier_add_milestone: {
         Args: { _name: string; _order: string; _photos?: string[] }
         Returns: undefined
+      }
+      supplier_create_shipment: {
+        Args: {
+          _carrier: string
+          _lines?: Json
+          _method: string
+          _order: string
+          _planned: string
+          _tracking: string
+        }
+        Returns: string
       }
       supplier_dashboard: { Args: never; Returns: Json }
       supplier_decline_rfq: {
@@ -2141,6 +2385,10 @@ export type Database = {
           _photos?: string[]
           _status: Database["public"]["Enums"]["order_status"]
         }
+        Returns: undefined
+      }
+      supplier_update_shipment: {
+        Args: { _desc?: string; _shipment: string; _status: string }
         Returns: undefined
       }
       supplier_view_rfq: { Args: { _rfq: string }; Returns: undefined }

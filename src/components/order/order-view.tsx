@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { StatusBadge } from "@/components/rfq/status-badge";
 import { eur } from "@/components/rfq/quote-thread";
 import { PhotoStrip, uploadOrderPhotos } from "@/components/order/photos";
+import { SHIPMENT_SELECT, ShipmentsPanel, mismatchPrefill, type Shipment } from "@/components/order/shipments";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import type { TKey } from "@/lib/translations";
@@ -33,7 +34,7 @@ export function OrderView({ id, side }: { id: string; side: "buyer" | "supplier"
         .eq("id", id).maybeSingle();
       if (error) throw error;
       if (!o) return null;
-      const [ev, pay, ms, dis, rev, fin, comm] = await Promise.all([
+      const [ev, pay, ms, dis, rev, fin, comm, sh] = await Promise.all([
         supabase.from("order_events").select("*").eq("order_id", id).order("created_at"),
         supabase.from("payments").select("*").eq("order_id", id).order("created_at"),
         supabase.from("production_milestones").select("*").eq("order_id", id).order("created_at"),
@@ -41,8 +42,9 @@ export function OrderView({ id, side }: { id: string; side: "buyer" | "supplier"
         supabase.from("reviews").select("*").eq("order_id", id).maybeSingle(),
         side === "buyer" ? supabase.from("financing_requests").select("*").eq("order_id", id).maybeSingle() : Promise.resolve({ data: null }),
         side === "supplier" ? supabase.rpc("my_order_commission", { _order: id }) : Promise.resolve({ data: null }),
+        supabase.from("shipments").select(SHIPMENT_SELECT).eq("order_id", id).order("created_at"),
       ]);
-      return { o, events: ev.data ?? [], payments: pay.data ?? [], milestones: ms.data ?? [], disputes: dis.data ?? [], review: rev.data, fin: fin.data, comm: comm.data?.[0] ?? null };
+      return { o, events: ev.data ?? [], payments: pay.data ?? [], milestones: ms.data ?? [], disputes: dis.data ?? [], review: rev.data, fin: fin.data, comm: comm.data?.[0] ?? null, shipments: (sh.data ?? []) as unknown as Shipment[] };
     },
   });
   const refresh = () => { qc.invalidateQueries({ queryKey: ["order", id] }); qc.invalidateQueries({ queryKey: ["orders"] }); };
@@ -54,7 +56,8 @@ export function OrderView({ id, side }: { id: string; side: "buyer" | "supplier"
 
   if (q.isLoading) return <p className="text-muted-foreground">…</p>;
   if (!q.data) return <p className="text-muted-foreground">{t("rfq.notFound")}</p>;
-  const { o, events, payments, milestones, disputes, review, fin, comm } = q.data;
+  const { o, events, payments, milestones, disputes, review, fin, comm, shipments } = q.data;
+  const prefill = mismatchPrefill(shipments);
   const total = Number(o.total);
   const pendingBalance = payments.find((p) => p.milestone === "delivery" && p.status === "pending");
 
@@ -104,10 +107,12 @@ export function OrderView({ id, side }: { id: string; side: "buyer" | "supplier"
           {side === "supplier" && ["paid_escrow", "processing"].includes(o.status) && <AddMilestone orderId={id} onAdd={(n, ph) => run(supabase.rpc("supplier_add_milestone", { _order: id, _name: n, _photos: ph }), t("ord.updated"))} />}
         </section>)}
 
+      <ShipmentsPanel orderId={id} orderStatus={o.status} side={side} shipments={shipments} onChange={refresh} />
+
       {side === "buyer" && (o.status === "delivered" || canDispute(o.status)) && (
         <div className="flex flex-wrap gap-2">
           {o.status === "delivered" && <Button onClick={() => run(supabase.rpc("buyer_accept_delivery", { _order: id }), t("ord.accepted"))}>{t("ord.accept")}</Button>}
-          {canDispute(o.status) && <DisputeButton orderId={id} total={total} onOpen={(r, d, h, ph) => run(supabase.rpc("buyer_open_dispute", { _order: id, _reason: r, _description: d, _held: h, _photos: ph }), t("ord.disputeOpened"))} />}
+          {canDispute(o.status) && <DisputeButton orderId={id} total={total} prefill={prefill} onOpen={(r, d, h, ph) => run(supabase.rpc("buyer_open_dispute", { _order: id, _reason: r, _description: d, _held: h, _photos: ph }), t("ord.disputeOpened"))} />}
         </div>)}
 
       {disputes.length > 0 && (
@@ -208,10 +213,10 @@ function AddMilestone({ orderId, onAdd }: { orderId: string; onAdd: (n: string, 
   );
 }
 
-function DisputeButton({ orderId, total, onOpen }: { orderId: string; total: number; onOpen: (r: string, d: string, h: number, photos: string[]) => Promise<boolean> }) {
+function DisputeButton({ orderId, total, prefill, onOpen }: { orderId: string; total: number; prefill: { reason: string; description: string } | null; onOpen: (r: string, d: string, h: number, photos: string[]) => Promise<boolean> }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
-  const [r, setR] = useState(""); const [d, setD] = useState("");
+  const [r, setR] = useState(prefill?.reason ?? ""); const [d, setD] = useState(prefill?.description ?? "");
   const [h, setH] = useState(String(stagedSplit(total).first));
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);

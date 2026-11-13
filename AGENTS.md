@@ -52,3 +52,5 @@ use the editor.
 - Dashboard numbers come from the `buyer_dashboard`/`supplier_dashboard` RPCs (savings formula lives there); the Price Index reads the `price_index` view, whose 5-sample rule is mirrored in `src/lib/price-index.ts`.
 - External services go through connectors in `src/lib/connectors/` (demo + live per service, picked by `integrations.mode`); live is only allowed when the service's secrets exist, checked server-side in `integrations.functions.ts`, so a half-configured provider can't break the demo.
 - Timed work runs through `sync_jobs` via `scheduler_tick` (one pg_cron job every 5 min + nightly trust recompute); `run_sync_jobs` retries with `job_backoff` (mirrored in `services.ts`), so there is a single scheduler and no extra sweeper.
+- Delivery tables change only via shipment RPCs funnelled through `_shipment_event`, which also moves the order status (so on-time rate keeps reading `order_events`); rules mirrored in `src/lib/shipment.ts`.
+- Public `/d/$token` uses only `driver_*` RPCs (token = credential); photos in private `delivery-photos/<driver_token>/`; site contact sits in `rfq_site_contacts`, hidden from suppliers until an order exists.
