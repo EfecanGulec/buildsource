@@ -6,8 +6,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTheme, type Theme } from "@/lib/theme";
 import { useI18n } from "@/lib/i18n";
+import type { TKey } from "@/lib/translations";
 
-const OPTIONS: { value: Theme; icon: typeof Sun; key: string }[] = [
+const OPTIONS: { value: Theme; icon: typeof Sun; key: TKey }[] = [
   { value: "light", icon: Sun, key: "theme.light" },
   { value: "dark", icon: Moon, key: "theme.dark" },
   { value: "system", icon: Monitor, key: "theme.system" },
