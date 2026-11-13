@@ -1,4 +1,5 @@
 # Roadmap (from docs/build-spec.md + step-by-step prompts)
+- [ ] Collect delivery details on buyer offer acceptance; show them to the chosen supplier before signing and cover accepted counter-offers.
 - [x] Repair update recovery for admin Disputes and Integrations; verified admin page loads and automatic recovery after a failed entry file.
 - [x] Step 1 – App shell and design
 - [x] Step 2 – Sign-up with company code + segment, own-area restriction, demo Smart-ID
