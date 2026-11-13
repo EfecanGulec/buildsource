@@ -44,7 +44,7 @@ export const setIntegrationMode = createServerFn({ method: "POST" })
     await assertAdmin(context);
     if (data.mode === "live" && !canGoLive(data.service, (n) => !!process.env[n]))
       throw new Error(`Add the ${SERVICES[data.service].secrets.join(", ")} secret(s) before switching to live`);
-    const { error } = await context.supabase.rpc("admin_set_integration", { _service: data.service, _mode: data.mode, _enabled: undefined as unknown as boolean });
+    const { error } = await context.supabase.rpc("admin_set_integration", { _service: data.service, _mode: data.mode, _enabled: true });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
