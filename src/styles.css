@@ -4,19 +4,22 @@
  *   npm package before @importing its CSS. Never @import a remote URL (web fonts, CDN CSS): the
  *   build resolves @import from the filesystem. Load those with a <link> in the head() of
  *   src/routes/__root.tsx and name the family in a --font-* token in @theme inline below.
+ *
+ * Design source: BuildSource_LT_Design_System.md (replaces spec §3). Apple-inspired:
+ * calm surfaces, elevation over borders, glass layers, spring motion (see src/lib/motion.ts).
  */
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark, .dark *));
 
 /*
  * Design system definition.
  *
  * The design lives in this file: oklch color tokens on the shadcn variables
- * (--background, --foreground, --primary, --secondary, --muted, --accent, ...) plus
- * new tokens as needed, font tokens, and custom styles and animations.
+ * (--background, --foreground, --primary, ...) plus the design-system tokens
+ * (surface-2, hairline, brand-hover, ai, navy, sand, glass, shadows, radii).
  *
  * The @theme inline block maps CSS custom properties to Tailwind utility
  * classes (e.g. --color-primary -> bg-primary, text-primary).
@@ -64,8 +67,6 @@
   --color-chart-5: var(--chart-5);
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
-  --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-sans: "Inter", system-ui, sans-serif;
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-info: var(--info);
@@ -77,47 +78,156 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Design system extras (BuildSource_LT_Design_System.md §2) */
+  --color-surface-2: var(--surface-2);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  --color-hairline: var(--hairline);
+  --color-brand-hover: var(--brand-hover);
+  --color-ai: var(--ai);
+  --color-ai-tint: var(--ai-tint);
+  --color-navy: var(--navy);
+  --color-sand: var(--sand);
+  --color-danger: var(--danger);
+  --color-glass: var(--glass);
+
+  --font-sans: system-ui, -apple-system, "Inter", "Segoe UI", Roboto, sans-serif;
+  --font-display: system-ui, -apple-system, "Inter", "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", monospace;
+
+  --shadow-sm: 0 1px 2px rgba(20, 24, 22, 0.06), 0 1px 1px rgba(20, 24, 22, 0.04);
+  --shadow-md: 0 8px 24px rgba(20, 24, 22, 0.08), 0 2px 6px rgba(20, 24, 22, 0.05);
+  --shadow-lg: 0 24px 60px rgba(20, 24, 22, 0.16), 0 6px 16px rgba(20, 24, 22, 0.08);
+
+  --radius-card: 18px;
+  --radius-sheet: 24px;
+  --radius-pill: 999px;
 }
 
 :root {
-  --radius: 0.5rem;
-  --background: oklch(0.976 0.003 130);
-  --foreground: oklch(0.21 0 0);
+  --radius: 0.75rem; /* 12px: buttons and inputs */
+
+  /* surfaces */
+  --background: oklch(0.968 0.003 106); /* #F5F5F2 warm off-white */
+  --foreground: oklch(0.216 0.006 160); /* #141816 */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0 0);
+  --card-foreground: oklch(0.216 0.006 160);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0 0);
-  --primary: oklch(0.42 0.09 158);
+  --popover-foreground: oklch(0.216 0.006 160);
+  --surface-2: oklch(0.953 0.003 106); /* #F0F0EC inset areas, inputs */
+  --glass: rgba(255, 255, 255, 0.72);
+  --hairline: rgba(20, 24, 22, 0.08);
+
+  /* text */
+  --text-2: oklch(0.456 0.008 160); /* #5B635F secondary */
+  --text-3: oklch(0.607 0.007 160); /* #8A918D tertiary, placeholders */
+
+  /* brand */
+  --primary: oklch(0.508 0.104 162); /* #0F7A4C BuildSource green */
   --primary-foreground: oklch(0.985 0.003 130);
-  --secondary: oklch(0.95 0.012 70);
-  --secondary-foreground: oklch(0.21 0 0);
-  --muted: oklch(0.955 0.004 130);
-  --muted-foreground: oklch(0.48 0.01 240);
-  --accent: oklch(0.88 0.03 65);
-  --accent-foreground: oklch(0.26 0.015 240);
-  --destructive: oklch(0.577 0.245 27.325);
+  --brand-hover: oklch(0.462 0.093 162); /* #0C6A41 */
+  --secondary: oklch(0.953 0.003 106); /* surface-2 */
+  --secondary-foreground: oklch(0.216 0.006 160);
+  --muted: oklch(0.953 0.003 106);
+  --muted-foreground: oklch(0.456 0.008 160);
+  --accent: oklch(0.953 0.003 106);
+  --accent-foreground: oklch(0.216 0.006 160);
+  --navy: oklch(0.272 0.014 240); /* #1F272E hero, deep surfaces */
+  --sand: oklch(0.874 0.038 65); /* #E8D5C4 warm accent on navy */
+  --ink: oklch(0.272 0.014 240); /* alias of navy, used by hero/sidebar badges */
+  --ink-foreground: oklch(0.874 0.038 65);
+
+  /* status (separate from brand) */
+  --success: oklch(0.623 0.142 155); /* #1E9E5A */
+  --warning: oklch(0.641 0.116 75); /* #C98A0B */
+  --danger: oklch(0.583 0.191 25); /* #D64545 */
+  --info: oklch(0.541 0.141 262); /* #2F6FDB */
+  --destructive: oklch(0.583 0.191 25);
   --destructive-foreground: oklch(0.985 0 0);
-  --success: oklch(0.6 0.15 150);
-  --warning: oklch(0.78 0.15 75);
-  --info: oklch(0.58 0.15 250);
-  --border: oklch(0.9 0.006 130);
-  --input: oklch(0.9 0.006 130);
-  --ring: oklch(0.42 0.09 158);
-  --ink: oklch(0.26 0.015 240);
-  --ink-foreground: oklch(0.88 0.03 65);
-  --chart-1: oklch(0.42 0.09 158);
-  --chart-2: oklch(0.88 0.03 65);
-  --chart-3: oklch(0.26 0.015 240);
-  --chart-4: oklch(0.58 0.15 250);
-  --chart-5: oklch(0.78 0.15 75);
-  --sidebar: oklch(0.42 0.09 158);
+
+  /* AI (purple only for AI features) */
+  --ai: oklch(0.541 0.19 285); /* #6C5CE7 */
+  --ai-tint: rgba(108, 92, 231, 0.1);
+
+  --border: oklch(0.216 0.006 160 / 0.08); /* hairline */
+  --input: oklch(0.216 0.006 160 / 0.08);
+  --ring: oklch(0.508 0.104 162);
+
+  --chart-1: oklch(0.508 0.104 162);
+  --chart-2: oklch(0.874 0.038 65);
+  --chart-3: oklch(0.272 0.014 240);
+  --chart-4: oklch(0.541 0.141 262);
+  --chart-5: oklch(0.641 0.116 75);
+
+  --sidebar: oklch(0.508 0.104 162);
   --sidebar-foreground: oklch(0.96 0.01 130);
-  --sidebar-primary: oklch(0.88 0.03 65);
-  --sidebar-primary-foreground: oklch(0.26 0.015 240);
-  --sidebar-accent: oklch(0.36 0.08 158);
+  --sidebar-primary: oklch(0.874 0.038 65);
+  --sidebar-primary-foreground: oklch(0.272 0.014 240);
+  --sidebar-accent: oklch(0.44 0.09 162);
   --sidebar-accent-foreground: oklch(0.99 0 0);
-  --sidebar-border: oklch(0.48 0.08 158);
-  --sidebar-ring: oklch(0.88 0.03 65);
+  --sidebar-border: oklch(0.5 0.08 162);
+  --sidebar-ring: oklch(0.874 0.038 65);
+}
+
+.dark {
+  --background: oklch(0.19 0.005 160); /* #0E1110 */
+  --foreground: oklch(0.955 0.004 160); /* #F2F4F3 */
+  --card: oklch(0.225 0.005 160); /* #171B19 */
+  --card-foreground: oklch(0.955 0.004 160);
+  --popover: oklch(0.225 0.005 160);
+  --popover-foreground: oklch(0.955 0.004 160);
+  --surface-2: oklch(0.26 0.005 160); /* #1F2422 */
+  --glass: rgba(23, 27, 25, 0.7);
+  --hairline: rgba(255, 255, 255, 0.08);
+
+  --text-2: oklch(0.73 0.008 160); /* #A7AFAB */
+  --text-3: oklch(0.53 0.008 160); /* #737B77 */
+
+  --primary: oklch(0.682 0.128 162); /* #2FB27A */
+  --primary-foreground: oklch(0.19 0.005 160);
+  --brand-hover: oklch(0.74 0.14 162); /* #3CC489 */
+  --secondary: oklch(0.26 0.005 160);
+  --secondary-foreground: oklch(0.955 0.004 160);
+  --muted: oklch(0.26 0.005 160);
+  --muted-foreground: oklch(0.73 0.008 160);
+  --accent: oklch(0.26 0.005 160);
+  --accent-foreground: oklch(0.955 0.004 160);
+  --navy: oklch(0.225 0.005 160);
+  --sand: oklch(0.874 0.038 65);
+  --ink: oklch(0.26 0.005 160);
+  --ink-foreground: oklch(0.874 0.038 65);
+
+  --success: oklch(0.7 0.15 155);
+  --warning: oklch(0.72 0.12 75);
+  --danger: oklch(0.65 0.19 25);
+  --info: oklch(0.66 0.14 262);
+  --destructive: oklch(0.65 0.19 25);
+  --destructive-foreground: oklch(0.985 0 0);
+
+  --ai: oklch(0.68 0.16 285); /* #9A8CFF */
+  --ai-tint: rgba(154, 140, 255, 0.14);
+
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: oklch(0.682 0.128 162);
+
+  --chart-1: oklch(0.682 0.128 162);
+  --chart-2: oklch(0.874 0.038 65);
+  --chart-3: oklch(0.73 0.008 160);
+  --chart-4: oklch(0.66 0.14 262);
+  --chart-5: oklch(0.72 0.12 75);
+
+  --sidebar: oklch(0.225 0.005 160);
+  --sidebar-foreground: oklch(0.955 0.004 160);
+  --sidebar-primary: oklch(0.682 0.128 162);
+  --sidebar-primary-foreground: oklch(0.19 0.005 160);
+  --sidebar-accent: oklch(0.26 0.005 160);
+  --sidebar-accent-foreground: oklch(0.955 0.004 160);
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: oklch(0.682 0.128 162);
+
+  color-scheme: dark;
 }
 
 @layer base {
@@ -125,15 +235,87 @@
     border-color: var(--color-border);
   }
 
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
   }
+
   h1, h2, h3 {
-    font-family: var(--font-display);
     letter-spacing: -0.02em;
     font-weight: 700;
+  }
+
+  /* All prices, quantities and scores use tabular numbers (design system §2.2) */
+  input[type="number"],
+  [data-tnum] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Visible focus ring: 2px brand + 2px offset (design system §9) */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Typography scale (design system §2.2) — rem so text scales with browser settings */
+@utility text-display {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+@utility text-title-1 {
+  font-size: 1.75rem;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+@utility text-title-2 {
+  font-size: 1.375rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+@utility text-headline {
+  font-size: 1.0625rem;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+@utility text-callout {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+@utility text-caption {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Glass material (design system §2.4): top bar, tab bar, AI panel, sheets.
+   Content scrolls underneath; never stack glass on glass. */
+@utility glass {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: var(--color-card);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
 
