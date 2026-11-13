@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SmartIdDialog } from "@/components/smart-id-dialog";
 import { eur } from "@/components/rfq/quote-thread";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +31,8 @@ export function AgreementView({ id, side }: { id: string; side: "buyer" | "suppl
   const today = new Date().toISOString().slice(0, 10);
   const q = useQuery({
     queryKey: ["agreement", id],
+    refetchInterval: 5000,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data, error } = await supabase.from("agreements")
         .select("*, rfqs(id,rfq_number,title,delivery_city,delivery_address,companies(name),rfq_items(id,description,unit)), quotes(companies(name)), quote_versions(*)")
@@ -55,14 +58,14 @@ export function AgreementView({ id, side }: { id: string; side: "buyer" | "suppl
   async function signed(code: string) {
     const { error } = side === "supplier"
       ? await supabase.rpc("supplier_sign_agreement", { _agreement: id, _code: code, _date: estDate, _time: estTime })
-      : await supabase.rpc("buyer_sign_agreement", { _agreement: id, _code: code, _latest: (latest || null) as string, _note: note });
+      : await supabase.rpc("buyer_sign_agreement", { _agreement: id, _code: code, _latest: null as unknown as string, _note: "" });
     if (error) { toast.error(error.message); return; }
     toast.success(t("agr.signedToast")); refresh();
   }
   async function refuseDate() {
-    const { error } = await supabase.rpc("buyer_reject_delivery_date", { _agreement: id, _reason: refuseReason, _latest: (latest || null) as string });
+    const { error } = await supabase.rpc("buyer_reject_delivery_date", { _agreement: id, _reason: note.trim() ? `${refuseReason.trim()}\n${t("agr.deliveryNote")}: ${note.trim()}` : refuseReason, _latest: (latest || null) as string });
     if (error) { toast.error(error.message); return; }
-    toast.success(t("agr.dateRefused")); setRefusing(false); setRefuseReason(""); refresh();
+    toast.success(t("agr.dateRefused")); setRefusing(false); setRefuseReason(""); setNote(""); setLatest(""); refresh();
   }
   async function cancel() {
     const { error } = await supabase.rpc("cancel_agreement", { _agreement: id });
@@ -114,21 +117,25 @@ export function AgreementView({ id, side }: { id: string; side: "buyer" | "suppl
         <div className="grid gap-3 rounded-lg border p-4 sm:grid-cols-2">
           <p className="text-sm sm:col-span-2">{t("agr.supplierProposed")}: <strong>{a.delivery_date}</strong>{a.delivery_time_window ? ` (${a.delivery_time_window})` : ""}</p>
           <p className="text-sm text-muted-foreground sm:col-span-2">{t("agr.buyerConfirmHelp")}</p>
-          <div className="space-y-1.5"><Label htmlFor="latest">{t("agr.latest")}</Label><Input id="latest" type="date" min={today} value={latest} onChange={(e) => setLatest(e.target.value)} /></div>
-          {!refusing && <div className="space-y-1.5 sm:col-span-2"><Label htmlFor="dnote">{t("agr.deliveryNote")}</Label><Textarea id="dnote" rows={2} maxLength={1000} value={note} onChange={(e) => setNote(e.target.value)} /></div>}
-          {refusing && <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="refuse">{t("agr.refuseReason")} *</Label>
-            <Textarea id="refuse" rows={2} maxLength={1000} value={refuseReason} onChange={(e) => setRefuseReason(e.target.value)} />
-            <div className="flex flex-wrap gap-2"><Button variant="destructive" disabled={!refuseReason.trim()} onClick={refuseDate}>{t("agr.sendRefusal")}</Button><Button variant="ghost" onClick={() => setRefusing(false)}>{t("quote.cancel")}</Button></div>
-          </div>}
         </div>)}
-      {a.status === "pending" && !mySigned && !refusing && (
+      {a.status === "pending" && !mySigned && (
         <div className="flex flex-wrap gap-2">
           <Button disabled={missingDelivery || (side === "supplier" ? !estDate : !supplierReady)} onClick={() => setSigning(true)}>{t(side === "buyer" ? "agr.confirmSign" : "agr.sign")}</Button>
           {side === "buyer" && supplierReady && <Button variant="outline" onClick={() => setRefusing(true)}>{t("agr.refuseDate")}</Button>}
           <Button variant="ghost" onClick={cancel}>{t("agr.cancel")}</Button>
         </div>)}
-      {a.status === "pending" && mySigned && <p className="text-sm text-muted-foreground">{t("agr.waitOther")}</p>}
+      {a.status === "pending" && mySigned && <p className="text-sm text-muted-foreground">{t(side === "supplier" ? "agr.waitBuyerConfirm" : "agr.waitOther")}</p>}
+      <Dialog open={refusing} onOpenChange={setRefusing}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{t("agr.refuseDate")}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5"><Label htmlFor="refuse">{t("agr.refuseReason")} *</Label><Textarea id="refuse" rows={2} maxLength={1000} value={refuseReason} onChange={(e) => setRefuseReason(e.target.value)} /></div>
+            <div className="space-y-1.5"><Label htmlFor="latest">{t("agr.latest")}</Label><Input id="latest" type="date" min={today} value={latest} onChange={(e) => setLatest(e.target.value)} /></div>
+            <div className="space-y-1.5"><Label htmlFor="dnote">{t("agr.deliveryNote")}</Label><Textarea id="dnote" rows={2} maxLength={800} value={note} onChange={(e) => setNote(e.target.value)} /></div>
+          </div>
+          <DialogFooter><Button variant="ghost" onClick={() => setRefusing(false)}>{t("quote.cancel")}</Button><Button variant="destructive" disabled={!refuseReason.trim()} onClick={refuseDate}>{t("agr.sendRefusal")}</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
       {a.status === "cancelled" && <p className="rounded-md bg-muted p-3 text-sm">{t("agr.cancelled")}</p>}
       {order && (
         <div className="rounded-lg border border-success/40 bg-success/10 p-4 text-sm space-y-1">
