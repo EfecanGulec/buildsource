@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ function RfqDetail() {
     queryFn: async () => {
       await supabase.rpc("expire_stale_quotes");
       const { data: rfq, error } = await supabase.from("rfqs")
-        .select("*, rfq_items(*, categories(name_en)), rfq_recipients(*, companies(name,city)), quotes(*, quote_versions(*), companies(name))")
+        .select("*, rfq_items(*, categories(name_en)), rfq_recipients(*, companies(name,city)), quotes(*, quote_versions(*), companies(name)), agreements(id,status)")
         .eq("id", rfqId).maybeSingle();
       if (error) throw error;
       if (!rfq) return null;
@@ -74,7 +74,9 @@ function RfqDetail() {
           <p className="text-sm text-muted-foreground">{t(`project.${rfq.project_type}` as TKey)} · {rfq.delivery_city} · {rfq.delivery_week}</p>
         </div>
         <div className="flex items-center gap-3"><StatusBadge status={rfq.status} />
-          {rfq.status === "draft" && <Button onClick={submit}>{t("rfq.submit")}</Button>}</div>
+          {rfq.status === "draft" && <Button onClick={submit}>{t("rfq.submit")}</Button>}
+          {rfq.quotes.length > 1 && <Button asChild variant="outline"><Link to="/app/compare" search={{ rfq: rfq.id }}>{t("nav.compare")}</Link></Button>}
+          {rfq.agreements.filter((a) => a.status !== "cancelled").map((a) => <Button key={a.id} asChild><Link to="/app/agreements/$agreementId" params={{ agreementId: a.id }}>{t("agr.open")}</Link></Button>)}</div>
       </div>
       <Tabs defaultValue={recipients.length ? "suppliers" : "details"}>
         <TabsList>
@@ -149,6 +151,7 @@ type BuyerQuoteProps = {
 };
 function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const [countering, setCountering] = useState(false);
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState("");
@@ -160,6 +163,11 @@ function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
     const { error } = await supabase.rpc("buyer_counter_quote", { _quote: quote.id, _offer: o });
     if (error) { toast.error(error.message); return false; }
     toast.success(t("quote.counterSent")); setCountering(false); onChange(); return true;
+  }
+  async function accept() {
+    const { data, error } = await supabase.rpc("buyer_accept_quote", { _quote: quote.id });
+    if (error) { toast.error(error.message); return; }
+    navigate({ to: "/app/agreements/$agreementId", params: { agreementId: data } });
   }
   async function reject() {
     const { error } = await supabase.rpc("buyer_reject_quote", { _quote: quote.id, _reason: reason });
@@ -181,7 +189,7 @@ function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
         <div className="flex flex-wrap items-center gap-2">
           {acts.buyerCounter && <Button onClick={() => setCountering(true)}>{t("quote.makeCounter")}</Button>}
           <Button variant="outline" onClick={() => setRejecting(true)}>{t("quote.reject")}</Button>
-          <span className="text-xs text-muted-foreground">{t("quote.acceptSoon")}</span>
+          {acts.buyerAccept && <Button variant="secondary" onClick={accept}>{t("compare.accept")}</Button>}
         </div>)}
       {countering && <OfferForm items={items} initial={last} submitLabel={t("quote.sendCounter")} onSubmit={counter} onCancel={() => setCountering(false)} />}
       <div className="border-t pt-4"><ChatPanel rfqId={quote.rfq_id} recipientId={quote.recipient_id} viewer="buyer" canSend={quote.status !== "rejected"} /></div>

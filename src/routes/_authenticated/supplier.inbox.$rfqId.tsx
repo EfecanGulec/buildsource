@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { ArrowLeft, MessageSquare, Send, X } from "lucide-react";
@@ -31,6 +31,7 @@ function SupplierRfq() {
   const { rfqId } = Route.useParams();
   const { t } = useI18n();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const { data: account } = useAccount();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState<Reason>("out_of_stock");
@@ -49,7 +50,7 @@ function SupplierRfq() {
       if (!rec) return null;
       const { data: msgs } = await supabase.from("messages").select("id,body,sender_party,created_at").eq("recipient_id", rec.id).order("created_at");
       await supabase.rpc("expire_stale_quotes");
-      const { data: quote } = await supabase.from("quotes").select("*, quote_versions(*)").eq("rfq_id", rfqId).maybeSingle();
+      const { data: quote } = await supabase.from("quotes").select("*, quote_versions(*), agreements(id,status)").eq("rfq_id", rfqId).maybeSingle();
       return { rec, msgs: msgs ?? [], quote };
     },
   });
@@ -82,6 +83,11 @@ function SupplierRfq() {
     const { error } = await supabase.rpc("supplier_send_quote", { _rfq: rfqId, _offer: o });
     if (error) { toast.error(error.message); return false; }
     toast.success(t("quote.sent")); setQuoting(false); refresh(); return true;
+  }
+  async function acceptCounter() {
+    const { data, error } = await supabase.rpc("supplier_accept_counter", { _rfq: rfqId });
+    if (error) { toast.error(error.message); return; }
+    navigate({ to: "/supplier/agreements/$agreementId", params: { agreementId: data } });
   }
   async function rejectCounter() {
     const { error } = await supabase.rpc("supplier_reject_counter", { _rfq: rfqId });
@@ -141,11 +147,13 @@ function SupplierRfq() {
               <StatusBadge kind="quote" status={quote.status} /></div>
           </div>
           <QuoteThread versions={versions as ThreadVersion[]} viewer="supplier" items={items} />
+          {quote.agreements.filter((a) => a.status !== "cancelled").map((a) => (
+            <Button key={a.id} asChild><Link to="/supplier/agreements/$agreementId" params={{ agreementId: a.id }}>{t("agr.open")}</Link></Button>))}
           {acts?.supplierRevise && !quoting && (
             <div className="flex flex-wrap gap-2">
               <Button onClick={() => setQuoting(true)}>{t("quote.revise")}</Button>
               <Button variant="outline" onClick={rejectCounter}>{t("quote.rejectCounter")}</Button>
-              <span className="self-center text-xs text-muted-foreground">{t("quote.acceptSoon")}</span>
+              <Button variant="secondary" onClick={acceptCounter}>{t("quote.acceptCounter")}</Button>
             </div>)}
           {quote.status === "sent" && <p className="text-sm text-muted-foreground">{t("quote.waitBuyer")}</p>}
           {(quote.status === "rejected" || quote.status === "expired" || quote.status === "withdrawn") && <p className="text-sm text-muted-foreground">{t("quote.closed")}</p>}
