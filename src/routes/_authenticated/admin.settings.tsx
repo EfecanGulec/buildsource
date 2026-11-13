@@ -39,7 +39,7 @@ function AdminSettings() {
           <div className="flex flex-wrap items-end gap-3">
             <div className="space-y-1"><Label htmlFor="pd">{t("ps.minutes")}</Label>
               <Input id="pd" type="number" min={5} max={10080} value={min} onChange={(e) => setMin(e.target.value)} className="w-36" /></div>
-            <Button onClick={save} disabled={!min || Number(min) === q.data}>{t("common.save" as never) || "Save"}</Button>
+            <Button onClick={save} disabled={!min || Number(min) === q.data}>{t("cd.save")}</Button>
           </div>
           {q.data != null && <p className="text-sm">{t("ps.current")}: <strong>{q.data} min</strong></p>}
         </CardContent>
