@@ -21,7 +21,6 @@ export default defineConfig({
       alias: {
         "entities/lib/decode.js": path.resolve(__dirname, "node_modules/entities/lib/decode.js"),
         "entities/lib/encode.js": path.resolve(__dirname, "node_modules/entities/lib/encode.js"),
-        entities: path.resolve(__dirname, "node_modules/entities"),
       },
     },
     // Pre-bundle every UI primitive up front: otherwise the first page that uses a new one makes
