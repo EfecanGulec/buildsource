@@ -1,4 +1,5 @@
 # Roadmap (from docs/build-spec.md + step-by-step prompts)
+- [x] Repair update recovery for admin Disputes and Integrations; verified admin page loads and automatic recovery after a failed entry file.
 - [x] Step 1 – App shell and design
 - [x] Step 2 – Sign-up with company code + segment, own-area restriction, demo Smart-ID
 - [x] Step 3 – full database, demo seed, admin reset
@@ -11,7 +12,7 @@
 - [x] Step 11 – Compare quotes, accept, agreement signed by both via Smart-ID, order + commission
 - [x] Step 12 – Checkout (escrow, pay later, 30/70 staged), orders + timeline, supplier status + photos, milestones, accept delivery, disputes + admin resolution, reviews
 - [x] Step 13 – Group Buy (pools, tiers, join/leave, close, 24 h confirm, keep-tier, auto-RFQ, admin close)
-- [ ] Pool deadlines close automatically — blocked: no scheduler on the backend yet (admin "Close pool now" works); revisit in Step 16 (pg_cron)
+- [x] Pool deadlines close automatically — scheduler added in Step 16; completed pool_close jobs visible in admin Integrations.
 - [x] Step 14 – Price Index (5-sample rule, chart per category + region) and buyer/supplier dashboards
 - [x] Step 15 – Demo polish: café starts outside the pool, supplier Earnings / My quotes / Agreements pages, Lithuanian labels, mobile magic link check
 - [x] Step 16 – Integrations page + scheduler

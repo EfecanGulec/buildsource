@@ -19,7 +19,14 @@ type Outcome = Database["public"]["Enums"]["dispute_status"];
 const OUTCOMES: Outcome[] = ["resolved_replacement", "resolved_partial_refund", "resolved_full_refund", "rejected"];
 
 export const Route = createFileRoute("/_authenticated/admin/disputes")({
-  head: () => ({ meta: [{ title: "Disputes — BuildSource LT admin" }] }),
+  head: () => ({ meta: [
+    { title: "Disputes — BuildSource LT admin" },
+    { name: "description", content: "Review order disputes and resolutions on BuildSource LT." },
+    { property: "og:title", content: "Disputes — BuildSource LT admin" },
+    { property: "og:description", content: "Review order disputes and resolutions on BuildSource LT." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: AdminDisputes,
 });
 
