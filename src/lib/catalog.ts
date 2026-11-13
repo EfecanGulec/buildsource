@@ -36,8 +36,8 @@ function splitCsvLine(line: string, sep: string): string[] {
 export function parseCsv(text: string): Row[] {
   const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter((l) => l.trim());
   if (lines.length < 2) return [];
-  const sep = [";", ",", "\t"].sort((a, b) => lines[0].split(b).length - lines[0].split(a).length)[0];
-  const head = splitCsvLine(lines[0], sep);
+  const sep = [";", ",", "\t"].sort((a, b) => lines[0]!.split(b).length - lines[0]!.split(a).length)[0]!;
+  const head = splitCsvLine(lines[0]!, sep);
   return lines.slice(1).map((l) => {
     const cells = splitCsvLine(l, sep);
     return Object.fromEntries(head.map((h, i) => [h, cells[i] ?? ""]));
@@ -55,8 +55,8 @@ export function parseXml(text: string): Row[] {
   const rec = new RegExp(`<${tag}(\\s[^>]*)?>([\\s\\S]*?)</${tag}>`, "gi");
   for (const m of text.matchAll(rec)) {
     const row: Row = {};
-    for (const a of (m[1] ?? "").matchAll(/([\w:-]+)="([^"]*)"/g)) row[a[1]] = decode(a[2]);
-    for (const c of m[2].matchAll(/<([\w:-]+)(?:\s[^>]*)?>([\s\S]*?)<\/\1>/g)) if (!(c[1] in row)) row[c[1]] = decode(c[2]);
+    for (const a of (m[1] ?? "").matchAll(/([\w:-]+)="([^"]*)"/g)) row[a[1]!] = decode(a[2]!);
+    for (const c of m[2]!.matchAll(/<([\w:-]+)(?:\s[^>]*)?>([\s\S]*?)<\/\1>/g)) if (!(c[1]! in row)) row[c[1]!] = decode(c[2]!);
     rows.push(row);
   }
   return rows;
@@ -144,9 +144,9 @@ export function guessCategory(p: Pick<RawProduct, "name" | "description" | "cate
   if (exact) return { category_id: exact.id, confidence: 0.95 };
   const scan = (text: string) => cats.filter((c) => (KEYWORDS[c.slug] ?? [c.name_en.toLowerCase()]).some((k) => text.includes(k)));
   const inHint = hint ? scan(hint) : [];
-  if (inHint.length === 1) return { category_id: inHint[0].id, confidence: 0.85 };
+  if (inHint.length === 1) return { category_id: inHint[0]!.id, confidence: 0.85 };
   const inName = scan(`${p.name} ${p.description ?? ""}`.toLowerCase());
-  if (inName.length === 1) return { category_id: inName[0].id, confidence: 0.6 };
+  if (inName.length === 1) return { category_id: inName[0]!.id, confidence: 0.6 };
   return { category_id: (inHint[0] ?? inName[0])?.id ?? null, confidence: inHint.length + inName.length ? 0.4 : 0 };
 }
 
