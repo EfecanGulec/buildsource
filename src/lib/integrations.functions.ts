@@ -31,7 +31,7 @@ export const testIntegration = createServerFn({ method: "POST" })
     const t0 = Date.now();
     let r: { ok: boolean; message: string };
     try { r = await getConnector(data.service, mode).test(); } catch (e) { r = { ok: false, message: e instanceof Error ? e.message : String(e) }; }
-    await supabaseAdmin.from("integration_logs").insert({ service: data.service, provider: row?.provider, action: "test_connection",
+    await supabaseAdmin.from("integration_logs").insert({ service: data.service, provider: row?.provider ?? null, action: "test_connection",
       request_summary: { mode }, response_status: r.ok ? 200 : 500, duration_ms: Date.now() - t0, error: r.ok ? null : r.message });
     await supabaseAdmin.from("integrations").update(r.ok ? { last_success_at: new Date().toISOString(), last_error: null } : { last_error: r.message }).eq("service", data.service);
     return r;
@@ -44,7 +44,7 @@ export const setIntegrationMode = createServerFn({ method: "POST" })
     await assertAdmin(context);
     if (data.mode === "live" && !canGoLive(data.service, (n) => !!process.env[n]))
       throw new Error(`Add the ${SERVICES[data.service].secrets.join(", ")} secret(s) before switching to live`);
-    const { error } = await context.supabase.rpc("admin_set_integration", { _service: data.service, _mode: data.mode, _enabled: null as unknown as boolean });
+    const { error } = await context.supabase.rpc("admin_set_integration", { _service: data.service, _mode: data.mode, _enabled: undefined as unknown as boolean });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
