@@ -1853,6 +1853,7 @@ export type Database = {
         Returns: string
       }
       seed_demo_base: { Args: never; Returns: Json }
+      seed_demo_scored: { Args: never; Returns: Json }
       sign_agreement: {
         Args: { _agreement: string; _code: string }
         Returns: string
