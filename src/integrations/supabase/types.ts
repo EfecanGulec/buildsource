@@ -378,6 +378,47 @@ export type Database = {
           },
         ]
       }
+      feed_runs: {
+        Row: {
+          added: number
+          deactivated: number
+          errors: Json
+          feed_id: string
+          finished_at: string | null
+          id: string
+          started_at: string
+          updated: number
+        }
+        Insert: {
+          added?: number
+          deactivated?: number
+          errors?: Json
+          feed_id: string
+          finished_at?: string | null
+          id?: string
+          started_at?: string
+          updated?: number
+        }
+        Update: {
+          added?: number
+          deactivated?: number
+          errors?: Json
+          feed_id?: string
+          finished_at?: string | null
+          id?: string
+          started_at?: string
+          updated?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_runs_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "product_feeds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       financing_requests: {
         Row: {
           amount: number
@@ -1055,6 +1096,56 @@ export type Database = {
           },
         ]
       }
+      product_feeds: {
+        Row: {
+          created_at: string
+          credentials_secret_ref: string | null
+          field_mapping: Json
+          id: string
+          last_run_at: string | null
+          last_status: string | null
+          products_count: number
+          schedule: string
+          supplier_company_id: string
+          type: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          credentials_secret_ref?: string | null
+          field_mapping?: Json
+          id?: string
+          last_run_at?: string | null
+          last_status?: string | null
+          products_count?: number
+          schedule?: string
+          supplier_company_id: string
+          type: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          credentials_secret_ref?: string | null
+          field_mapping?: Json
+          id?: string
+          last_run_at?: string | null
+          last_status?: string | null
+          products_count?: number
+          schedule?: string
+          supplier_company_id?: string
+          type?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_feeds_supplier_company_id_fkey"
+            columns: ["supplier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       production_milestones: {
         Row: {
           approved_by_buyer: boolean
@@ -1086,6 +1177,94 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          category_id: string | null
+          currency: string
+          datasheet_url: string | null
+          description: string | null
+          external_id: string
+          feed_id: string | null
+          id: string
+          images: string[]
+          is_active: boolean
+          lead_time_days: number | null
+          list_price: number | null
+          mapping_confidence: number | null
+          mapping_confirmed: boolean
+          name: string
+          price_updated_at: string | null
+          specs: Json
+          stock_qty: number | null
+          supplier_company_id: string
+          unit: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          currency?: string
+          datasheet_url?: string | null
+          description?: string | null
+          external_id: string
+          feed_id?: string | null
+          id?: string
+          images?: string[]
+          is_active?: boolean
+          lead_time_days?: number | null
+          list_price?: number | null
+          mapping_confidence?: number | null
+          mapping_confirmed?: boolean
+          name: string
+          price_updated_at?: string | null
+          specs?: Json
+          stock_qty?: number | null
+          supplier_company_id: string
+          unit?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          currency?: string
+          datasheet_url?: string | null
+          description?: string | null
+          external_id?: string
+          feed_id?: string | null
+          id?: string
+          images?: string[]
+          is_active?: boolean
+          lead_time_days?: number | null
+          list_price?: number | null
+          mapping_confidence?: number | null
+          mapping_confirmed?: boolean
+          name?: string
+          price_updated_at?: string | null
+          specs?: Json
+          stock_qty?: number | null
+          supplier_company_id?: string
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "product_feeds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_supplier_company_id_fkey"
+            columns: ["supplier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -2117,6 +2296,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      _my_supplier: { Args: never; Returns: string }
       _next_order_number: { Args: never; Returns: string }
       _notify_order: {
         Args: {
@@ -2337,6 +2517,10 @@ export type Database = {
         Args: { _name: string; _order: string; _photos?: string[] }
         Returns: undefined
       }
+      supplier_confirm_product: {
+        Args: { _category: string; _id: string }
+        Returns: undefined
+      }
       supplier_create_shipment: {
         Args: {
           _carrier: string
@@ -2373,7 +2557,26 @@ export type Database = {
           total: number
         }[]
       }
+      supplier_import_products: {
+        Args: { _errors?: Json; _feed: string; _rows: Json }
+        Returns: Json
+      }
+      supplier_integration_level: {
+        Args: { _company: string }
+        Returns: number
+      }
       supplier_reject_counter: { Args: { _rfq: string }; Returns: undefined }
+      supplier_save_feed: {
+        Args: {
+          _id: string
+          _mapping: Json
+          _schedule: string
+          _secret_ref: string
+          _type: string
+          _url: string
+        }
+        Returns: string
+      }
       supplier_send_quote: {
         Args: { _offer: Json; _rfq: string }
         Returns: string
