@@ -37,7 +37,7 @@ function SupplierPools() {
     const s = sortTiers(tiers);
     const { error } = await supabase.from("group_buy_pools").insert({
       supplier_company_id: companyId!, product_name: f.name.trim(), category_id: f.category || null, unit: f.unit || "pcs",
-      base_price: Number(f.base), tiers: s, min_qty: Number(f.minQty) || s[0].min_qty, region: f.region || null,
+      base_price: Number(f.base), tiers: s, min_qty: Number(f.minQty) || s[0]!.min_qty, region: f.region || null,
       deadline: new Date(f.deadline).toISOString(), images: f.image ? [f.image] : [], status: "open",
     });
     if (error) { toast.error(error.message); return; }

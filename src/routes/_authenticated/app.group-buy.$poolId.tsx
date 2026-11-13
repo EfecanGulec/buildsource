@@ -34,12 +34,12 @@ function PoolPage() {
       const { data, error } = await supabase.from("group_buy_pools").select(POOL_COLS).eq("id", poolId).maybeSingle();
       if (error) throw error;
       if (!data) return null;
-      const [[pool], { data: me }, { data: trust }] = await Promise.all([
+      const [pools, { data: me }, { data: trust }] = await Promise.all([
         withTotals([data]),
         supabase.from("pool_members").select("*").eq("pool_id", poolId).maybeSingle(),
         supabase.from("trust_scores").select("score,breakdown").eq("company_id", data.supplier_company_id).maybeSingle(),
       ]);
-      return { pool, me, trust };
+      return { pool: pools[0]!, me, trust };
     },
   });
   if (q.isLoading) return <div className="h-64 max-w-3xl animate-pulse rounded-lg bg-muted" />;

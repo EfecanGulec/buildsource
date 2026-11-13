@@ -5,7 +5,7 @@ export const POOL_COLS = "id,product_name,unit,base_price,tiers,deadline,status,
 export async function withTotals<T extends { id: string }>(rows: T[]) {
   const totals = await Promise.all(rows.map((r) => supabase.rpc("pool_totals", { _pool: r.id })));
   return rows.map((r, i) => {
-    const x = totals[i].data?.[0];
+    const x = totals[i]?.data?.[0];
     return { ...r, totals: { total_qty: Number(x?.total_qty ?? 0), members: Number(x?.members ?? 0), confirmed_qty: Number(x?.confirmed_qty ?? 0) } };
   });
 }

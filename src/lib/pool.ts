@@ -38,7 +38,7 @@ export function finalDiscount(tiers: Tier[], closedQty: number, confirmedQty: nu
 export function validTiers(tiers: Tier[]): boolean {
   const s = sortTiers(tiers);
   return s.length > 0 && s.every((t, i) => t.min_qty > 0 && t.discount_pct > 0 && t.discount_pct < 100 &&
-    (i === 0 || (t.min_qty > s[i - 1].min_qty && t.discount_pct > s[i - 1].discount_pct)));
+    (i === 0 || (t.min_qty > s[i - 1]!.min_qty && t.discount_pct > s[i - 1]!.discount_pct)));
 }
 
 export function timeLeft(deadline: string | null, now = Date.now()): string {
