@@ -1,5 +1,5 @@
 # Roadmap (from docs/build-spec.md + step-by-step prompts)
-- [ ] Restyle the public homepage to the supplied reference, animate the material-scan phone, remove the bazaar badge, and replace footer cities with All rights reserved.
+- [x] Restyle the public homepage to the supplied reference, animate the material-scan phone, remove the bazaar badge, and replace footer cities with All rights reserved. Phone/tablet/desktop layouts and buyer signup link verified; motion respects reduced-motion preferences.
 - [x] Remove social/Lovable login and Lithuanian options; show matching photos and titles for identified RFQ items during editing and confirmation. Email sign-in, eight scanned items with loaded photos, English-only settings and mobile confirmation verified; 14 tests pass.
 - [x] Identify every selected photo, group same-product views, hand off all distinct products to one RFQ, and preserve the photo workspace on accidental close. Live AI identified three products from two photos; phone/desktop closure, deletion and handoff verified; 11 tests pass.
 - [x] Collect delivery details on buyer offer acceptance; show them to the chosen supplier before signing and cover accepted counter-offers. Eight validation tests pass; buyer acceptance and supplier read-back verified, including mobile.

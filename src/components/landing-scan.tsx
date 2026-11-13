@@ -23,7 +23,7 @@ export function LandingScan() {
             <div className="flex justify-between gap-2"><span>Nordic Materials</span><span className="tnum">€8.40/m²</span></div>
           </div>
           <p className="mt-3 text-[10px] text-muted-foreground">{t("landing.example")}</p>
-          <Button asChild className="mt-auto w-full"><Link to="/auth" search={{ mode: "signup", type: "buyer" }}>{t("lens.requestOffers")}</Link></Button>
+          <Button asChild className="mt-auto w-full"><Link to="/auth" search={{ mode: "signup", type: "buyer" }}>{t("lens.request")}</Link></Button>
         </div>
       </div>
       <div className="landing-float landing-float-trust"><ShieldCheck className="size-5 shrink-0 text-success" /><div><p className="font-semibold">{t("landing.verified")}</p><p className="text-xs opacity-70">{t("landing.trustExample")}</p></div></div>
