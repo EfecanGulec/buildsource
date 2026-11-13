@@ -35,7 +35,7 @@ const TYPES: { v: ProjectType; icon: typeof Hammer }[] = [
   { v: "new_construction", icon: Building2 }, { v: "renovation", icon: Hammer },
   { v: "interior_design", icon: Sofa }, { v: "business_fitout", icon: Store },
 ];
-const STEPS = ["rfq.step.project", "rfq.step.items", "rfq.step.delivery", "rfq.step.review"] as const;
+const STEPS = ["rfq.step.projectItems", "rfq.step.confirm"] as const;
 const blankItem = (): Item => ({ category_id: "", description: "", specs: {}, quantity: 1, unit: "", standard: "", waste_pct: 0, confidence: null, confirmed: true });
 
 function CreateRfq() {
@@ -89,7 +89,7 @@ function CreateRfq() {
       if (!title) setTitle(r?.item_name ?? d.description);
       if (data?.note && !description) setDescription(data.note);
       if (!projectType) setProjectType("renovation");
-      setStep(1);
+      setStep(0);
       toast.info(t("lens.prefilled"));
     });
   }, [scan, cats.length]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -137,7 +137,26 @@ function CreateRfq() {
   const fromAi = items.some((i) => i.confidence !== null);
 
   const itemsValid = items.length > 0 && items.every((i) => i.category_id && i.description.trim() && i.quantity > 0 && i.confirmed);
-  const canNext = [!!projectType && !!title.trim(), itemsValid, !!delivery.city.trim() && !!delivery.date, true][step];
+  const canNext = [!!projectType && !!title.trim() && itemsValid, true][step];
+  const slugs = Array.from(new Set(items.map((i) => catById.get(i.category_id)?.slug).filter((x): x is string => !!x)));
+  const city = delivery.city || account?.company?.city || "";
+  const suppliers = useQuery({
+    queryKey: ["rfq-preview-suppliers", slugs.join(","), city],
+    enabled: step === 1 && slugs.length > 0,
+    queryFn: async () => {
+      const res = await Promise.all(slugs.map((sl) => supabase.rpc("lens_suppliers", { _category_slug: sl, _city: city })));
+      const m = new Map<string, { id: string; name: string; city: string | null; trust: number | null; lead: number | null; inRegion: boolean; score: number }>();
+      for (const r of res) for (const x of r.data ?? []) {
+        const prev = m.get(x.company_id);
+        if (!prev || (x.match_score ?? 0) > prev.score) m.set(x.company_id, { id: x.company_id, name: x.name, city: x.city, trust: x.trust_score, lead: x.lead_time_days, inRegion: !!x.in_region, score: x.match_score ?? 0 });
+      }
+      return Array.from(m.values()).sort((a, b) => b.score - a.score);
+    },
+  });
+  const [picked, setPicked] = useState<string[] | null>(null);
+  const list = suppliers.data ?? [];
+  const chosen = picked ?? (preferred.length ? preferred.filter((id) => list.some((x) => x.id === id)) : list.map((x) => x.id));
+  const toggle = (id: string) => setPicked(chosen.includes(id) ? chosen.filter((x) => x !== id) : [...chosen, id]);
 
   async function save(submit: boolean) {
     if (!account?.company || !projectType) return;
@@ -145,11 +164,11 @@ function CreateRfq() {
     const kit = refs.data?.kits.find((k) => k.id === kitId);
     const { data: rfq, error } = await supabase.from("rfqs").insert({
       buyer_company_id: account.company.id, project_type: projectType, title: title.trim(), description: description.trim() || null,
-      delivery_city: delivery.city.trim(), delivery_address: delivery.address.trim() || null,
+      delivery_city: city.trim(), delivery_address: delivery.address.trim() || null,
       unloading: delivery.unloading, delivery_window: delivery.window, site_access_notes: delivery.access.trim() || null,
       delivery_date_requested: delivery.date || null, delivery_week: delivery.date ? isoWeek(delivery.date) : null,
       status: "draft", source: scanId ? "material_lens" : fromAi ? "snap_source" : kit ? "kit" : "manual",
-      preferred_supplier_ids: preferred, material_scan_id: scanId, ai_upload_urls: fromAi ? uploadPaths : [],
+      preferred_supplier_ids: submit && list.length ? chosen : preferred, material_scan_id: scanId, ai_upload_urls: fromAi ? uploadPaths : [],
     }).select("id,rfq_number").single();
     if (error || !rfq) { setSaving(false); toast.error(error?.message ?? "Error"); return; }
     const { error: e2 } = await supabase.from("rfq_items").insert(items.map((i, n) => ({
@@ -210,9 +229,7 @@ function CreateRfq() {
               <Button variant="outline" onClick={applyKit} disabled={!kitId}>{t("rfq.applyKit")}</Button>
             </div>
           </div>
-        </>)}
 
-        {step === 1 && (<>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm text-muted-foreground">{t("rfq.itemsHint")}</p>
             <LensButton variant="outline" label />
@@ -280,38 +297,11 @@ function CreateRfq() {
           <Button variant="outline" onClick={() => setItems((xs) => [...xs, blankItem()])}><Plus className="mr-2 h-4 w-4" />{t("rfq.addItem")}</Button>
         </>)}
 
-        {step === 2 && (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="space-y-1 text-sm"><span>{t("rfq.city")}</span>
-              <Input value={delivery.city} onChange={(e) => setDelivery({ ...delivery, city: e.target.value })} /></label>
-            <label className="space-y-1 text-sm"><span>{t("rfq.address")}</span>
-              <Input value={delivery.address} onChange={(e) => setDelivery({ ...delivery, address: e.target.value })} /></label>
-            <label className="space-y-1 text-sm"><span>{t("rfq.date")}</span>
-              <Input type="date" value={delivery.date} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setDelivery({ ...delivery, date: e.target.value })} /></label>
-            <div className="space-y-1 text-sm"><span>{t("rfq.week")}</span>
-              <p className="flex h-10 items-center font-mono">{delivery.date ? isoWeek(delivery.date) : "—"}</p></div>
-            <label className="space-y-1 text-sm"><span>{t("rfq.unloading")}</span>
-              <Select value={delivery.unloading} onValueChange={(v) => setDelivery({ ...delivery, unloading: v })}><SelectTrigger aria-label={t("rfq.unloading")}><SelectValue /></SelectTrigger>
-                <SelectContent>{["manual", "crane_needed", "forklift_on_site"].map((u) => <SelectItem key={u} value={u}>{t(`unl.${u}` as TKey)}</SelectItem>)}</SelectContent></Select></label>
-            <label className="space-y-1 text-sm"><span>{t("rfq.window")}</span>
-              <Select value={delivery.window} onValueChange={(v) => setDelivery({ ...delivery, window: v })}><SelectTrigger aria-label={t("rfq.window")}><SelectValue /></SelectTrigger>
-                <SelectContent>{["morning", "afternoon", "any"].map((u) => <SelectItem key={u} value={u}>{t(`win.${u}` as TKey)}</SelectItem>)}</SelectContent></Select></label>
-            <label className="space-y-1 text-sm"><span>{t("rfq.siteContact")}</span>
-              <Input value={delivery.contact} onChange={(e) => setDelivery({ ...delivery, contact: e.target.value })} /></label>
-            <label className="space-y-1 text-sm"><span>{t("rfq.sitePhone")}</span>
-              <Input type="tel" value={delivery.phone} onChange={(e) => setDelivery({ ...delivery, phone: e.target.value })} /></label>
-            <label className="space-y-1 text-sm sm:col-span-2"><span>{t("rfq.access")}</span>
-              <Input value={delivery.access} onChange={(e) => setDelivery({ ...delivery, access: e.target.value })} /></label>
-          </div>
-        )}
-
-        {step === 3 && (
+        {step === 1 && (
           <div className="space-y-4 text-sm">
             <dl className="grid gap-2 sm:grid-cols-2">
               <div><dt className="text-muted-foreground">{t("rfq.title")}</dt><dd className="font-medium">{title}</dd></div>
               <div><dt className="text-muted-foreground">{t("rfq.step.project")}</dt><dd>{projectType && t(`project.${projectType}` as TKey)}</dd></div>
-              <div><dt className="text-muted-foreground">{t("rfq.step.delivery")}</dt><dd>{delivery.city}{delivery.address && `, ${delivery.address}`}</dd></div>
-              <div><dt className="text-muted-foreground">{t("rfq.date")}</dt><dd>{delivery.date} ({delivery.date && isoWeek(delivery.date)})</dd></div>
             </dl>
             <div className="overflow-x-auto"><table className="w-full">
               <thead className="text-left text-muted-foreground"><tr><th className="py-1">{t("rfq.category")}</th><th>{t("rfq.itemDescription")}</th><th className="text-right">{t("rfq.quantity")}</th></tr></thead>
@@ -321,6 +311,24 @@ function CreateRfq() {
                   <td className="text-right tabular-nums">{it.quantity} {it.unit}</td></tr>))}
               </tbody>
             </table></div>
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-display font-semibold">{t("rfq.potential")}</h3>
+                {list.length > 0 && <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setPicked(list.map((x) => x.id))}>{t("rfq.selectAll")}</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setPicked([])}>{t("rfq.selectNone")}</Button>
+                </div>}
+              </div>
+              {suppliers.isLoading ? <p className="text-muted-foreground"><Loader2 className="mr-2 inline h-4 w-4 animate-spin" />…</p>
+                : list.length === 0 ? <p className="text-muted-foreground">{t("rfq.noPotential")}</p>
+                : <ul className="grid gap-2 sm:grid-cols-2">{list.map((x) => (
+                  <li key={x.id}><label className={cn("flex cursor-pointer items-start gap-3 rounded-md border p-3", chosen.includes(x.id) && "border-primary bg-primary/5")}>
+                    <Checkbox checked={chosen.includes(x.id)} onCheckedChange={() => toggle(x.id)} aria-label={x.name} />
+                    <span className="min-w-0 flex-1"><span className="block font-medium">{x.name}</span>
+                      <span className="block text-xs text-muted-foreground">{x.city ?? ""}{x.trust != null && ` · Trust ${x.trust}`}{x.lead != null && ` · ${x.lead} d`}{!x.inRegion && ` · ${t("lens.outRegion")}`}</span></span>
+                  </label></li>))}</ul>}
+              {list.length > 0 && <p className="text-xs text-muted-foreground">{t("rfq.sendingTo").replace("{n}", String(chosen.length))}</p>}
+            </div>
             <MatchingPools categoryIds={items.map((i) => i.category_id).filter(Boolean)} />
           </div>
         )}
@@ -328,12 +336,12 @@ function CreateRfq() {
 
       <div className="flex justify-between">
         <Button variant="ghost" onClick={() => setStep((s) => s - 1)} disabled={step === 0}>{t("rfq.back")}</Button>
-        {step < 3 ? (
+        {step < 1 ? (
           <Button onClick={() => setStep((s) => s + 1)} disabled={!canNext}>{t("rfq.next")}</Button>
         ) : (
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => save(false)} disabled={saving}>{t("rfq.saveDraft")}</Button>
-            <Button onClick={() => save(true)} disabled={saving}>{t("rfq.submit")}</Button>
+            <Button onClick={() => save(true)} disabled={saving || (list.length > 0 && chosen.length === 0)}>{t("rfq.submit")}</Button>
           </div>
         )}
       </div>

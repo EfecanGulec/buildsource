@@ -225,6 +225,13 @@
       "when": 1794586150281,
       "tag": "0031_rfq_scan_photos",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1794603267819,
+      "tag": "0032_match_only_chosen",
+      "breakpoints": true
     }
   ]
 }
