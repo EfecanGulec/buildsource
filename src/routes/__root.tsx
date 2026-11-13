@@ -16,6 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { isChunkLoadError, reloadOnce } from "../lib/chunk-recovery";
+import { refreshCurrentPage } from "../lib/chunk-recovery";
+import { Button } from "@/components/ui/button";
 
 function NotFoundComponent() {
   return (
@@ -60,16 +62,16 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
             : "Something went wrong on our end. You can try refreshing or head back home."}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
+          <Button
             onClick={() => {
-              if (stale) return window.location.reload();
+              if (stale) return refreshCurrentPage();
               router.invalidate();
               reset();
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Try again
-          </button>
+          </Button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
@@ -122,7 +124,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 // key and limits (3 quick reloads, then 3 more 10 s apart, per 2 minutes) with src/lib/chunk-recovery.ts.
 const EARLY_RECOVERY = `(function(){var K="bs-chunk-reload",P=/importing a module script failed|failed to fetch dynamically imported module|error loading dynamically imported module/i;
 function s(){var f=function(){if(document.getElementById("bs-stale"))return;var d=document.createElement("div");d.id="bs-stale";d.style.cssText="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#F7F8F6;font-family:sans-serif;z-index:99999;text-align:center;padding:16px";d.innerHTML="<div><p style=\\"font-size:18px;font-weight:600;color:#1A1A1A\\">The app is updating</p><p style=\\"color:#555;margin:8px 0 16px\\">Give it a moment, then refresh.</p><button onclick=\\"sessionStorage.removeItem('bs-chunk-reload');location.reload()\\" style=\\"background:#0F5D3A;color:#fff;border:0;border-radius:6px;padding:8px 16px;cursor:pointer\\">Refresh</button></div>";document.body.appendChild(d)};document.body?f():addEventListener("DOMContentLoaded",f)}
-function r(){if(window.__bsR)return;var n=Date.now(),st=null;try{st=JSON.parse(sessionStorage.getItem(K)||"null")}catch(e){}if(!st||n-st.first>120000)st={first:n,count:0};if(st.count>=6){s();return}var d=st.count<3?st.count*800:10000;st.count++;try{sessionStorage.setItem(K,JSON.stringify(st))}catch(e){}window.__bsR=1;setTimeout(function(){location.reload()},d)}
+function r(){if(window.__bsR)return true;var n=Date.now(),st=null;try{st=JSON.parse(sessionStorage.getItem(K)||"null")}catch(e){}if(!st||n-st.first>120000)st={first:n,count:0};if(st.count>=6){s();return false}var d=st.count<3?st.count*800:10000;st.count++;try{sessionStorage.setItem(K,JSON.stringify(st))}catch(e){}window.__bsR=1;setTimeout(function(){var u=new URL(location.href);u.searchParams.set("__bs_refresh",String(Date.now()));location.replace(u.href)},d);return true}window.__bsReload=r;
 addEventListener("error",function(e){var t=e.target;if(t&&t.tagName==="SCRIPT"&&t.type==="module"){r();return}if(P.test(String(e.message||"")))r()},true);
 addEventListener("unhandledrejection",function(e){var m=e.reason&&e.reason.message||String(e.reason||"");if(P.test(m))r()});})();`;
 

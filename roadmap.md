@@ -1,4 +1,5 @@
 # Roadmap (from docs/build-spec.md + step-by-step prompts)
+- [ ] Repair update recovery for admin Disputes and Integrations; verify stale-file recovery and page loads.
 - [x] Step 1 – App shell and design
 - [x] Step 2 – Sign-up with company code + segment, own-area restriction, demo Smart-ID
 - [x] Step 3 – full database, demo seed, admin reset

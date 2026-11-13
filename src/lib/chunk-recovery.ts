@@ -34,9 +34,26 @@ export function isChunkLoadError(err: unknown): boolean {
 }
 
 let pending = false;
-/** Reloads the page unless it already retried several times in the last minute. Returns true if a reload is scheduled. */
+declare global {
+  interface Window { __bsReload?: () => boolean }
+}
+
+/** Bypass an already-cached document while keeping the current path, search and hash. */
+export function recoveryUrl(href: string, now: number): string {
+  const url = new URL(href);
+  url.searchParams.set("__bs_refresh", String(now));
+  return url.href;
+}
+
+export function refreshCurrentPage() {
+  sessionStorage.removeItem(KEY);
+  window.location.replace(recoveryUrl(window.location.href, Date.now()));
+}
+
+/** All error listeners share one scheduler and one bounded retry budget. */
 export function reloadOnce(): boolean {
   if (typeof window === "undefined") return false;
+  if (window.__bsReload) return window.__bsReload();
   if (pending) return true;
   let state: ReloadState = null;
   try {
@@ -49,7 +66,7 @@ export function reloadOnce(): boolean {
     sessionStorage.setItem(KEY, JSON.stringify(next.state));
   } catch {}
   pending = true;
-  setTimeout(() => window.location.reload(), next.delay);
+  setTimeout(() => window.location.replace(recoveryUrl(window.location.href, Date.now())), next.delay);
   return true;
 }
 

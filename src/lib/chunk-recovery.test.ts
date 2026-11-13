@@ -1,7 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { isChunkLoadError, nextReload } from "./chunk-recovery";
+import { isChunkLoadError, nextReload, recoveryUrl } from "./chunk-recovery";
 
 describe("chunk recovery", () => {
+  it("bypasses cached HTML without losing the requested admin page", () => {
+    const url = new URL(recoveryUrl("https://example.test/admin/integrations?mode=demo&__bs_refresh=1#jobs", 42));
+    expect(url.pathname).toBe("/admin/integrations");
+    expect(url.searchParams.get("mode")).toBe("demo");
+    expect(url.searchParams.getAll("__bs_refresh")).toEqual(["42"]);
+    expect(url.hash).toBe("#jobs");
+  });
   it("recognises the Safari stale-module error", () => {
     expect(isChunkLoadError(new TypeError("Importing a module script failed."))).toBe(true);
   });
