@@ -16,8 +16,10 @@ export type Offer = {
   delivery_date: string; warehouse_origin: string; valid_until: string; payment_terms: string; message: string;
 };
 
-export function OfferForm({ items, initial, submitLabel, onSubmit, onCancel }: {
-  items: OfferItem[]; initial?: VersionLike | null | undefined; submitLabel: string;
+export type PriceHint = { name: string; price: number; unit: string | null; updated: string | null };
+
+export function OfferForm({ items, hints, initial, submitLabel, onSubmit, onCancel }: {
+  items: OfferItem[]; hints?: Record<string, PriceHint>; initial?: VersionLike | null | undefined; submitLabel: string;
   onSubmit: (o: Offer) => Promise<boolean>; onCancel?: () => void;
 }) {
   const { t } = useI18n();
@@ -52,13 +54,17 @@ export function OfferForm({ items, initial, submitLabel, onSubmit, onCancel }: {
         <thead className="text-left text-muted-foreground"><tr><th className="py-1">{t("rfq.itemDescription")}</th><th className="text-right">{t("rfq.quantity")}</th><th className="w-32 text-right">{t("quote.unitPrice")}</th><th className="w-28 text-right">{t("rfq.total")}</th></tr></thead>
         <tbody>{items.map((i) => (
           <tr key={i.id} className="border-t">
-            <td className="py-2 pr-2">{i.description}</td>
+            <td className="py-2 pr-2">{i.description}
+              {hints?.[i.id] && <p className="mt-1 text-xs text-muted-foreground">
+                {t("cat.hint")}: {hints[i.id]!.name} · {eur(hints[i.id]!.price)}{hints[i.id]!.unit ? ` / ${hints[i.id]!.unit}` : ""} · {t("cat.priceUpdated").replace("{d}", hints[i.id]!.updated ? new Date(hints[i.id]!.updated!).toLocaleDateString("en-GB") : "—")}{" "}
+                <button type="button" className="font-medium text-primary underline" onClick={() => setPrices({ ...prices, [i.id]: String(hints[i.id]!.price) })}>{t("cat.use")}</button></p>}</td>
             <td className="text-right tabular-nums">{Number(i.quantity)} {i.unit}</td>
             <td className="pl-2"><Input type="number" min={0} step="0.01" inputMode="decimal" aria-label={`${t("quote.unitPrice")} ${i.description}`}
               value={prices[i.id]} onChange={(e) => setPrices({ ...prices, [i.id]: e.target.value })} className="text-right" /></td>
             <td className="text-right tabular-nums">{prices[i.id] !== "" ? eur(Number(prices[i.id]) * Number(i.quantity)) : "—"}</td>
           </tr>))}</tbody>
       </table>
+      {hints && Object.keys(hints).length > 0 && <p className="text-xs text-muted-foreground">{t("cat.hintNote")}</p>}
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="space-y-1"><span>{t("quote.delivery")}</span><Input type="number" min={0} value={delivery} onChange={(e) => setDelivery(e.target.value)} /></label>
         <label className="space-y-1"><span>{t("rfq.leadTime")} ({t("rfq.days")})</span><Input type="number" min={0} value={lead} onChange={(e) => setLead(e.target.value)} /></label>

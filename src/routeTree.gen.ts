@@ -35,6 +35,7 @@ import { Route as AuthenticatedAppCreateRfqRouteImport } from './routes/_authent
 import { Route as AuthenticatedAppPriceIndexRouteImport } from './routes/_authenticated/app.price-index'
 import { Route as AuthenticatedSupplierIndexRouteImport } from './routes/_authenticated/supplier.index'
 import { Route as AuthenticatedSupplierSectionRouteImport } from './routes/_authenticated/supplier.$section'
+import { Route as AuthenticatedSupplierCatalogueRouteImport } from './routes/_authenticated/supplier.catalogue'
 import { Route as AuthenticatedSupplierEarningsRouteImport } from './routes/_authenticated/supplier.earnings'
 import { Route as AuthenticatedSupplierPoolsRouteImport } from './routes/_authenticated/supplier.pools'
 import { Route as AuthenticatedSupplierProfileRouteImport } from './routes/_authenticated/supplier.profile'
@@ -191,6 +192,12 @@ const AuthenticatedSupplierSectionRoute =
     path: '/$section',
     getParentRoute: () => AuthenticatedSupplierRoute,
   } as any)
+const AuthenticatedSupplierCatalogueRoute =
+  AuthenticatedSupplierCatalogueRouteImport.update({
+    id: '/catalogue',
+    path: '/catalogue',
+    getParentRoute: () => AuthenticatedSupplierRoute,
+  } as any)
 const AuthenticatedSupplierEarningsRoute =
   AuthenticatedSupplierEarningsRouteImport.update({
     id: '/earnings',
@@ -317,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
   '/app/price-index': typeof AuthenticatedAppPriceIndexRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
+  '/supplier/catalogue': typeof AuthenticatedSupplierCatalogueRoute
   '/supplier/earnings': typeof AuthenticatedSupplierEarningsRoute
   '/supplier/pools': typeof AuthenticatedSupplierPoolsRoute
   '/supplier/profile': typeof AuthenticatedSupplierProfileRoute
@@ -358,6 +366,7 @@ export interface FileRoutesByTo {
   '/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
   '/app/price-index': typeof AuthenticatedAppPriceIndexRoute
   '/supplier/$section': typeof AuthenticatedSupplierSectionRoute
+  '/supplier/catalogue': typeof AuthenticatedSupplierCatalogueRoute
   '/supplier/earnings': typeof AuthenticatedSupplierEarningsRoute
   '/supplier/pools': typeof AuthenticatedSupplierPoolsRoute
   '/supplier/profile': typeof AuthenticatedSupplierProfileRoute
@@ -404,6 +413,7 @@ export interface FileRoutesById {
   '/_authenticated/app/create-rfq': typeof AuthenticatedAppCreateRfqRoute
   '/_authenticated/app/price-index': typeof AuthenticatedAppPriceIndexRoute
   '/_authenticated/supplier/$section': typeof AuthenticatedSupplierSectionRoute
+  '/_authenticated/supplier/catalogue': typeof AuthenticatedSupplierCatalogueRoute
   '/_authenticated/supplier/earnings': typeof AuthenticatedSupplierEarningsRoute
   '/_authenticated/supplier/pools': typeof AuthenticatedSupplierPoolsRoute
   '/_authenticated/supplier/profile': typeof AuthenticatedSupplierProfileRoute
@@ -450,6 +460,7 @@ export interface FileRouteTypes {
     | '/app/create-rfq'
     | '/app/price-index'
     | '/supplier/$section'
+    | '/supplier/catalogue'
     | '/supplier/earnings'
     | '/supplier/pools'
     | '/supplier/profile'
@@ -491,6 +502,7 @@ export interface FileRouteTypes {
     | '/app/create-rfq'
     | '/app/price-index'
     | '/supplier/$section'
+    | '/supplier/catalogue'
     | '/supplier/earnings'
     | '/supplier/pools'
     | '/supplier/profile'
@@ -536,6 +548,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/create-rfq'
     | '/_authenticated/app/price-index'
     | '/_authenticated/supplier/$section'
+    | '/_authenticated/supplier/catalogue'
     | '/_authenticated/supplier/earnings'
     | '/_authenticated/supplier/pools'
     | '/_authenticated/supplier/profile'
@@ -751,6 +764,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupplierSectionRouteImport
       parentRoute: typeof AuthenticatedSupplierRoute
     }
+    '/_authenticated/supplier/catalogue': {
+      id: '/_authenticated/supplier/catalogue'
+      path: '/catalogue'
+      fullPath: '/supplier/catalogue'
+      preLoaderRoute: typeof AuthenticatedSupplierCatalogueRouteImport
+      parentRoute: typeof AuthenticatedSupplierRoute
+    }
     '/_authenticated/supplier/earnings': {
       id: '/_authenticated/supplier/earnings'
       path: '/earnings'
@@ -932,6 +952,7 @@ const AuthenticatedAppRouteWithChildren =
 
 interface AuthenticatedSupplierRouteChildren {
   AuthenticatedSupplierSectionRoute: typeof AuthenticatedSupplierSectionRoute
+  AuthenticatedSupplierCatalogueRoute: typeof AuthenticatedSupplierCatalogueRoute
   AuthenticatedSupplierEarningsRoute: typeof AuthenticatedSupplierEarningsRoute
   AuthenticatedSupplierPoolsRoute: typeof AuthenticatedSupplierPoolsRoute
   AuthenticatedSupplierProfileRoute: typeof AuthenticatedSupplierProfileRoute
@@ -947,6 +968,7 @@ interface AuthenticatedSupplierRouteChildren {
 
 const AuthenticatedSupplierRouteChildren: AuthenticatedSupplierRouteChildren = {
   AuthenticatedSupplierSectionRoute: AuthenticatedSupplierSectionRoute,
+  AuthenticatedSupplierCatalogueRoute: AuthenticatedSupplierCatalogueRoute,
   AuthenticatedSupplierEarningsRoute: AuthenticatedSupplierEarningsRoute,
   AuthenticatedSupplierPoolsRoute: AuthenticatedSupplierPoolsRoute,
   AuthenticatedSupplierProfileRoute: AuthenticatedSupplierProfileRoute,

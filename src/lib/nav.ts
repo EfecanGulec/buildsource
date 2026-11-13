@@ -1,6 +1,6 @@
 import {
   BarChart3, Building2, FileCheck, FilePlus2, FileText, Gavel, GitCompare, Inbox, LayoutDashboard,
-  Package, Send, Settings, ShieldCheck, Tags, Users, Wallet, Database, Plug,
+  Package, Send, Settings, ShieldCheck, Tags, Users, Wallet, Database, Plug, BookOpen,
   type LucideIcon,
 } from "lucide-react";
 import type { TKey } from "./translations";
@@ -26,6 +26,7 @@ export const NAV: Record<Area, NavItem[]> = {
     { slug: "agreements", key: "nav.agreements", icon: FileCheck },
     { slug: "orders", key: "nav.orders", icon: Package },
     { slug: "pools", key: "nav.pools", icon: Users },
+    { slug: "catalogue", key: "nav.catalogue", icon: BookOpen },
     { slug: "profile", key: "nav.profile", icon: Building2 },
     { slug: "earnings", key: "nav.earnings", icon: Wallet },
   ],

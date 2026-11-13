@@ -51,7 +51,12 @@ function SupplierRfq() {
       const { data: msgs } = await supabase.from("messages").select("id,body,sender_party,created_at").eq("recipient_id", rec.id).order("created_at");
       await supabase.rpc("expire_stale_quotes");
       const { data: quote } = await supabase.from("quotes").select("*, quote_versions(*), agreements(id,status)").eq("rfq_id", rfqId).maybeSingle();
-      return { rec, msgs: msgs ?? [], quote };
+      // Spec 18.3: own catalogue prices as hints per item category (hints only; the signed quote always wins).
+      const catIds = [...new Set((rec.rfqs?.rfq_items ?? []).map((i) => i.category_id).filter(Boolean))] as string[];
+      const { data: prods } = catIds.length
+        ? await supabase.from("products").select("category_id,name,list_price,unit,stock_qty,price_updated_at").eq("is_active", true).in("category_id", catIds).not("list_price", "is", null).order("list_price")
+        : { data: [] };
+      return { rec, msgs: msgs ?? [], quote, prods: prods ?? [] };
     },
   });
 
@@ -63,9 +68,14 @@ function SupplierRfq() {
 
   if (q.isLoading) return <p className="text-muted-foreground">…</p>;
   if (!q.data?.rec.rfqs) return <p className="text-muted-foreground">{t("rfq.notFound")}</p>;
-  const { rec, msgs, quote } = q.data;
+  const { rec, msgs, quote, prods } = q.data;
   const rfq = rec.rfqs!;
   const items = [...rfq.rfq_items].sort((a, b) => a.sort_order - b.sort_order);
+  const hints = Object.fromEntries(items.flatMap((i) => {
+    const m = prods.filter((p) => p.category_id === i.category_id);
+    const best = m.find((p) => (p.stock_qty ?? 0) > 0) ?? m[0];
+    return best ? [[i.id, { name: best.name, price: Number(best.list_price), unit: best.unit, updated: best.price_updated_at }]] : [];
+  }));
   const canAct = rec.status === "sent" || rec.status === "viewed";
   const versions = [...(quote?.quote_versions ?? [])].sort((a, b) => a.version - b.version);
   const last = versions[versions.length - 1];
@@ -162,7 +172,7 @@ function SupplierRfq() {
       {quoting && (
         <div className="rounded-lg border bg-card p-6 space-y-4">
           <h2 className="font-display text-lg font-semibold">{quote ? t("quote.revise") : t("quote.yourQuote")}</h2>
-          <OfferForm items={items} initial={last} submitLabel={quote ? t("quote.revise") : t("quote.send")} onSubmit={sendOffer} onCancel={() => setQuoting(false)} />
+          <OfferForm items={items} hints={hints} initial={last} submitLabel={quote ? t("quote.revise") : t("quote.send")} onSubmit={sendOffer} onCancel={() => setQuoting(false)} />
         </div>
       )}
 

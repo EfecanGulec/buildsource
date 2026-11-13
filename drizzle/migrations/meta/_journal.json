@@ -176,6 +176,20 @@
       "when": 1794570446140,
       "tag": "0024_delivery_tracking",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794571207734,
+      "tag": "0025_catalogue_feeds",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1794571221904,
+      "tag": "0026_fix_catalog_push_log",
+      "breakpoints": true
     }
   ]
 }
