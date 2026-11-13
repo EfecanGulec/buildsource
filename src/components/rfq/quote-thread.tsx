@@ -26,7 +26,7 @@ export function QuoteThread({ versions, viewer, items }: { versions: ThreadVersi
             <p className="text-xs text-muted-foreground">
               {new Date(v.created_at).toLocaleString("en-GB")} · {v.lead_time_days ?? "—"} {t("rfq.days")}
               {v.delivery_date && ` · ${t("rfq.date")} ${v.delivery_date}`}{v.valid_until && ` · ${t("quote.validUntil")} ${v.valid_until}`}
-              {v.payment_terms && ` · ${v.payment_terms}`} · {t("quote.delivery")} {eur(Number(v.delivery_cost))}
+              {v.payment_terms && ` · ${v.payment_terms}`} · {t("quote.deliveryCost")} {eur(Number(v.delivery_cost))}
             </p>
             <ul className="mt-2 space-y-0.5 text-xs">{((v.lines as { rfq_item_id: string; unit_price: number; quantity: number; line_total: number }[]) ?? []).map((l) => (
               <li key={l.rfq_item_id} className="flex justify-between gap-2"><span className="truncate">{names.get(l.rfq_item_id) ?? "—"}</span>
