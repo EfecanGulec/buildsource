@@ -99,6 +99,13 @@
       "when": 1794528267911,
       "tag": "0013_quotes_negotiation",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794528603360,
+      "tag": "0014_chat_and_quote_expiry",
+      "breakpoints": true
     }
   ]
 }
