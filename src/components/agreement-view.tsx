@@ -85,7 +85,7 @@ export function AgreementView({ id, side }: { id: string; side: "buyer" | "suppl
         <div className="rounded-lg border border-success/40 bg-success/10 p-4 text-sm space-y-1">
           <p className="font-medium">{t("agr.orderCreated").replace("{n}", order.order_number)}</p>
           {comm && <p>{t("agr.commission")}: {eur(Number(comm.commission_amount))} ({(Number(comm.commission_rate) * 100).toFixed(2)}%) · {t("agr.payout")}: <strong>{eur(Number(comm.supplier_payout))}</strong></p>}
-          <Link className="text-primary underline" to={side === "buyer" ? "/app/$section" : "/supplier/$section"} params={{ section: "orders" }}>{t("nav.orders")}</Link>
+          <Link className="text-primary underline" to={side === "buyer" ? "/app/orders/$orderId" : "/supplier/orders/$orderId"} params={{ orderId: order.id }}>{t("nav.orders")}</Link>
         </div>)}
       <SmartIdDialog open={signing} onOpenChange={setSigning} onConfirmed={signed} title={t("agr.sign")} />
     </div>
