@@ -56,4 +56,3 @@ use the editor.
 - Delivery tables change only via shipment RPCs funnelled through `_shipment_event`, which also moves the order status (so on-time rate keeps reading `order_events`); rules mirrored in `src/lib/shipment.ts`.
 - Public `/d/$token` uses only `driver_*` RPCs (token = credential); photos in private `delivery-photos/<driver_token>/`; site contact sits in `rfq_site_contacts`, hidden from suppliers until an order exists.
 - Material Lens: logic and flow notes in `src/lib/AGENTS.md`.
-- Payment deadline: `orders.payment_due_at` set on insert from `platform_settings`; `expire_unpaid_orders` runs in the 5-min tick.
