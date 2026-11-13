@@ -169,7 +169,7 @@ export function MaterialLensDialog({ open, onOpenChange }: { open: boolean; onOp
                   className={cn("w-full rounded-md border p-3 text-left text-sm", on && !isSupplier && "border-primary bg-primary/5")}>
                   <div className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-2 font-medium">{!isSupplier && <span className={cn("grid h-4 w-4 place-items-center rounded border", on && "border-primary bg-primary text-primary-foreground")}>{on && <Check className="h-3 w-3" />}</span>}{s.name}</span>
-                    <TrustBadge score={s.trust_score} />
+                    <TrustBadge score={s.trust_score} breakdown={null} />
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">{[s.city, s.country].filter(Boolean).join(", ")}{s.lead_time_days ? ` · ${t("lens.lead").replace("{n}", String(s.lead_time_days))}` : ""}{!s.in_region ? ` · ${t("lens.outRegion")}` : ""}</p>
                   {s.product_name && <p className="mt-1 flex items-center gap-1 text-xs"><Package className="h-3 w-3 text-primary" />{s.product_name}
