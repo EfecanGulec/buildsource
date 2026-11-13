@@ -34,7 +34,7 @@ User note: ${data.note || "none"}. Answer text fields in ${data.lang === "lt" ? 
 Allowed category_slug values: ${JSON.stringify(slugs)} (use null if none fits).
 Rules: status "identified" only when confidence >= 0.6, else "uncertain" with alternatives; "not_a_material" if the photo shows something else.
 Read brand/model text only if visible; never guess prices; never invent quantities (quantity is always null).
-If it could be hazardous (e.g. asbestos in old cement sheets or pipe lagging), set safety_note but never claim certainty.
+Set safety_note ONLY if the item itself may contain a health-hazardous substance (e.g. asbestos in old cement roof sheets or pipe lagging); never claim certainty. Ordinary properties like flammability are not safety notes — use null.
 Return JSON only with keys: status, item_name, category_slug, confidence, alternatives[{item_name,category_slug,confidence}], plain_explanation, visible_markings, likely_specs{}, specs_to_confirm[], typical_uses[], standards_to_ask_for[], questions_to_confirm[], safety_note, rfq_item_draft{category_slug,description,specs{},unit,quantity}.`;
 
     let result: LensResult | null = null;

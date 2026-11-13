@@ -25,4 +25,6 @@
 - [ ] Step 22 – Live payments — blocked: user chose to wait
 - [x] Step 4 – Trust Score from real platform data
 - [x] AI chat assistant: private ✦ AI panel, @AI shared replies, drafts fill offer forms
-- [ ] AI: TC26–TC30 on Go-live page, Material Lens photo feature
+- [x] Step 24 Material Lens: top bar + Create RFQ step 2, scan → suppliers → Request offers
+- [ ] Material Lens extras: camera in chat boxes, magic-link page, Add to existing RFQ, Ask in chat
+- [ ] AI: TC23–TC30 on Go-live page
