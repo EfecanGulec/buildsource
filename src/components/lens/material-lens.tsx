@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -46,12 +46,15 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
   const name = r?.rfq_item_draft?.description ?? r?.item_name ?? "";
   function edit(patch: Partial<LensProduct>) { set("products", (xs) => xs.map((x, i) => i === active ? { ...x, ...patch } : x)); }
   const setName = (description: string) => { if (r) edit({ item_name: description, rfq_item_draft: { ...(r.rfq_item_draft ?? { category_slug: slug, specs, unit: "pcs", quantity: null }), description } }); };
-  const setSlug = (category_slug: string | null) => { if (r) edit({ category_slug, rfq_item_draft: r.rfq_item_draft ? { ...r.rfq_item_draft, category_slug } : null }); };
   const setSpecs = (fn: (old: typeof specs) => typeof specs) => { if (r) edit({ likely_specs: fn(specs), rfq_item_draft: r.rfq_item_draft ? { ...r.rfq_item_draft, specs: fn(specs) } : null }); };
   const [targetRfq, setTargetRfq] = useState("");
   const [qty, setQty] = useState(0);
-  const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
-  useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  useEffect(() => {
+    const urls = files.map((f) => URL.createObjectURL(f));
+    setPreviews(urls);
+    return () => urls.forEach((u) => URL.revokeObjectURL(u));
+  }, [files]);
   const ready = products.filter((p) => p.rfq_item_draft);
   function addPhotos(incoming: File[]) {
     const photos = incoming.filter((f) => f.type.startsWith("image/"));
