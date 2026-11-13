@@ -56,8 +56,8 @@ export function OfferForm({ items, hints, initial, submitLabel, onSubmit, onCanc
           <tr key={i.id} className="border-t">
             <td className="py-2 pr-2">{i.description}
               {hints?.[i.id] && <p className="mt-1 text-xs text-muted-foreground">
-                {t("cat.hint")}: {hints[i.id].name} · {eur(hints[i.id].price)}{hints[i.id].unit ? ` / ${hints[i.id].unit}` : ""} · {t("cat.priceUpdated").replace("{d}", hints[i.id].updated ? new Date(hints[i.id].updated!).toLocaleDateString("en-GB") : "—")}{" "}
-                <button type="button" className="font-medium text-primary underline" onClick={() => setPrices({ ...prices, [i.id]: String(hints[i.id].price) })}>{t("cat.use")}</button></p>}</td>
+                {t("cat.hint")}: {hints[i.id]!.name} · {eur(hints[i.id]!.price)}{hints[i.id]!.unit ? ` / ${hints[i.id]!.unit}` : ""} · {t("cat.priceUpdated").replace("{d}", hints[i.id]!.updated ? new Date(hints[i.id]!.updated!).toLocaleDateString("en-GB") : "—")}{" "}
+                <button type="button" className="font-medium text-primary underline" onClick={() => setPrices({ ...prices, [i.id]: String(hints[i.id]!.price) })}>{t("cat.use")}</button></p>}</td>
             <td className="text-right tabular-nums">{Number(i.quantity)} {i.unit}</td>
             <td className="pl-2"><Input type="number" min={0} step="0.01" inputMode="decimal" aria-label={`${t("quote.unitPrice")} ${i.description}`}
               value={prices[i.id]} onChange={(e) => setPrices({ ...prices, [i.id]: e.target.value })} className="text-right" /></td>
