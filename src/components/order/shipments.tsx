@@ -85,7 +85,7 @@ export function ShipmentsPanel({ orderId, orderStatus, side, shipments, onChange
               <Button onClick={() => run(supabase.rpc("buyer_confirm_pickup", { _shipment: s.id }), t("ship.updated"))}>{t("ship.confirmPickup")}</Button>)}
           </div>);
       })}
-      {canPlan && <PlanShipment onCreate={(m, c, tr, d) => run(supabase.rpc("supplier_create_shipment", { _order: orderId, _method: m, _carrier: c, _tracking: tr, ...(d ? { _planned: d } : {}) } as { _order: string; _method: string; _carrier: string; _tracking: string; _planned: string }), t("ship.created"))} />}
+      {canPlan && <PlanShipment onCreate={(m, c, tr, d) => run(supabase.rpc("supplier_create_shipment", { _order: orderId, _method: m, _carrier: c, _tracking: tr, _planned: (d || null) as string }), t("ship.created"))} />}
     </section>
   );
 }
