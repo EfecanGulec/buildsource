@@ -1676,11 +1676,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      _open_agreement: { Args: { _quote: string }; Returns: string }
       _supplier_offer: {
         Args: { _offer: Json; _profile: string; _rec: string }
         Returns: string
       }
       admin_simulate_48h: { Args: never; Returns: Json }
+      buyer_accept_quote: { Args: { _quote: string }; Returns: string }
       buyer_counter_quote: {
         Args: { _offer: Json; _quote: string }
         Returns: number
@@ -1689,6 +1691,14 @@ export type Database = {
         Args: { _quote: string; _reason: string }
         Returns: undefined
       }
+      calc_commission: {
+        Args: { _buyer: string; _supplier: string; _version: string }
+        Returns: {
+          amount: number
+          rate: number
+        }[]
+      }
+      cancel_agreement: { Args: { _agreement: string }; Returns: undefined }
       choose_account_type: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: undefined
@@ -1725,6 +1735,14 @@ export type Database = {
       mark_smart_id_verified: { Args: never; Returns: undefined }
       match_rfq: { Args: { _rfq: string }; Returns: number }
       my_company_id: { Args: never; Returns: string }
+      my_order_commission: {
+        Args: { _order: string }
+        Returns: {
+          commission_amount: number
+          commission_rate: number
+          supplier_payout: number
+        }[]
+      }
       pool_joined_qty: { Args: { _pool: string }; Returns: number }
       pool_owner: { Args: { _pool: string }; Returns: string }
       process_rfq_timeouts: { Args: { _offset?: string }; Returns: Json }
@@ -1753,6 +1771,11 @@ export type Database = {
         Returns: string
       }
       seed_demo_base: { Args: never; Returns: Json }
+      sign_agreement: {
+        Args: { _agreement: string; _code: string }
+        Returns: string
+      }
+      supplier_accept_counter: { Args: { _rfq: string }; Returns: string }
       supplier_decline_rfq: {
         Args: {
           _message: string
