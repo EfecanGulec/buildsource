@@ -260,6 +260,13 @@
       "when": 1794607559511,
       "tag": "0036_buyer_reject_delivery_date",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1794608807926,
+      "tag": "0037_payment_decision_deadline",
+      "breakpoints": true
     }
   ]
 }
