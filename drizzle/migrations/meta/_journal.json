@@ -232,6 +232,13 @@
       "when": 1794603267819,
       "tag": "0032_match_only_chosen",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1794605734073,
+      "tag": "0033_delivery_at_offer_acceptance",
+      "breakpoints": true
     }
   ]
 }

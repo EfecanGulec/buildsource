@@ -20,6 +20,8 @@ export type Database = {
           buyer_signed_at: string | null
           created_at: string
           delivery_date: string | null
+          delivery_details: Json | null
+          delivery_details_required: boolean
           id: string
           lead_time_days: number | null
           payment_terms: string | null
@@ -36,6 +38,8 @@ export type Database = {
           buyer_signed_at?: string | null
           created_at?: string
           delivery_date?: string | null
+          delivery_details?: Json | null
+          delivery_details_required?: boolean
           id?: string
           lead_time_days?: number | null
           payment_terms?: string | null
@@ -52,6 +56,8 @@ export type Database = {
           buyer_signed_at?: string | null
           created_at?: string
           delivery_date?: string | null
+          delivery_details?: Json | null
+          delivery_details_required?: boolean
           id?: string
           lead_time_days?: number | null
           payment_terms?: string | null
@@ -2461,6 +2467,10 @@ export type Database = {
         Returns: undefined
       }
       _order_lines: { Args: { _order: string }; Returns: Json }
+      _save_agreement_delivery: {
+        Args: { _agreement: string; _details: Json }
+        Returns: undefined
+      }
       _shipment_event: {
         Args: {
           _desc: string
@@ -2491,6 +2501,10 @@ export type Database = {
       admin_simulate_48h: { Args: never; Returns: Json }
       buyer_accept_delivery: { Args: { _order: string }; Returns: undefined }
       buyer_accept_quote: { Args: { _quote: string }; Returns: string }
+      buyer_accept_quote_with_delivery: {
+        Args: { _details: Json; _quote: string }
+        Returns: string
+      }
       buyer_approve_milestone: {
         Args: { _milestone: string }
         Returns: undefined
@@ -2522,6 +2536,10 @@ export type Database = {
       }
       buyer_reject_quote: {
         Args: { _quote: string; _reason: string }
+        Returns: undefined
+      }
+      buyer_save_agreement_delivery: {
+        Args: { _agreement: string; _details: Json }
         Returns: undefined
       }
       calc_commission: {
