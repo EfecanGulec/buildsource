@@ -105,7 +105,7 @@ function RfqDetail() {
         </TabsContent>
         <TabsContent value="quotes" className="space-y-4">
           {rfq.quotes.length === 0 && <p className="rounded-lg border bg-card p-8 text-center text-muted-foreground">{t("rfq.noQuotes")}</p>}
-          {rfq.quotes.map((qu) => <BuyerQuote key={qu.id} quote={qu} items={items} roundLimit={rfq.negotiation_round_limit} onChange={() => qc.invalidateQueries({ queryKey: ["rfqs"] })} />)}
+          {rfq.quotes.map((qu) => <BuyerQuote key={qu.id} quote={qu} items={items} roundLimit={rfq.negotiation_round_limit} openAgreementId={rfq.agreements.find((a) => a.status !== "cancelled")?.id} onChange={() => qc.invalidateQueries({ queryKey: ["rfqs"] })} />)}
           {recipients.filter((r) => !rfq.quotes.some((qu) => qu.recipient_id === r.id) && r.status !== "rerouted").map((r) => (
             <div key={r.id} className="rounded-lg border bg-card p-6">
               <ChatPanel rfqId={rfqId} recipientId={r.id} viewer="buyer" canSend={r.status !== "declined"} title={t("chat.with").replace("{name}", r.companies?.name ?? "")} />
@@ -153,7 +153,7 @@ type BuyerQuoteProps = {
   items: { id: string; description: string; quantity: number; unit: string | null }[];
   roundLimit: number; onChange: () => void;
 };
-function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
+function BuyerQuote({ quote, items, roundLimit, onChange, openAgreementId }: BuyerQuoteProps & { openAgreementId?: string | undefined }) {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [countering, setCountering] = useState(false);
@@ -187,11 +187,12 @@ function BuyerQuote({ quote, items, roundLimit, onChange }: BuyerQuoteProps) {
       <QuoteThread versions={versions} viewer="buyer" items={items} />
       {acts.roundLimitReached && <p className="rounded-md border border-warning bg-warning/15 p-3 text-sm">{t("quote.limit")}</p>}
       {last?.party === "buyer" && acts.buyerReject && <p className="text-sm text-muted-foreground">{t("quote.waitSupplier")}</p>}
+      {openAgreementId && <p className="rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">{t("compare.hasAgreement")} <Link className="font-medium text-primary underline" to="/app/agreements/$agreementId" params={{ agreementId: openAgreementId }}>{t("compare.openAgreement")}</Link></p>}
       {!countering && !rejecting && acts.buyerReject && (
         <div className="flex flex-wrap items-center gap-2">
           {acts.buyerCounter && <Button onClick={() => setCountering(true)}>{t("quote.makeCounter")}</Button>}
           <Button variant="outline" onClick={() => setRejecting(true)}>{t("quote.reject")}</Button>
-          {acts.buyerAccept && <DeliveryAcceptance variant="secondary" rfqId={quote.rfq_id} quoteId={quote.id} />}
+          {acts.buyerAccept && !openAgreementId && <DeliveryAcceptance variant="secondary" rfqId={quote.rfq_id} quoteId={quote.id} />}
         </div>)}
       {countering && <OfferForm key={draftKey} items={items} initial={draft ? fromDraft(last, draft) : last} draftMessage={draft?.message} submitLabel={t("quote.sendCounter")} onSubmit={counter} onCancel={() => { setCountering(false); setDraft(null); }} />}
       <div className="border-t pt-4"><ChatPanel rfqId={quote.rfq_id} recipientId={quote.recipient_id} viewer="buyer" canSend={quote.status !== "rejected"} onOfferDraft={acts.buyerCounter ? useDraft : undefined} /></div>
