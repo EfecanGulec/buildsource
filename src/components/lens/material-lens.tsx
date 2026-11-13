@@ -17,8 +17,6 @@ import { prepPhoto } from "@/lib/image-prep";
 import { useLensWorkspace } from "@/lib/lens-workspace";
 import { cn } from "@/lib/utils";
 
-type Spec = string | number | boolean;
-
 export function LensButton({ variant = "ghost", label }: { variant?: "ghost" | "outline"; label?: boolean }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
@@ -140,7 +138,12 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
     persist({ saved: true }).catch(() => undefined);
     onOpenChange(false);
   }
-  const pickAlt = (a: { item_name: string; category_slug: string | null }) => { setName(a.item_name); setSlug(a.category_slug); };
+  const pickAlt = (a: { item_name: string; category_slug: string | null }) => {
+    if (!r) return;
+    edit({ item_name: a.item_name, category_slug: a.category_slug, rfq_item_draft: {
+      ...(r.rfq_item_draft ?? { specs, unit: "pcs", quantity: null }), description: a.item_name, category_slug: a.category_slug,
+    } });
+  };
   const toggle = (id: string) => setChosen((c) => c.includes(id) ? c.filter((x) => x !== id) : [...c, id]);
   const iSupply = isSupplier && suppliers.data?.some((s) => s.company_id === account?.company?.id);
 
@@ -188,7 +191,7 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
           ) : (<div className="rounded-lg border p-4 space-y-3">
             <div className="flex gap-3">
               {previews[r.photo_indices[0] ?? 0] && <img src={previews[r.photo_indices[0] ?? 0]} alt="" className="h-20 w-20 rounded-md object-cover" />}
-              <div className="flex-1 space-y-1">
+              <div className="min-w-0 flex-1 space-y-1">
                 <Input value={name} onChange={(e) => setName(e.target.value)} className="font-semibold" aria-label={t("lens.itemName")} />
                 <span className={cn("inline-block rounded-full px-2 py-0.5 text-xs font-medium", r.status === "identified" ? "bg-primary/15 text-primary" : "bg-warning/20")}>
                   {Math.round(r.confidence * 100)}% · {t(r.status === "identified" ? "lens.identified" : "lens.uncertain")}
