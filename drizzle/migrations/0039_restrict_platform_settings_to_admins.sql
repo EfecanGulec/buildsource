@@ -1,0 +1,3 @@
+ALTER POLICY "Signed-in read settings" ON public.platform_settings TO authenticated USING (public.is_admin());
+ALTER POLICY "Signed-in read settings" ON public.platform_settings RENAME TO "Admins read settings";
+COMMENT ON POLICY "Admins read settings" ON public.platform_settings IS 'Platform settings are readable only by authenticated administrators; payment deadlines remain available through the existing server-calculated order fields.';
