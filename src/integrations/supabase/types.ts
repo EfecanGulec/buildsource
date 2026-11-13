@@ -1685,6 +1685,16 @@ export type Database = {
       is_order_party: { Args: { _order: string }; Returns: boolean }
       is_rfq_buyer: { Args: { _rfq: string }; Returns: boolean }
       is_rfq_supplier: { Args: { _rfq: string }; Returns: boolean }
+      magic_ask: { Args: { _body: string; _token: string }; Returns: undefined }
+      magic_decline: {
+        Args: {
+          _message: string
+          _reason: Database["public"]["Enums"]["decline_reason"]
+          _token: string
+        }
+        Returns: undefined
+      }
+      magic_get: { Args: { _token: string }; Returns: Json }
       mark_smart_id_verified: { Args: never; Returns: undefined }
       match_rfq: { Args: { _rfq: string }; Returns: number }
       my_company_id: { Args: never; Returns: string }

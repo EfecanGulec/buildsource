@@ -19,6 +19,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedSupplierRouteImport } from './routes/_authenticated/supplier'
 import { Route as AuthenticatedVerifyRouteImport } from './routes/_authenticated/verify'
+import { Route as QTokenRouteImport } from './routes/q.$token'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminSectionRouteImport } from './routes/_authenticated/admin.$section'
 import { Route as AuthenticatedAdminDemoDataRouteImport } from './routes/_authenticated/admin.demo-data'
@@ -82,6 +83,11 @@ const AuthenticatedVerifyRoute = AuthenticatedVerifyRouteImport.update({
   id: '/verify',
   path: '/verify',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const QTokenRoute = QTokenRouteImport.update({
+  id: '/q/$token',
+  path: '/q/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
@@ -175,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/supplier': typeof AuthenticatedSupplierRouteWithChildren
   '/verify': typeof AuthenticatedVerifyRoute
+  '/q/$token': typeof QTokenRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
@@ -197,6 +204,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/verify': typeof AuthenticatedVerifyRoute
+  '/q/$token': typeof QTokenRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
@@ -224,6 +232,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/supplier': typeof AuthenticatedSupplierRouteWithChildren
   '/_authenticated/verify': typeof AuthenticatedVerifyRoute
+  '/q/$token': typeof QTokenRoute
   '/_authenticated/admin/$section': typeof AuthenticatedAdminSectionRoute
   '/_authenticated/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/_authenticated/admin/trust-scores': typeof AuthenticatedAdminTrustScoresRoute
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/supplier'
     | '/verify'
+    | '/q/$token'
     | '/admin/$section'
     | '/admin/demo-data'
     | '/admin/trust-scores'
@@ -273,6 +283,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/verify'
+    | '/q/$token'
     | '/admin/$section'
     | '/admin/demo-data'
     | '/admin/trust-scores'
@@ -299,6 +310,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/supplier'
     | '/_authenticated/verify'
+    | '/q/$token'
     | '/_authenticated/admin/$section'
     | '/_authenticated/admin/demo-data'
     | '/_authenticated/admin/trust-scores'
@@ -320,6 +332,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  QTokenRoute: typeof QTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -393,6 +406,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/verify'
       preLoaderRoute: typeof AuthenticatedVerifyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/q/$token': {
+      id: '/q/$token'
+      path: '/q/$token'
+      fullPath: '/q/$token'
+      preLoaderRoute: typeof QTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -578,6 +598,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  QTokenRoute: QTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
