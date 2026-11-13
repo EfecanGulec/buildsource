@@ -239,6 +239,13 @@
       "when": 1794605734073,
       "tag": "0033_delivery_at_offer_acceptance",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1794606743197,
+      "tag": "0034_supplier_sets_delivery_date",
+      "breakpoints": true
     }
   ]
 }
