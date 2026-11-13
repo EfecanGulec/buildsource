@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MatchingPools } from "@/components/pool/matching-pools";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { LensButton } from "@/components/lens/material-lens";
 import { Building2, Camera, Check, Hammer, Loader2, Package, Plus, Sofa, Store, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,6 +27,7 @@ type Item = { category_id: string; description: string; specs: Record<string, st
 
 export const Route = createFileRoute("/_authenticated/app/create-rfq")({
   head: () => ({ meta: [{ title: "Create RFQ — BuildSource LT" }] }),
+  validateSearch: (s: Record<string, unknown>): { scan?: string } => (typeof s.scan === "string" ? { scan: s.scan } : {}),
   component: CreateRfq,
 });
 
@@ -55,6 +57,9 @@ function CreateRfq() {
   const [reading, setReading] = useState(false);
   const [uploadPaths, setUploadPaths] = useState<string[]>([]);
   const runSnap = useServerFn(snapSource);
+  const { scan } = Route.useSearch();
+  const [preferred, setPreferred] = useState<string[]>([]);
+  const [scanId, setScanId] = useState<string | null>(null);
 
   const refs = useQuery({
     queryKey: ["rfq-refs"],
@@ -69,6 +74,25 @@ function CreateRfq() {
   const cats = refs.data?.cats ?? [];
   const parents = cats.filter((c) => !c.parent_id);
   const catById = new Map(cats.map((c) => [c.id, c]));
+
+  // Material Lens hand-off: one item with specs, chosen suppliers first; buyer still adds quantity and delivery.
+  useEffect(() => {
+    if (!scan || scan === scanId || !cats.length) return;
+    setScanId(scan);
+    supabase.from("material_scans").select("id,result,note").eq("id", scan).maybeSingle().then(({ data }) => {
+      const r = data?.result as { item_name?: string; rfq_item_draft?: { category_slug: string | null; description: string; specs: Item["specs"]; unit: string } | null; chosen_suppliers?: string[]; standards_to_ask_for?: string[] } | undefined;
+      const d = r?.rfq_item_draft;
+      if (!d) return;
+      const cat = cats.find((c) => c.slug === d.category_slug);
+      setItems([{ ...blankItem(), category_id: cat?.id ?? "", description: d.description, specs: d.specs ?? {}, unit: d.unit || cat?.default_unit || "", standard: (r?.standards_to_ask_for ?? [])[0] ?? "", quantity: 0 }]);
+      setPreferred(r?.chosen_suppliers ?? []);
+      if (!title) setTitle(r?.item_name ?? d.description);
+      if (data?.note && !description) setDescription(data.note);
+      if (!projectType) setProjectType("renovation");
+      setStep(1);
+      toast.info(t("lens.prefilled"));
+    });
+  }, [scan, cats.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = (i: number, patch: Partial<Item>) => setItems((xs) => xs.map((x, j) => (j === i ? { ...x, ...patch } : x)));
   const applyKit = () => {
@@ -124,7 +148,8 @@ function CreateRfq() {
       delivery_city: delivery.city.trim(), delivery_address: delivery.address.trim() || null,
       unloading: delivery.unloading, delivery_window: delivery.window, site_access_notes: delivery.access.trim() || null,
       delivery_date_requested: delivery.date || null, delivery_week: delivery.date ? isoWeek(delivery.date) : null,
-      status: "draft", source: fromAi ? "snap_source" : kit ? "kit" : "manual", ai_upload_urls: fromAi ? uploadPaths : [],
+      status: "draft", source: scanId ? "material_lens" : fromAi ? "snap_source" : kit ? "kit" : "manual",
+      preferred_supplier_ids: preferred, material_scan_id: scanId, ai_upload_urls: fromAi ? uploadPaths : [],
     }).select("id,rfq_number").single();
     if (error || !rfq) { setSaving(false); toast.error(error?.message ?? "Error"); return; }
     const { error: e2 } = await supabase.from("rfq_items").insert(items.map((i, n) => ({
@@ -188,7 +213,11 @@ function CreateRfq() {
         </>)}
 
         {step === 1 && (<>
-          <p className="text-sm text-muted-foreground">{t("rfq.itemsHint")}</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm text-muted-foreground">{t("rfq.itemsHint")}</p>
+            <LensButton variant="outline" label />
+          </div>
+          {preferred.length > 0 && <p className="rounded-md bg-primary/10 p-2 text-sm text-primary">{t("lens.preferred").replace("{n}", String(preferred.length))}</p>}
           <div className="rounded-md border border-dashed border-primary/40 bg-primary/5 p-4 space-y-3">
             <p className="flex items-center gap-2 text-sm font-medium"><Camera className="h-4 w-4 text-primary" />{t("snap.title")}</p>
             <p className="text-xs text-muted-foreground">{t("snap.hint")}</p>
