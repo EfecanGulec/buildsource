@@ -39,6 +39,7 @@ export const NAV: Record<Area, NavItem[]> = {
     { slug: "pools", key: "nav.pools", icon: Users },
     { slug: "integrations", key: "nav.integrations", icon: Plug },
     { slug: "go-live", key: "nav.goLive", icon: Rocket },
+    { slug: "settings", key: "nav.platformSettings", icon: Settings },
     { slug: "demo-data", key: "nav.demoData", icon: Database },
   ],
 };

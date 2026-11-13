@@ -1033,6 +1033,7 @@ export type Database = {
           created_at: string
           id: string
           order_number: string
+          payment_due_at: string | null
           payment_method: Database["public"]["Enums"]["payment_method"]
           pool_id: string | null
           rfq_id: string | null
@@ -1051,6 +1052,7 @@ export type Database = {
           created_at?: string
           id?: string
           order_number: string
+          payment_due_at?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"]
           pool_id?: string | null
           rfq_id?: string | null
@@ -1069,6 +1071,7 @@ export type Database = {
           created_at?: string
           id?: string
           order_number?: string
+          payment_due_at?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"]
           pool_id?: string | null
           rfq_id?: string | null
@@ -1175,6 +1178,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
       }
       pool_members: {
         Row: {
@@ -2510,6 +2531,10 @@ export type Database = {
         Args: { _enabled: boolean; _mode: string; _service: string }
         Returns: undefined
       }
+      admin_set_payment_deadline: {
+        Args: { _minutes: number }
+        Returns: undefined
+      }
       admin_simulate_48h: { Args: never; Returns: Json }
       buyer_accept_delivery: { Args: { _order: string }; Returns: undefined }
       buyer_accept_quote: { Args: { _quote: string }; Returns: string }
@@ -2604,6 +2629,7 @@ export type Database = {
       end_pool_window_now: { Args: { _pool: string }; Returns: undefined }
       enqueue_job: { Args: { _job: string; _target?: string }; Returns: string }
       expire_stale_quotes: { Args: never; Returns: number }
+      expire_unpaid_orders: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2661,6 +2687,7 @@ export type Database = {
         }[]
       }
       order_lines: { Args: { _order: string }; Returns: Json }
+      payment_deadline_minutes: { Args: never; Returns: number }
       pool_confirm: { Args: { _code: string; _pool: string }; Returns: string }
       pool_join: {
         Args: { _if_fails?: string; _pool: string; _qty: number }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, CheckCircle2, ShieldCheck, Star } from "lucide-react";
@@ -21,7 +21,7 @@ import { canDispute, canPayLater, nextSupplierStatuses, stagedSplit } from "@/li
 
 type OrderStatus = Database["public"]["Enums"]["order_status"];
 const MILESTONES = ["drawing_approved", "sample_approved", "in_production", "ready"] as const;
-const COLS = "id,order_number,rfq_id,total,status,payment_method,staged_payment,created_at,buyer_company_id,supplier_company_id";
+const COLS = "id,order_number,rfq_id,total,status,payment_method,staged_payment,created_at,payment_due_at,buyer_company_id,supplier_company_id";
 
 export function OrderView({ id, side }: { id: string; side: "buyer" | "supplier" }) {
   const { t } = useI18n();
@@ -76,6 +76,7 @@ export function OrderView({ id, side }: { id: string; side: "buyer" | "supplier"
         </div>
       </div>
 
+      {o.status === "awaiting_payment" && o.payment_due_at && <PayDeadline due={o.payment_due_at} side={side} />}
       {side === "buyer" && o.status === "awaiting_payment" && <Checkout total={total} staged={o.staged_payment} onPay={(m, term) => run(supabase.rpc("buyer_pay_order", { _order: id, _method: m, _term_days: term }), t("ord.paid"))} />}
 
       {payments.length > 0 && (
@@ -254,4 +255,16 @@ function ReviewForm({ onSend }: { onSend: (r: number, c: string) => Promise<bool
       <Button onClick={() => onSend(r, c)}>{t("ord.submitReview")}</Button>
     </section>
   );
+}
+
+function PayDeadline({ due, side }: { due: string; side: "buyer" | "supplier" }) {
+  const { t } = useI18n();
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => { const i = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(i); }, []);
+  const ms = new Date(due).getTime() - now;
+  const time = new Date(due).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const left = `${Math.floor(s / 3600) ? Math.floor(s / 3600) + "h " : ""}${Math.floor((s % 3600) / 60)}m ${s % 60}s`;
+  const text = ms <= 0 ? t("ord.payExpired") : (side === "buyer" ? t("ord.payDue") : t("ord.payDueSupplier")).replace("{time}", time).replace("{left}", left);
+  return <div role="status" className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm tabular-nums">{text}</div>;
 }
