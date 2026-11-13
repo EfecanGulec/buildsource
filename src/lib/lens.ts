@@ -6,6 +6,11 @@ export const LENS_MAX_PHOTOS = 4;
 export const LENS_MAX_PX = 1600;
 
 const spec = z.union([z.string(), z.number(), z.boolean()]);
+// Models sometimes return arrays for text, or nulls inside spec maps; coerce instead of failing the scan.
+const text = z.preprocess((v) => (Array.isArray(v) ? v.join(" · ") : v), z.string().nullable());
+const specMap = z.preprocess((v) => (v && typeof v === "object" && !Array.isArray(v)
+  ? Object.fromEntries(Object.entries(v).filter(([, x]) => x !== null && typeof x !== "object")) : {}), z.record(z.string(), spec));
+const strList = z.preprocess((v) => (typeof v === "string" ? [v] : Array.isArray(v) ? v.filter((x) => typeof x === "string") : []), z.array(z.string()));
 export const lensResultSchema = z.object({
   status: z.enum(["identified", "uncertain", "not_a_material", "failed"]),
   item_name: z.string().default(""),
@@ -13,19 +18,19 @@ export const lensResultSchema = z.object({
   confidence: z.number().min(0).max(1).default(0),
   alternatives: z.array(z.object({ item_name: z.string(), category_slug: z.string().nullable(), confidence: z.number().min(0).max(1) })).default([]),
   plain_explanation: z.string().default(""),
-  visible_markings: z.string().nullable().default(null),
-  likely_specs: z.record(z.string(), spec).default({}),
-  specs_to_confirm: z.array(z.string()).default([]),
-  typical_uses: z.array(z.string()).default([]),
-  standards_to_ask_for: z.array(z.string()).default([]),
-  questions_to_confirm: z.array(z.string()).default([]),
-  safety_note: z.string().nullable().default(null),
+  visible_markings: text.default(null),
+  likely_specs: specMap.default({}),
+  specs_to_confirm: strList.default([]),
+  typical_uses: strList.default([]),
+  standards_to_ask_for: strList.default([]),
+  questions_to_confirm: strList.default([]),
+  safety_note: text.default(null),
   rfq_item_draft: z.object({
     category_slug: z.string().nullable(),
     description: z.string(),
-    specs: z.record(z.string(), spec).default({}),
+    specs: specMap.default({}),
     unit: z.string().default("pcs"),
-    quantity: z.number().nullable().default(null),
+    quantity: z.unknown().transform(() => null as number | null),
   }).nullable().default(null),
 });
 export type LensResult = z.infer<typeof lensResultSchema>;

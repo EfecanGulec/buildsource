@@ -16,6 +16,11 @@ describe("material lens", () => {
     expect(r.rfq_item_draft?.quantity).toBeNull();
     expect(normaliseLens({ ...DEMO_LENS.eps, status: "not_a_material" }, slugs).rfq_item_draft).toBeNull();
   });
+  it("accepts array markings and null specs from the model", () => {
+    const r = parseLensResult(JSON.stringify({ ...DEMO_LENS.eps, visible_markings: ["EPS 100", "100 mm"], likely_specs: { a: null, b: 1 } }), slugs)!;
+    expect(r.visible_markings).toBe("EPS 100 · 100 mm");
+    expect(r.likely_specs).toEqual({ b: 1 });
+  });
   it("needs a positive quantity to submit", () => {
     expect(lensCanSubmit(null)).toBe(false);
     expect(lensCanSubmit(0)).toBe(false);
