@@ -434,7 +434,9 @@ export type Database = {
           base_price: number
           category_id: string | null
           certificates: Json
+          closed_at: string | null
           closed_qty: number | null
+          confirm_until: string | null
           confirm_window_hours: number
           created_at: string
           datasheet_url: string | null
@@ -458,7 +460,9 @@ export type Database = {
           base_price: number
           category_id?: string | null
           certificates?: Json
+          closed_at?: string | null
           closed_qty?: number | null
+          confirm_until?: string | null
           confirm_window_hours?: number
           created_at?: string
           datasheet_url?: string | null
@@ -482,7 +486,9 @@ export type Database = {
           base_price?: number
           category_id?: string | null
           certificates?: Json
+          closed_at?: string | null
           closed_qty?: number | null
+          confirm_until?: string | null
           confirm_window_hours?: number
           created_at?: string
           datasheet_url?: string | null
@@ -1666,6 +1672,8 @@ export type Database = {
         }
         Returns: number
       }
+      _close_pool: { Args: { _pool: string }; Returns: string }
+      _finalize_pool: { Args: { _pool: string }; Returns: undefined }
       _invite_supplier: {
         Args: {
           _claimed: boolean
@@ -1676,6 +1684,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      _next_order_number: { Args: never; Returns: string }
       _notify_order: {
         Args: {
           _body: string
@@ -1754,8 +1763,10 @@ export type Database = {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: undefined
       }
+      close_pool_now: { Args: { _pool: string }; Returns: string }
       compute_buyer_reliability: { Args: { _company: string }; Returns: number }
       compute_trust_score: { Args: { _company: string }; Returns: number }
+      end_pool_window_now: { Args: { _pool: string }; Returns: undefined }
       expire_stale_quotes: { Args: never; Returns: number }
       has_role: {
         Args: {
@@ -1794,8 +1805,27 @@ export type Database = {
           supplier_payout: number
         }[]
       }
+      pool_confirm: { Args: { _code: string; _pool: string }; Returns: string }
+      pool_join: {
+        Args: { _if_fails?: string; _pool: string; _qty: number }
+        Returns: undefined
+      }
       pool_joined_qty: { Args: { _pool: string }; Returns: number }
+      pool_leave: { Args: { _pool: string }; Returns: undefined }
       pool_owner: { Args: { _pool: string }; Returns: string }
+      pool_tier_discount: {
+        Args: { _qty: number; _tiers: Json }
+        Returns: number
+      }
+      pool_totals: {
+        Args: { _pool: string }
+        Returns: {
+          confirmed_qty: number
+          members: number
+          total_qty: number
+        }[]
+      }
+      process_pools: { Args: never; Returns: number }
       process_rfq_timeouts: { Args: { _offset?: string }; Returns: Json }
       quote_rfq: { Args: { _quote: string }; Returns: string }
       quote_supplier: { Args: { _quote: string }; Returns: string }

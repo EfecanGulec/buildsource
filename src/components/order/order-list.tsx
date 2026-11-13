@@ -11,7 +11,7 @@ export function OrderList({ side }: { side: "buyer" | "supplier" }) {
     queryKey: ["orders", side],
     queryFn: async () => {
       const { data, error } = await supabase.from("orders")
-        .select("id,order_number,total,status,created_at,buyer:companies!orders_buyer_company_id_fkey(name),supplier:companies!orders_supplier_company_id_fkey(name),rfqs(title)")
+        .select("id,order_number,total,status,created_at,buyer:companies!orders_buyer_company_id_fkey(name),supplier:companies!orders_supplier_company_id_fkey(name),rfqs(title),pool:group_buy_pools!orders_pool_id_fkey(product_name)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -28,7 +28,7 @@ export function OrderList({ side }: { side: "buyer" | "supplier" }) {
               <td>{side === "buyer"
                 ? <Link to="/app/orders/$orderId" params={{ orderId: o.id }} className="font-mono text-primary hover:underline">{o.order_number}</Link>
                 : <Link to="/supplier/orders/$orderId" params={{ orderId: o.id }} className="font-mono text-primary hover:underline">{o.order_number}</Link>}
-                <div className="text-xs text-muted-foreground">{o.rfqs?.title}</div></td>
+                <div className="text-xs text-muted-foreground">{o.rfqs?.title ?? o.pool?.product_name}</div></td>
               <td>{side === "buyer" ? o.supplier?.name : o.buyer?.name}</td>
               <td className="text-right tabular-nums">{eur(Number(o.total))}</td>
               <td><StatusBadge kind="order" status={o.status} /></td>

@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { MatchingPools } from "@/components/pool/matching-pools";
 import { useState } from "react";
 import { Building2, Camera, Check, Hammer, Loader2, Package, Plus, Sofa, Store, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
@@ -274,6 +275,7 @@ function CreateRfq() {
                   <td className="text-right tabular-nums">{it.quantity} {it.unit}</td></tr>))}
               </tbody>
             </table>
+            <MatchingPools categoryIds={items.map((i) => i.category_id).filter(Boolean)} />
           </div>
         )}
       </div>

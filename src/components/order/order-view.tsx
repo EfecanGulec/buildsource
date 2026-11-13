@@ -29,7 +29,7 @@ export function OrderView({ id, side }: { id: string; side: "buyer" | "supplier"
     queryKey: ["order", id],
     queryFn: async () => {
       const { data: o, error } = await supabase.from("orders")
-        .select(`${COLS},rfqs(rfq_number,title),buyer:companies!orders_buyer_company_id_fkey(name),supplier:companies!orders_supplier_company_id_fkey(name)`)
+        .select(`${COLS},rfqs(rfq_number,title),pool:group_buy_pools!orders_pool_id_fkey(product_name),buyer:companies!orders_buyer_company_id_fkey(name),supplier:companies!orders_supplier_company_id_fkey(name)`)
         .eq("id", id).maybeSingle();
       if (error) throw error;
       if (!o) return null;
@@ -63,8 +63,8 @@ export function OrderView({ id, side }: { id: string; side: "buyer" | "supplier"
       <Link to={side === "buyer" ? "/app/orders" : "/supplier/orders"} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />{t("nav.orders")}</Link>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="font-mono text-sm text-muted-foreground">{o.order_number} · {o.rfqs?.rfq_number}</p>
-          <h1 className="font-display text-2xl font-semibold">{o.rfqs?.title}</h1>
+          <p className="font-mono text-sm text-muted-foreground">{o.order_number} · {o.rfqs?.rfq_number ?? t("nav.groupBuy")}</p>
+          <h1 className="font-display text-2xl font-semibold">{o.rfqs?.title ?? o.pool?.product_name}</h1>
           <p className="text-sm text-muted-foreground">{side === "buyer" ? o.supplier?.name : o.buyer?.name}</p>
         </div>
         <div className="text-right"><StatusBadge kind="order" status={o.status} />

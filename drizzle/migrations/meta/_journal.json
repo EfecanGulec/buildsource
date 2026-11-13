@@ -134,6 +134,13 @@
       "when": 1794529582724,
       "tag": "0018_fix_order_recompute_trigger",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794533368217,
+      "tag": "0019_group_buy",
+      "breakpoints": true
     }
   ]
 }
