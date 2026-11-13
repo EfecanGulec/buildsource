@@ -12,7 +12,7 @@ const Email = ({ title = 'Update on BuildSource LT', intro = 'There is an update
 )
 export const template = {
   component: Email,
-  subject: (d: Record<string, any>) => d.title || 'Update on BuildSource LT',
+  subject: (d: Record<string, any>) => d['title'] || 'Update on BuildSource LT',
   displayName: 'Platform notification',
   previewData: { title: 'New offer on RFQ-2026-0008', intro: 'You received a new offer.', body: 'Oak flooring, 120 m²', link: 'https://example.com/app/rfqs/1' },
 } satisfies TemplateEntry

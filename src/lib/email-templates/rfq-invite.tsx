@@ -13,7 +13,7 @@ const Email = ({ title = 'New request for quotation', body, link }: Props) => (
 )
 export const template = {
   component: Email,
-  subject: (d: Record<string, any>) => d.title || 'New request for quotation',
+  subject: (d: Record<string, any>) => d['title'] || 'New request for quotation',
   displayName: 'New RFQ (supplier invite)',
   previewData: { title: 'New RFQ RFQ-2026-0008', body: 'Café fitout, Vilnius', link: 'https://example.com/q/abc' },
 } satisfies TemplateEntry

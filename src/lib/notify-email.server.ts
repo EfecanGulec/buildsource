@@ -52,7 +52,7 @@ export async function dispatchNotificationEmails(appUrl: string, limit = 50) {
       await db.from('notifications').update({ email_status: status, emailed_at: status === 'sent' ? new Date().toISOString() : null, email_error: null }).eq('id', n.id)
     } catch (e: any) {
       // Domain not verified yet or a temporary failure: put it back so the next run retries (until it is a day old).
-      tally.failed = (tally.failed ?? 0) + 1
+      tally['failed'] = (tally['failed'] ?? 0) + 1
       await db.from('notifications').update({ email_status: null, email_error: String(e?.code ?? e?.message ?? e).slice(0, 300) }).eq('id', n.id)
       if (e?.status === 429 || e?.code === 'domain_not_verified' || e?.code === 'emails_disabled') break
     }
