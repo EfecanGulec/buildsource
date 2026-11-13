@@ -27,7 +27,7 @@ type Item = { category_id: string; description: string; specs: Record<string, st
 
 export const Route = createFileRoute("/_authenticated/app/create-rfq")({
   head: () => ({ meta: [{ title: "Create RFQ — BuildSource LT" }] }),
-  validateSearch: (s: Record<string, unknown>): { scan?: string } => (typeof s.scan === "string" ? { scan: s.scan } : {}),
+  validateSearch: (s: Record<string, unknown>): { scan?: string } => (typeof s["scan"] === "string" ? { scan: s["scan"] } : {}),
   component: CreateRfq,
 });
 
