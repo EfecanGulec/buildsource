@@ -23,7 +23,7 @@ export function LensButton({ variant = "ghost", label }: { variant?: "ghost" | "
   const [open, setOpen] = useState(false);
   return (<>
     <Button variant={variant} size={label ? "sm" : "icon"} onClick={() => setOpen(true)} aria-label={t("lens.button")}>
-      <Camera className={label ? "mr-2 h-4 w-4" : ""} />{label && t("lens.button")}
+      <Camera className={label ? "h-4 w-4 sm:mr-2" : ""} />{label && <span className="hidden sm:inline">{t("lens.button")}</span>}
     </Button>
     {open && <MaterialLensDialog open={open} onOpenChange={setOpen} />}
   </>);
