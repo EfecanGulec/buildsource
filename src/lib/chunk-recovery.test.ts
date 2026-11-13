@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isChunkLoadError, shouldReload } from "./chunk-recovery";
+import { isChunkLoadError, nextReload } from "./chunk-recovery";
 
 describe("chunk recovery", () => {
   it("recognises the Safari stale-module error", () => {
@@ -11,9 +11,14 @@ describe("chunk recovery", () => {
   it("ignores ordinary errors", () => {
     expect(isChunkLoadError(new Error("RFQ not found"))).toBe(false);
   });
-  it("does not reload again within 10 seconds", () => {
-    expect(shouldReload(1000, 5000)).toBe(false);
-    expect(shouldReload(1000, 12_000)).toBe(true);
-    expect(shouldReload(null, 0)).toBe(true);
+  it("retries up to 3 times a minute with a growing delay", () => {
+    const a = nextReload(null, 0)!;
+    expect(a).toEqual({ state: { first: 0, count: 1 }, delay: 0 });
+    const b = nextReload(a.state, 1000)!;
+    expect(b.delay).toBe(800);
+    const c = nextReload(b.state, 2000)!;
+    expect(c.delay).toBe(1600);
+    expect(nextReload(c.state, 3000)).toBeNull();
+    expect(nextReload(c.state, 61_000)?.state.count).toBe(1);
   });
 });

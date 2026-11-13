@@ -1,8 +1,21 @@
 // Recovers from stale page code: after the app updates or the preview restarts, an open tab
 // can ask for files that no longer exist ("Importing a module script failed"). Reloading
 // fetches the current files. A short cooldown stops reload loops if the server is really down.
-const KEY = "bs-chunk-reload-at";
-const COOLDOWN_MS = 10_000;
+const KEY = "bs-chunk-reload";
+// A preview restart can take a few seconds, so one reload may land mid-restart and fail again.
+// Allow a few reloads, each waiting a little longer, then stop so a real outage cannot loop.
+const WINDOW_MS = 60_000;
+const MAX_RELOADS = 3;
+const STEP_MS = 800;
+
+export type ReloadState = { first: number; count: number } | null;
+
+/** Next state and delay if another reload is allowed, else null. */
+export function nextReload(state: ReloadState, now: number): { state: { first: number; count: number }; delay: number } | null {
+  if (!state || now - state.first > WINDOW_MS) return { state: { first: now, count: 1 }, delay: 0 };
+  if (state.count >= MAX_RELOADS) return null;
+  return { state: { first: state.first, count: state.count + 1 }, delay: state.count * STEP_MS };
+}
 
 const PATTERNS = [
   /importing a module script failed/i, // Safari
@@ -18,24 +31,23 @@ export function isChunkLoadError(err: unknown): boolean {
   return PATTERNS.some((p) => p.test(msg));
 }
 
-export function shouldReload(lastAt: number | null, now: number): boolean {
-  return lastAt === null || now - lastAt > COOLDOWN_MS;
-}
-
-/** Reloads the page unless it already did so moments ago. Returns true if a reload started. */
+let pending = false;
+/** Reloads the page unless it already retried several times in the last minute. Returns true if a reload is scheduled. */
 export function reloadOnce(): boolean {
   if (typeof window === "undefined") return false;
-  let last: number | null = null;
+  if (pending) return true;
+  let state: ReloadState = null;
   try {
     const v = sessionStorage.getItem(KEY);
-    last = v ? Number(v) : null;
+    state = v ? (JSON.parse(v) as ReloadState) : null;
   } catch {}
-  const now = Date.now();
-  if (!shouldReload(last, now)) return false;
+  const next = nextReload(state, Date.now());
+  if (!next) return false;
   try {
-    sessionStorage.setItem(KEY, String(now));
+    sessionStorage.setItem(KEY, JSON.stringify(next.state));
   } catch {}
-  window.location.reload();
+  pending = true;
+  setTimeout(() => window.location.reload(), next.delay);
   return true;
 }
 
