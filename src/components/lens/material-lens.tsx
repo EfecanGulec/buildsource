@@ -115,7 +115,7 @@ export function MaterialLensDialog({ open, onOpenChange, onAskInChat }: { open: 
   }
   function askChat() {
     const sp = Object.entries(specs).map(([k, v]) => `${k}: ${v}`).join(", ");
-    onAskInChat?.(t("lens.chatSummary").replace("{name}", name).replace("{specs}", sp || "—"));
+    onAskInChat?.(t("lens.chatSummary").replace("{name}", name.replace(/\.+$/, "")).replace("{specs}", sp || "—"));
     persist({ saved: true }).catch(() => undefined);
     onOpenChange(false);
   }
