@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { SERVICES, type Service } from "@/lib/connectors/services";
-import { integrationReadiness, setIntegrationMode, testIntegration } from "@/lib/integrations.functions";
+import { integrationReadiness, sendPendingEmails, setIntegrationMode, testIntegration } from "@/lib/integrations.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/integrations")({
   head: () => ({ meta: [
@@ -29,6 +29,10 @@ function Integrations() {
   const ready = useServerFn(integrationReadiness);
   const test = useServerFn(testIntegration);
   const setMode = useServerFn(setIntegrationMode);
+  const sendEmails = useServerFn(sendPendingEmails);
+  const emailM = useMutation({ mutationFn: () => sendEmails(),
+    onSuccess: (r) => toast.success(t("int.emailsSent") + " " + (Object.entries(r).map(([k, v]) => `${k}: ${v}`).join(", ") || "0")),
+    onError: (e) => toast.error(e instanceof Error ? e.message : String(e)) });
   const rows = useQuery({ queryKey: ["integrations"], queryFn: async () => {
     const { data, error } = await supabase.from("integrations").select("*").order("service");
     if (error) throw error; return data;
@@ -85,7 +89,10 @@ function Integrations() {
       <section className="space-y-3 rounded-lg border bg-card p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div><h2 className="font-display font-semibold">{t("int.jobs")}</h2><p className="text-xs text-muted-foreground">{t("int.jobsHint")}</p></div>
-          <Button size="sm" onClick={() => runJobs.mutate()} disabled={runJobs.isPending}>{t("int.runNow")}</Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => emailM.mutate()} disabled={emailM.isPending}>{t("int.sendEmails")}</Button>
+            <Button size="sm" onClick={() => runJobs.mutate()} disabled={runJobs.isPending}>{t("int.runNow")}</Button>
+          </div>
         </div>
         <ul className="divide-y text-sm">
           {jobs.data?.length === 0 && <li className="py-2 text-muted-foreground">{t("int.noJobs")}</li>}

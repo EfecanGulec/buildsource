@@ -53,6 +53,7 @@ import { Route as AuthenticatedSupplierInboxIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedSupplierInboxRfqIdRouteImport } from './routes/_authenticated/supplier.inbox.$rfqId'
 import { Route as AuthenticatedSupplierOrdersIndexRouteImport } from './routes/_authenticated/supplier.orders.index'
 import { Route as AuthenticatedSupplierOrdersOrderIdRouteImport } from './routes/_authenticated/supplier.orders.$orderId'
+import { Route as ApiPublicNotificationsDispatchRouteImport } from './routes/api/public/notifications/dispatch'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
@@ -301,6 +302,12 @@ const AuthenticatedSupplierOrdersOrderIdRoute =
     path: '/orders/$orderId',
     getParentRoute: () => AuthenticatedSupplierRoute,
   } as any)
+const ApiPublicNotificationsDispatchRoute =
+  ApiPublicNotificationsDispatchRouteImport.update({
+    id: '/api/public/notifications/dispatch',
+    path: '/api/public/notifications/dispatch',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
@@ -346,6 +353,7 @@ export interface FileRoutesByFullPath {
   '/supplier/agreements/$agreementId': typeof AuthenticatedSupplierAgreementsAgreementIdRoute
   '/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/supplier/orders/$orderId': typeof AuthenticatedSupplierOrdersOrderIdRoute
+  '/api/public/notifications/dispatch': typeof ApiPublicNotificationsDispatchRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/app/group-buy/': typeof AuthenticatedAppGroupBuyIndexRoute
   '/app/orders/': typeof AuthenticatedAppOrdersIndexRoute
@@ -389,6 +397,7 @@ export interface FileRoutesByTo {
   '/supplier/agreements/$agreementId': typeof AuthenticatedSupplierAgreementsAgreementIdRoute
   '/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/supplier/orders/$orderId': typeof AuthenticatedSupplierOrdersOrderIdRoute
+  '/api/public/notifications/dispatch': typeof ApiPublicNotificationsDispatchRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/app/group-buy': typeof AuthenticatedAppGroupBuyIndexRoute
   '/app/orders': typeof AuthenticatedAppOrdersIndexRoute
@@ -437,6 +446,7 @@ export interface FileRoutesById {
   '/_authenticated/supplier/agreements/$agreementId': typeof AuthenticatedSupplierAgreementsAgreementIdRoute
   '/_authenticated/supplier/inbox/$rfqId': typeof AuthenticatedSupplierInboxRfqIdRoute
   '/_authenticated/supplier/orders/$orderId': typeof AuthenticatedSupplierOrdersOrderIdRoute
+  '/api/public/notifications/dispatch': typeof ApiPublicNotificationsDispatchRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/_authenticated/app/group-buy/': typeof AuthenticatedAppGroupBuyIndexRoute
   '/_authenticated/app/orders/': typeof AuthenticatedAppOrdersIndexRoute
@@ -485,6 +495,7 @@ export interface FileRouteTypes {
     | '/supplier/agreements/$agreementId'
     | '/supplier/inbox/$rfqId'
     | '/supplier/orders/$orderId'
+    | '/api/public/notifications/dispatch'
     | '/lovable/email/transactional/preview'
     | '/app/group-buy/'
     | '/app/orders/'
@@ -528,6 +539,7 @@ export interface FileRouteTypes {
     | '/supplier/agreements/$agreementId'
     | '/supplier/inbox/$rfqId'
     | '/supplier/orders/$orderId'
+    | '/api/public/notifications/dispatch'
     | '/lovable/email/transactional/preview'
     | '/app/group-buy'
     | '/app/orders'
@@ -575,6 +587,7 @@ export interface FileRouteTypes {
     | '/_authenticated/supplier/agreements/$agreementId'
     | '/_authenticated/supplier/inbox/$rfqId'
     | '/_authenticated/supplier/orders/$orderId'
+    | '/api/public/notifications/dispatch'
     | '/lovable/email/transactional/preview'
     | '/_authenticated/app/group-buy/'
     | '/_authenticated/app/orders/'
@@ -591,6 +604,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   DTokenRoute: typeof DTokenRoute
   QTokenRoute: typeof QTokenRoute
+  ApiPublicNotificationsDispatchRoute: typeof ApiPublicNotificationsDispatchRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
@@ -904,6 +918,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupplierOrdersOrderIdRouteImport
       parentRoute: typeof AuthenticatedSupplierRoute
     }
+    '/api/public/notifications/dispatch': {
+      id: '/api/public/notifications/dispatch'
+      path: '/api/public/notifications/dispatch'
+      fullPath: '/api/public/notifications/dispatch'
+      preLoaderRoute: typeof ApiPublicNotificationsDispatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
@@ -1039,6 +1060,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   DTokenRoute: DTokenRoute,
   QTokenRoute: QTokenRoute,
+  ApiPublicNotificationsDispatchRoute: ApiPublicNotificationsDispatchRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport

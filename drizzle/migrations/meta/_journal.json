@@ -190,6 +190,13 @@
       "when": 1794571221904,
       "tag": "0026_fix_catalog_push_log",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1794573821726,
+      "tag": "0027_notification_emails",
+      "breakpoints": true
     }
   ]
 }

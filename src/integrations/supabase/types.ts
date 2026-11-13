@@ -211,6 +211,7 @@ export type Database = {
           city: string | null
           claimed_at: string | null
           company_code: string
+          contact_email: string | null
           country: string
           created_at: string
           created_by: string | null
@@ -233,6 +234,7 @@ export type Database = {
           city?: string | null
           claimed_at?: string | null
           company_code: string
+          contact_email?: string | null
           country?: string
           created_at?: string
           created_by?: string | null
@@ -255,6 +257,7 @@ export type Database = {
           city?: string | null
           claimed_at?: string | null
           company_code?: string
+          contact_email?: string | null
           country?: string
           created_at?: string
           created_by?: string | null
@@ -785,6 +788,9 @@ export type Database = {
           body: string | null
           company_id: string | null
           created_at: string
+          email_error: string | null
+          email_status: string | null
+          emailed_at: string | null
           id: string
           link: string | null
           profile_id: string | null
@@ -796,6 +802,9 @@ export type Database = {
           body?: string | null
           company_id?: string | null
           created_at?: string
+          email_error?: string | null
+          email_status?: string | null
+          emailed_at?: string | null
           id?: string
           link?: string | null
           profile_id?: string | null
@@ -807,6 +816,9 @@ export type Database = {
           body?: string | null
           company_id?: string | null
           created_at?: string
+          email_error?: string | null
+          email_status?: string | null
+          emailed_at?: string | null
           id?: string
           link?: string | null
           profile_id?: string | null
