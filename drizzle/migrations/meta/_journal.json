@@ -141,6 +141,13 @@
       "when": 1794533368217,
       "tag": "0019_group_buy",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794534005368,
+      "tag": "0020_dashboards",
+      "breakpoints": true
     }
   ]
 }
