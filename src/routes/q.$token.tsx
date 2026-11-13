@@ -80,7 +80,7 @@ function MagicPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-hero px-4 py-5 text-hero-foreground">
+      <header className="bg-ink px-4 py-5 text-ink-foreground">
         <div className="mx-auto max-w-2xl">
           <p className="text-sm opacity-80">BuildSource LT · {d.supplier.name}</p>
           <h1 className="mt-1 font-display text-xl font-semibold">{t("magic.invited")}</h1>
@@ -133,7 +133,7 @@ function MagicPage() {
           <section className="rounded-lg border border-accent bg-accent/40 p-4 space-y-2">
             <p className="flex items-center gap-2 font-medium"><Building2 className="h-4 w-4" />{t("magic.claim")}</p>
             <p className="text-sm">{t("magic.claimText")}</p>
-            <Button asChild><Link to="/auth" search={{ mode: "signup" }}>{t("magic.claimCta")}</Link></Button>
+            <Button asChild><Link to="/auth" search={{ mode: "signup", type: "supplier" }}>{t("magic.claimCta")}</Link></Button>
           </section>)}
       </main>
 
