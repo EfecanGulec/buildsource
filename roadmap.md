@@ -17,5 +17,7 @@
 - [x] Step 16 – Integrations page + scheduler
 - [x] Step 17 – Delivery: shipments, driver page /d/:token (phone-checked), proof of delivery, mismatch → dispute, daily late alerts
 - [x] Step 18 – Catalogue: feeds, mapping, AI category check, price hints, integration level, shop connectors (demo)
-- [ ] Steps 19–23 – see prompts PDF
+- [x] Step 19 – Notification emails
+- [x] Step 20 – Company data: admin Companies page, live VIES VAT check, contact emails
+- [ ] Steps 21–23 – see prompts PDF
 - [x] Step 4 – Trust Score from real platform data

@@ -23,6 +23,7 @@ import { Route as DTokenRouteImport } from './routes/d.$token'
 import { Route as QTokenRouteImport } from './routes/q.$token'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminSectionRouteImport } from './routes/_authenticated/admin.$section'
+import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin.companies'
 import { Route as AuthenticatedAdminDemoDataRouteImport } from './routes/_authenticated/admin.demo-data'
 import { Route as AuthenticatedAdminDisputesRouteImport } from './routes/_authenticated/admin.disputes'
 import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
@@ -124,6 +125,12 @@ const AuthenticatedAdminSectionRoute =
   AuthenticatedAdminSectionRouteImport.update({
     id: '/$section',
     path: '/$section',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCompaniesRoute =
+  AuthenticatedAdminCompaniesRouteImport.update({
+    id: '/companies',
+    path: '/companies',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminDemoDataRoute =
@@ -328,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/d/$token': typeof DTokenRoute
   '/q/$token': typeof QTokenRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
+  '/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/disputes': typeof AuthenticatedAdminDisputesRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
@@ -372,6 +380,7 @@ export interface FileRoutesByTo {
   '/d/$token': typeof DTokenRoute
   '/q/$token': typeof QTokenRoute
   '/admin/$section': typeof AuthenticatedAdminSectionRoute
+  '/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/admin/disputes': typeof AuthenticatedAdminDisputesRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
@@ -421,6 +430,7 @@ export interface FileRoutesById {
   '/d/$token': typeof DTokenRoute
   '/q/$token': typeof QTokenRoute
   '/_authenticated/admin/$section': typeof AuthenticatedAdminSectionRoute
+  '/_authenticated/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin/demo-data': typeof AuthenticatedAdminDemoDataRoute
   '/_authenticated/admin/disputes': typeof AuthenticatedAdminDisputesRoute
   '/_authenticated/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
@@ -470,6 +480,7 @@ export interface FileRouteTypes {
     | '/d/$token'
     | '/q/$token'
     | '/admin/$section'
+    | '/admin/companies'
     | '/admin/demo-data'
     | '/admin/disputes'
     | '/admin/integrations'
@@ -514,6 +525,7 @@ export interface FileRouteTypes {
     | '/d/$token'
     | '/q/$token'
     | '/admin/$section'
+    | '/admin/companies'
     | '/admin/demo-data'
     | '/admin/disputes'
     | '/admin/integrations'
@@ -562,6 +574,7 @@ export interface FileRouteTypes {
     | '/d/$token'
     | '/q/$token'
     | '/_authenticated/admin/$section'
+    | '/_authenticated/admin/companies'
     | '/_authenticated/admin/demo-data'
     | '/_authenticated/admin/disputes'
     | '/_authenticated/admin/integrations'
@@ -706,6 +719,13 @@ declare module '@tanstack/react-router' {
       path: '/$section'
       fullPath: '/admin/$section'
       preLoaderRoute: typeof AuthenticatedAdminSectionRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/companies': {
+      id: '/_authenticated/admin/companies'
+      path: '/companies'
+      fullPath: '/admin/companies'
+      preLoaderRoute: typeof AuthenticatedAdminCompaniesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/demo-data': {
@@ -937,6 +957,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSectionRoute: typeof AuthenticatedAdminSectionRoute
+  AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
   AuthenticatedAdminDemoDataRoute: typeof AuthenticatedAdminDemoDataRoute
   AuthenticatedAdminDisputesRoute: typeof AuthenticatedAdminDisputesRoute
   AuthenticatedAdminIntegrationsRoute: typeof AuthenticatedAdminIntegrationsRoute
@@ -947,6 +968,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminSectionRoute: AuthenticatedAdminSectionRoute,
+  AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
   AuthenticatedAdminDemoDataRoute: AuthenticatedAdminDemoDataRoute,
   AuthenticatedAdminDisputesRoute: AuthenticatedAdminDisputesRoute,
   AuthenticatedAdminIntegrationsRoute: AuthenticatedAdminIntegrationsRoute,
