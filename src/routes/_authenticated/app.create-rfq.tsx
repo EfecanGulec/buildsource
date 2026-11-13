@@ -132,6 +132,10 @@ function CreateRfq() {
       unit: i.unit || catById.get(i.category_id)?.default_unit || null, standard: i.standard || null, waste_pct: i.waste_pct, sort_order: n + 1, buyer_confirmed: i.confirmed, ai_confidence: i.confidence,
     })));
     if (e2) { setSaving(false); toast.error(e2.message); return; }
+    if (delivery.contact.trim() || delivery.phone.trim()) {
+      const { error: ec } = await supabase.from("rfq_site_contacts").insert({ rfq_id: rfq.id, name: delivery.contact.trim() || null, phone: delivery.phone.trim() || null });
+      if (ec) { setSaving(false); toast.error(ec.message); return; }
+    }
     // Submitting after items exist lets the database match suppliers on the full item list.
     if (submit) {
       const { error: e3 } = await supabase.from("rfqs").update({ status: "submitted", submitted_at: new Date().toISOString() }).eq("id", rfq.id);
