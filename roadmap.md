@@ -9,5 +9,6 @@
 - [x] Step 9 – Quotes, counter-offers, revisions, 3-round limit, reject (signed-in + magic link)
 - [x] Step 10 – Private chat per supplier thread (contact-info warning, auto-refresh), quote expiry
 - [x] Step 11 – Compare quotes, accept, agreement signed by both via Smart-ID, order + commission
-- [ ] Steps 12–23 – see prompts PDF
+- [x] Step 12 – Checkout (escrow, pay later, 30/70 staged), orders + timeline, supplier status + photos, milestones, accept delivery, disputes + admin resolution, reviews
+- [ ] Steps 13–23 – see prompts PDF
 - [x] Step 4 – Trust Score from real platform data

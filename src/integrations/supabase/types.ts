@@ -1676,16 +1676,67 @@ export type Database = {
         }
         Returns: undefined
       }
+      _notify_order: {
+        Args: {
+          _body: string
+          _order: string
+          _title: string
+          _to_buyer: boolean
+        }
+        Returns: undefined
+      }
       _open_agreement: { Args: { _quote: string }; Returns: string }
+      _order_event: {
+        Args: {
+          _note: string
+          _order: string
+          _photos?: string[]
+          _status: Database["public"]["Enums"]["order_status"]
+        }
+        Returns: undefined
+      }
       _supplier_offer: {
         Args: { _offer: Json; _profile: string; _rec: string }
         Returns: string
       }
+      admin_resolve_dispute: {
+        Args: {
+          _dispute: string
+          _note: string
+          _outcome: Database["public"]["Enums"]["dispute_status"]
+          _refund: number
+        }
+        Returns: undefined
+      }
       admin_simulate_48h: { Args: never; Returns: Json }
+      buyer_accept_delivery: { Args: { _order: string }; Returns: undefined }
       buyer_accept_quote: { Args: { _quote: string }; Returns: string }
+      buyer_approve_milestone: {
+        Args: { _milestone: string }
+        Returns: undefined
+      }
       buyer_counter_quote: {
         Args: { _offer: Json; _quote: string }
         Returns: number
+      }
+      buyer_open_dispute: {
+        Args: {
+          _description: string
+          _held: number
+          _order: string
+          _photos?: string[]
+          _reason: string
+        }
+        Returns: string
+      }
+      buyer_pay_balance: { Args: { _order: string }; Returns: undefined }
+      buyer_pay_order: {
+        Args: {
+          _method: Database["public"]["Enums"]["payment_method"]
+          _order: string
+          _term_days?: number
+        }
+        Returns: undefined
       }
       buyer_reject_quote: {
         Args: { _quote: string; _reason: string }
@@ -1776,6 +1827,10 @@ export type Database = {
         Returns: string
       }
       supplier_accept_counter: { Args: { _rfq: string }; Returns: string }
+      supplier_add_milestone: {
+        Args: { _name: string; _order: string; _photos?: string[] }
+        Returns: undefined
+      }
       supplier_decline_rfq: {
         Args: {
           _message: string
@@ -1788,6 +1843,15 @@ export type Database = {
       supplier_send_quote: {
         Args: { _offer: Json; _rfq: string }
         Returns: string
+      }
+      supplier_update_order: {
+        Args: {
+          _note: string
+          _order: string
+          _photos?: string[]
+          _status: Database["public"]["Enums"]["order_status"]
+        }
+        Returns: undefined
       }
       supplier_view_rfq: { Args: { _rfq: string }; Returns: undefined }
     }

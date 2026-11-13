@@ -29,4 +29,13 @@ export const RFQ_STATUS_TONE: Record<string, string> = {
   negotiating: "bg-primary/15 text-primary",
   closed: "bg-primary text-primary-foreground",
   cancelled: "bg-destructive/15 text-destructive",
+  awaiting_payment: "bg-warning/20 text-foreground",
+  paid_escrow: "bg-accent text-accent-foreground",
+  processing: "bg-primary/15 text-primary",
+  shipped: "bg-primary/15 text-primary",
+  in_transit: "bg-primary/15 text-primary",
+  delivered: "bg-primary/15 text-primary",
+  accepted: "bg-primary text-primary-foreground",
+  completed: "bg-primary text-primary-foreground",
+  disputed: "bg-destructive/15 text-destructive",
 };
