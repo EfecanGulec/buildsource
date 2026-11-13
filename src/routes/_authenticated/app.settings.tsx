@@ -41,7 +41,7 @@ function Settings() {
     setD({ ...emptyDeliveryDetails, ...(m.default_delivery ?? {}) });
   }, [q.data]);
 
-  async function run(fn: () => Promise<{ error: { message: string } | null }>) {
+  async function run(fn: () => PromiseLike<{ error: { message: string } | null }>) {
     setBusy(true);
     const { error } = await fn();
     setBusy(false);
@@ -53,8 +53,8 @@ function Settings() {
     if (!r.error) setLang(p.language as Lang);
     return r;
   });
-  const saveCompany = () => run(() => supabase.rpc("save_my_company", { _name: c.name, _company_code: c.company_code, _city: c.city, _country: c.country, _buyer_segment: (c.buyer_segment || null) as never }).then((r) => r));
-  const saveDelivery = () => run(() => supabase.rpc("save_my_default_delivery", { _details: d }).then((r) => r));
+  const saveCompany = () => run(() => supabase.rpc("save_my_company", { _name: c.name, _company_code: c.company_code, _city: c.city, _country: c.country, _buyer_segment: (c.buyer_segment || null) as never }));
+  const saveDelivery = () => run(() => supabase.rpc("save_my_default_delivery", { _details: d }));
 
   if (q.isPending || q.isError) return <QueryState isLoading={q.isPending} error={q.error} onRetry={() => q.refetch()} />;
   const field = (label: TKey, value: string, on: (v: string) => void, opts: { id: string; type?: string; disabled?: boolean; wide?: boolean }) => (
