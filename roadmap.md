@@ -13,5 +13,7 @@
 - [x] Step 13 – Group Buy (pools, tiers, join/leave, close, 24 h confirm, keep-tier, auto-RFQ, admin close)
 - [ ] Pool deadlines close automatically — blocked: no scheduler on the backend yet (admin "Close pool now" works); revisit in Step 16 (pg_cron)
 - [x] Step 14 – Price Index (5-sample rule, chart per category + region) and buyer/supplier dashboards
-- [ ] Steps 15–23 – see prompts PDF
+- [x] Step 15 – Demo polish: café starts outside the pool, supplier Earnings / My quotes / Agreements pages, Lithuanian labels, mobile magic link check
+- [ ] Driver page mobile check — waits on Step 17 (driver page not built yet)
+- [ ] Steps 16–23 – see prompts PDF
 - [x] Step 4 – Trust Score from real platform data
