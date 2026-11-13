@@ -119,9 +119,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 // Runs before any app code, so it also catches the case where the main page files themselves
 // are stale (after an update or preview restart) and the app never starts. Shares the retry state
-// key and limits (3 reloads per minute, growing delay) with src/lib/chunk-recovery.ts.
+// key and limits (3 quick reloads, then 3 more 10 s apart, per 2 minutes) with src/lib/chunk-recovery.ts.
 const EARLY_RECOVERY = `(function(){var K="bs-chunk-reload",P=/importing a module script failed|failed to fetch dynamically imported module|error loading dynamically imported module/i;
-function r(){if(window.__bsR)return;var n=Date.now(),st=null;try{st=JSON.parse(sessionStorage.getItem(K)||"null")}catch(e){}if(!st||n-st.first>60000)st={first:n,count:0};if(st.count>=3)return;var d=st.count*800;st.count++;try{sessionStorage.setItem(K,JSON.stringify(st))}catch(e){}window.__bsR=1;setTimeout(function(){location.reload()},d)}
+function r(){if(window.__bsR)return;var n=Date.now(),st=null;try{st=JSON.parse(sessionStorage.getItem(K)||"null")}catch(e){}if(!st||n-st.first>120000)st={first:n,count:0};if(st.count>=6)return;var d=st.count<3?st.count*800:10000;st.count++;try{sessionStorage.setItem(K,JSON.stringify(st))}catch(e){}window.__bsR=1;setTimeout(function(){location.reload()},d)}
 addEventListener("error",function(e){var t=e.target;if(t&&t.tagName==="SCRIPT"&&t.type==="module"){r();return}if(P.test(String(e.message||"")))r()},true);
 addEventListener("unhandledrejection",function(e){var m=e.reason&&e.reason.message||String(e.reason||"");if(P.test(m))r()});})();`;
 

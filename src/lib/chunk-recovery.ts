@@ -4,8 +4,10 @@
 const KEY = "bs-chunk-reload";
 // A preview restart can take a few seconds, so one reload may land mid-restart and fail again.
 // Allow a few reloads, each waiting a little longer, then stop so a real outage cannot loop.
-const WINDOW_MS = 60_000;
-const MAX_RELOADS = 3;
+const WINDOW_MS = 120_000;
+const FAST_RELOADS = 3;
+const MAX_RELOADS = 6;
+const SLOW_MS = 10_000; // a long preview restart outlasts the fast retries; wait it out
 const STEP_MS = 800;
 
 export type ReloadState = { first: number; count: number } | null;
@@ -14,7 +16,7 @@ export type ReloadState = { first: number; count: number } | null;
 export function nextReload(state: ReloadState, now: number): { state: { first: number; count: number }; delay: number } | null {
   if (!state || now - state.first > WINDOW_MS) return { state: { first: now, count: 1 }, delay: 0 };
   if (state.count >= MAX_RELOADS) return null;
-  return { state: { first: state.first, count: state.count + 1 }, delay: state.count * STEP_MS };
+  return { state: { first: state.first, count: state.count + 1 }, delay: state.count < FAST_RELOADS ? state.count * STEP_MS : SLOW_MS };
 }
 
 const PATTERNS = [
