@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nextActions, offerTotals } from "./quote";
+import { compareLabels, nextActions, offerTotals } from "./quote";
 
 describe("offerTotals", () => {
   it("adds line totals and delivery", () => {
@@ -28,5 +28,21 @@ describe("nextActions", () => {
   it("closed quotes allow nothing", () => {
     const a = nextActions({ status: "rejected", lastParty: "supplier", roundCount: 1, roundLimit: 3 });
     expect(a.buyerCounter || a.buyerReject || a.supplierRevise).toBe(false);
+  });
+});
+
+describe("accept", () => {
+  it("buyer accepts only a supplier version", () => {
+    expect(nextActions({ status: "sent", lastParty: "supplier", roundCount: 3, roundLimit: 3 }).buyerAccept).toBe(true);
+    expect(nextActions({ status: "negotiating", lastParty: "buyer", roundCount: 1, roundLimit: 3 }).buyerAccept).toBe(false);
+  });
+  it("supplier accepts only a buyer counter", () => {
+    expect(nextActions({ status: "negotiating", lastParty: "buyer", roundCount: 1, roundLimit: 3 }).supplierAcceptCounter).toBe(true);
+  });
+});
+describe("compareLabels", () => {
+  it("marks lowest total and shortest lead time", () => {
+    expect(compareLabels([{ id: "a", total: 5000, leadDays: 10 }, { id: "b", total: 4800, leadDays: 14 }, { id: "c", total: 5200, leadDays: null }]))
+      .toEqual({ best: "b", fastest: "a" });
   });
 });

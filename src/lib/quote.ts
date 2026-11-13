@@ -18,8 +18,18 @@ export function nextActions(s: ThreadState) {
   return {
     buyerCounter: buyerTurn && s.roundCount < s.roundLimit,
     buyerReject: open,
+    buyerAccept: buyerTurn,
+    supplierAcceptCounter: supplierTurn,
     roundLimitReached: buyerTurn && s.roundCount >= s.roundLimit,
     supplierRevise: supplierTurn,
     supplierReject: supplierTurn,
   };
+}
+
+/** Labels for the comparison page: lowest total = best value, shortest lead time = fastest. */
+export function compareLabels(rows: { id: string; total: number; leadDays: number | null }[]) {
+  const best = rows.length ? rows.reduce((a, b) => (b.total < a.total ? b : a)).id : null;
+  const withLead = rows.filter((r) => r.leadDays != null);
+  const fastest = withLead.length ? withLead.reduce((a, b) => (b.leadDays! < a.leadDays! ? b : a)).id : null;
+  return { best, fastest };
 }
