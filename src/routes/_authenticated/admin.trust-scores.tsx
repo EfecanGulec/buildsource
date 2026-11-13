@@ -51,7 +51,7 @@ function TrustScores() {
       <p className="text-muted-foreground">{t("trust.intro")}</p>
       <section className="rounded-lg border bg-card p-6">
         <h2 className="font-display text-lg font-semibold mb-3">{t("trust.suppliers")}</h2>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto"><table className="w-full text-sm">
           <thead className="text-left text-muted-foreground"><tr>
             <th className="py-2">{t("trust.company")}</th><th>{t("trust.score")}</th>
             <th>{t("trust.src.public")}</th><th>{t("trust.src.platform")}</th><th>{t("trust.orders")}</th>
@@ -70,11 +70,11 @@ function TrustScores() {
               );
             })}
           </tbody>
-        </table>
+        </table></div>
       </section>
       <section className="rounded-lg border bg-card p-6">
         <h2 className="font-display text-lg font-semibold mb-3">{t("trust.buyers")}</h2>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto"><table className="w-full text-sm">
           <thead className="text-left text-muted-foreground"><tr>
             <th className="py-2">{t("trust.company")}</th><th>{t("trust.score")}</th><th>{t("trust.orders")}</th><th>{t("trust.noShows")}</th><th>{t("trust.late")}</th>
           </tr></thead>
@@ -86,7 +86,7 @@ function TrustScores() {
                 <td className="tabular-nums">{r?.late_confirmations ?? 0}</td>
               </tr>); })}
           </tbody>
-        </table>
+        </table></div>
       </section>
     </div>
   );

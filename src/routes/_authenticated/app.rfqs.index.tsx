@@ -34,7 +34,7 @@ function MyRfqs() {
         {q.data && q.data.length === 0 ? (
           <p className="p-8 text-center text-muted-foreground">{t("rfq.none")}</p>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-sm">
             <thead className="text-left text-muted-foreground"><tr className="[&>th]:px-4 [&>th]:py-3">
               <th>{t("rfq.number")}</th><th>{t("rfq.title")}</th><th>{t("rfq.city")}</th><th>{t("rfq.week")}</th>
               <th className="text-right">{t("rfq.items")}</th><th className="text-right">{t("rfq.quotes")}</th><th>{t("rfq.status")}</th>
@@ -51,7 +51,7 @@ function MyRfqs() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
     </div>

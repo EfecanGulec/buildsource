@@ -137,7 +137,7 @@ function SupplierRfq() {
       <div className="rounded-lg border bg-card p-6 space-y-4 text-sm">
         {rfq.description && <p>{rfq.description}</p>}
         <p className="text-muted-foreground">{t("rfq.address")}: {rfq.delivery_address ?? "—"} · {t("rfq.date")}: {rfq.delivery_date_requested ?? "—"}</p>
-        <table className="w-full">
+        <div className="overflow-x-auto"><table className="w-full">
           <thead className="text-left text-muted-foreground"><tr><th className="py-1">{t("rfq.category")}</th><th>{t("rfq.itemDescription")}</th><th>{t("rfq.standard")}</th><th className="text-right">{t("rfq.quantity")}</th></tr></thead>
           <tbody>{items.map((it) => (
             <tr key={it.id} className="border-t align-top"><td className="py-2">{it.categories?.name_en}</td>
@@ -145,7 +145,7 @@ function SupplierRfq() {
               <td>{it.standard ?? ""}</td>
               <td className="text-right tabular-nums">{Number(it.quantity)} {it.unit}{Number(it.waste_pct) > 0 && <span className="text-muted-foreground"> +{Number(it.waste_pct)}%</span>}</td></tr>))}
           </tbody>
-        </table>
+        </table></div>
       </div>
 
       {canAct && !quoting && (

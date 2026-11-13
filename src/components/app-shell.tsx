@@ -71,15 +71,15 @@ export function AppShell({ area, children }: { area: Area; children: ReactNode }
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <SidebarInset>
-        <header className="glass sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-hairline px-4">
-          <SidebarTrigger />
+      <SidebarInset className="min-w-0">
+        <header className="glass sticky top-0 z-10 flex h-14 min-w-0 items-center gap-2 border-b border-hairline px-3 sm:gap-3 sm:px-4">
+          <SidebarTrigger className="shrink-0" />
           <div className="relative hidden max-w-md flex-1 sm:block">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input placeholder={t("top.search")} className="h-9 pl-9" />
           </div>
-          <div className="ml-auto flex items-center gap-2">
-            <span className="rounded-full border border-warning/50 bg-warning/15 px-2.5 py-0.5 text-xs font-semibold text-foreground">
+          <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+            <span className="hidden rounded-full border border-warning/50 lg:inline bg-warning/15 px-2.5 py-0.5 text-xs font-semibold text-foreground">
               {t("top.demo")}
             </span>
             {(area === "app" || area === "supplier") && <LensButton variant="outline" label />}
@@ -104,7 +104,7 @@ export function AppShell({ area, children }: { area: Area; children: ReactNode }
             </DropdownMenu>
           </div>
         </header>
-        <main className="flex-1 p-6 md:p-8">{children}</main>
+        <main className="min-w-0 flex-1 px-4 py-5 sm:p-6 md:p-8">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

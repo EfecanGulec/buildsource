@@ -333,3 +333,7 @@
   font-weight: 600;
   color: var(--color-muted-foreground);
 }
+
+/* Responsive safety: long words/IDs wrap instead of pushing the page wider */
+main :where(h1, h2, h3, p, dd) { overflow-wrap: anywhere; }
+main :where(h1) { font-size: clamp(1.5rem, 1.1rem + 2vw, 1.875rem); }

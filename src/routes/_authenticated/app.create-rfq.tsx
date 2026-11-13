@@ -313,14 +313,14 @@ function CreateRfq() {
               <div><dt className="text-muted-foreground">{t("rfq.step.delivery")}</dt><dd>{delivery.city}{delivery.address && `, ${delivery.address}`}</dd></div>
               <div><dt className="text-muted-foreground">{t("rfq.date")}</dt><dd>{delivery.date} ({delivery.date && isoWeek(delivery.date)})</dd></div>
             </dl>
-            <table className="w-full">
+            <div className="overflow-x-auto"><table className="w-full">
               <thead className="text-left text-muted-foreground"><tr><th className="py-1">{t("rfq.category")}</th><th>{t("rfq.itemDescription")}</th><th className="text-right">{t("rfq.quantity")}</th></tr></thead>
               <tbody>{items.map((it, i) => (
                 <tr key={i} className="border-t align-top"><td className="py-2">{catById.get(it.category_id)?.name_en}</td>
                   <td>{it.description}<div className="text-xs text-muted-foreground">{specsSummary(it.specs)}</div></td>
                   <td className="text-right tabular-nums">{it.quantity} {it.unit}</td></tr>))}
               </tbody>
-            </table>
+            </table></div>
             <MatchingPools categoryIds={items.map((i) => i.category_id).filter(Boolean)} />
           </div>
         )}
