@@ -22,7 +22,7 @@ describe("catalogue import", () => {
   });
   it("reads comma decimal prices and rejects rows without name", () => {
     const { products, errors } = applyMapping([{ sku: "1", name: "A", price: "4,10" }, { sku: "2", name: "", price: "1" }], { external_id: "sku", name: "name", list_price: "price" });
-    expect(products[0].list_price).toBe(4.1);
+    expect(products[0]!.list_price).toBe(4.1);
     expect(errors).toHaveLength(1);
   });
   it("flags products below 0.75 confidence", () => {
@@ -33,7 +33,7 @@ describe("catalogue import", () => {
   });
   it("sample feed imports 100 products and flags some", () => {
     const rows = parseXml(readFileSync("public/samples/demo-feed.xml", "utf8"));
-    const { products } = applyMapping(rows, suggestMapping(Object.keys(rows[0])));
+    const { products } = applyMapping(rows, suggestMapping(Object.keys(rows[0]!)));
     expect(products).toHaveLength(100);
     const flagged = products.filter((p) => guessCategory(p, cats).confidence < 0.75);
     expect(flagged.length).toBeGreaterThan(0);
