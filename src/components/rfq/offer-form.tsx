@@ -17,7 +17,7 @@ export type Offer = {
 };
 
 export function OfferForm({ items, initial, submitLabel, onSubmit, onCancel }: {
-  items: OfferItem[]; initial?: VersionLike | null; submitLabel: string;
+  items: OfferItem[]; initial?: VersionLike | null | undefined; submitLabel: string;
   onSubmit: (o: Offer) => Promise<boolean>; onCancel?: () => void;
 }) {
   const { t } = useI18n();

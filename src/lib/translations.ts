@@ -271,6 +271,7 @@ export const en = {
   "quote.closed": "This quote is closed.",
   "quote.yourQuote": "Your quote",
   "quote.history": "Negotiation",
+  "quote.overview": "Overview",
 } as const;
 
 export type TKey = keyof typeof en;

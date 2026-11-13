@@ -78,7 +78,7 @@ function RfqDetail() {
         <TabsList>
           <TabsTrigger value="suppliers">{t("rfq.tab.suppliers")} ({recipients.length})</TabsTrigger>
           <TabsTrigger value="quotes">{t("rfq.tab.quotes")} ({rfq.quotes.length})</TabsTrigger>
-          <TabsTrigger value="summary">{t("rfq.total")}</TabsTrigger>
+          <TabsTrigger value="summary">{t("quote.overview")}</TabsTrigger>
           <TabsTrigger value="details">{t("rfq.tab.details")}</TabsTrigger>
           <TabsTrigger value="activity">{t("rfq.tab.activity")}</TabsTrigger>
         </TabsList>
